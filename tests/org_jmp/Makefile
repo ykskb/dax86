@@ -1,4 +1,5 @@
-TARGET = mov_jmp.bin
+TARGET = org_jmp.bin
+I386_ELF_GCC = /usr/local/Cellar/i386-elf-gcc/8.2.0/lib/gcc/i386-elf/8.2.0/include
 
 CC = gcc
 LD = ld

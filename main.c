@@ -82,9 +82,14 @@ uint32_t get_code32(Emulator *emu, int index)
     return code;
 }
 
+int32_t get_sign_code32(Emulator *emu, int index)
+{
+    return (int32_t)get_code32(emu, index);
+}
+
 /*
-MOV reg 32bit-imm: 5 bytes
-1 byte: op (0xb8) + reg
+mov reg 32bit-imm: 5 bytes
+1 byte: op (b8) + reg (3bits)
 4 bytes: value (32 bit unsigned)
 */
 void mov_r32_imm32(Emulator *emu)
@@ -96,14 +101,25 @@ void mov_r32_imm32(Emulator *emu)
 }
 
 /*
-JMP (Short): 2 bytes
-1 byte: op
-1 byte: operand (8 bit signed) -127 ~ 127
+jmp (short): 2 bytes
+1 byte: op (eb)
+1 byte: offset from eip (8 bit signed) -127 ~ 127
 */
 void short_jump(Emulator *emu)
 {
     int8_t offset = get_sign_code8(emu, 1);
     emu->eip += (offset + 2);
+}
+
+/*
+jmp (near): 5 bytes
+1 byte: op (e9)
+4 byte: offset from eip (32 bit signed)
+ */
+void near_jump(Emulator *emu)
+{
+    int32_t diff = get_sign_code32(emu, 1);
+    emu->eip += (diff + 5);
 }
 
 typedef void instruction_func_t(Emulator *); // instruction_func_t = void func(Emulator*)
@@ -114,11 +130,14 @@ void init_instructions(void)
 {
     int i;
     memset(instructions, 0, sizeof(instructions));
+
+    // Why 0xB8 ~ 0xBF: op code includes 8 registers in 1 byte.
     for (i = 0; i < 8; i++)
     {
-        instructions[0xB8 + i] = mov_r32_imm32; // Why 0xB8 ~ 0xBF??
+        instructions[0xB8 + i] = mov_r32_imm32;
     }
-    instructions[0xEB] = short_jump; // Why 0xEB?
+    instructions[0xE9] = near_jump;
+    instructions[0xEB] = short_jump;
 }
 
 int main(int argc, char *argv[])
@@ -132,8 +151,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    /* Initial setup: EIP: 0, ESP: 0x7c00 */
-    emu = create_emu(MEMORY_SIZE, 0x0000, 0x7c00);
+    /*
+    Initial setup: EIP: 0x7c00, ESP: 0x7c00
+    BIOS places instructions at 0x7c00.
+    */
+    emu = create_emu(MEMORY_SIZE, 0x7c00, 0x7c00);
 
     binary = fopen(argv[1], "rb"); // rb: read-binary (r: translated mode for "\n")
     if (binary == NULL)
@@ -145,9 +167,10 @@ int main(int argc, char *argv[])
     /* 
     Loads binary into emulator.
     Each index stores 1 byte of binary.
+    Offset beginning by 0x7c00 which is program placement by BIOS.
     0x200 (512) * 1 byte = 512 bytes
     */
-    fread(emu->memory, 1, 0x200, binary); // fread(*ptr, byte, num(of byte to read), *stream)
+    fread(emu->memory + 0x7c00, 1, 0x200, binary); // fread(*ptr, byte, num(of byte to read), *stream)
     fclose(binary);
 
     init_instructions();
