@@ -3,31 +3,14 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "emulator.h"
+#include "instructions.h"
+#include "emulator_functions.h"
+
 /* Memory size: 1MB */
 #define MEMORY_SIZE (1024 * 1024)
 
-enum Register
-{
-    EAX,
-    ECX,
-    EDX,
-    EBX,
-    ESP,
-    EBP,
-    ESI,
-    EDI,
-    REGISTERS_COUNT
-};
-
 char *register_names[] = {"EAX", "ECX", "EDX", "EBX", "ESP", "EBP", "ESI", "EDI"};
-
-typedef struct
-{
-    uint32_t registers[REGISTERS_COUNT];
-    uint32_t eglags;
-    uint8_t *memory;
-    uint32_t eip;
-} Emulator;
 
 static Emulator *create_emu(size_t size, uint32_t eip, uint32_t esp)
 {
@@ -56,88 +39,6 @@ static void dump_registers(Emulator *emu)
         printf("%s: %08x\n", register_names[i], emu->registers[i]); // %08x: prepends 0 to make 8 digits.
     }
     printf("EIP: %08x\n", emu->eip);
-}
-
-/* Retrieves code from memory by offset from EIP. */
-uint32_t get_code8(Emulator *emu, int index)
-{
-    return emu->memory[emu->eip + index];
-}
-
-int32_t get_sign_code8(Emulator *emu, int index)
-{
-    return (int8_t)emu->memory[emu->eip + index];
-}
-
-uint32_t get_code32(Emulator *emu, int index)
-{
-    int i;
-    uint32_t code = 0;
-    /* i386 uses little endian (lower bytes to right). */
-    for (i = 0; i < 4; i++)
-    {
-        /* Shift 8 bits to left per byte read */
-        code |= get_code8(emu, index + i) << (i * 8);
-    }
-    return code;
-}
-
-int32_t get_sign_code32(Emulator *emu, int index)
-{
-    return (int32_t)get_code32(emu, index);
-}
-
-/*
-mov reg 32bit-imm: 5 bytes
-1 byte: op (b8) + reg (3bits)
-4 bytes: value (32 bit unsigned)
-*/
-void mov_r32_imm32(Emulator *emu)
-{
-    uint8_t reg = get_code8(emu, 0) - 0xB8;
-    uint32_t value = get_code32(emu, 1);
-    emu->registers[reg] = value; // does this map to enum Register?
-    emu->eip += 5;
-}
-
-/*
-jmp (short): 2 bytes
-1 byte: op (eb)
-1 byte: offset from eip (8 bit signed) -127 ~ 127
-*/
-void short_jump(Emulator *emu)
-{
-    int8_t offset = get_sign_code8(emu, 1);
-    emu->eip += (offset + 2);
-}
-
-/*
-jmp (near): 5 bytes
-1 byte: op (e9)
-4 byte: offset from eip (32 bit signed)
- */
-void near_jump(Emulator *emu)
-{
-    int32_t diff = get_sign_code32(emu, 1);
-    emu->eip += (diff + 5);
-}
-
-typedef void instruction_func_t(Emulator *); // instruction_func_t = void func(Emulator*)
-
-instruction_func_t *instructions[256];
-
-void init_instructions(void)
-{
-    int i;
-    memset(instructions, 0, sizeof(instructions));
-
-    // Why 0xB8 ~ 0xBF: op code includes 8 registers in 1 byte.
-    for (i = 0; i < 8; i++)
-    {
-        instructions[0xB8 + i] = mov_r32_imm32;
-    }
-    instructions[0xE9] = near_jump;
-    instructions[0xEB] = short_jump;
 }
 
 int main(int argc, char *argv[])
