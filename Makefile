@@ -1,5 +1,5 @@
 TARGET = dax86
-OBJS = main.o emulator_functions.o instructions.o
+OBJS = main.o emulator_functions.o instructions.o modrm.o
 
 CC = /usr/bin/gcc
 CFLAGS += -Wall

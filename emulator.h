@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+/*
+In order of REG of ModR/M
+EAX: 000, ECX: 001 ... EDI: 111
+*/
 enum Register
 {
     EAX,

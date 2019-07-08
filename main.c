@@ -12,10 +12,10 @@
 
 char *register_names[] = {"EAX", "ECX", "EDX", "EBX", "ESP", "EBP", "ESI", "EDI"};
 
-static Emulator *create_emu(size_t size, uint32_t eip, uint32_t esp)
+static Emulator *create_emu(size_t mem_size, uint32_t eip, uint32_t esp)
 {
     Emulator *emu = malloc(sizeof(Emulator));
-    emu->memory = malloc(size);
+    emu->memory = malloc(mem_size);
 
     /* Resets registers. */
     memset(emu->registers, 0, sizeof(emu->registers));
@@ -40,6 +40,19 @@ static void dump_registers(Emulator *emu)
     }
     printf("EIP: %08x\n", emu->eip);
 }
+
+// static void dump_input(Emulator *emu)
+// {
+//     printf("Input:\n");
+//     int i;
+//     for (i = 0; i < MEMORY_SIZE; i++)
+//     {
+//         if (emu->memory[i])
+//         {
+//             printf("%08x\n", emu->memory[i]);
+//         }
+//     }
+// }
 
 int main(int argc, char *argv[])
 {
@@ -74,11 +87,15 @@ int main(int argc, char *argv[])
     fread(emu->memory + 0x7c00, 1, 0x200, binary); // fread(*ptr, byte, num(of byte to read), *stream)
     fclose(binary);
 
+    // dump_input(emu);
+
     init_instructions();
 
     while (emu->eip < MEMORY_SIZE)
     {
         uint8_t op = get_code8(emu, 0);
+        printf("EIP: %X Op: %02X\n", emu->eip, op);
+
         if (instructions[op] == NULL)
         {
             printf("Op: %x not implemented.\n", op); // %x: int as hex
