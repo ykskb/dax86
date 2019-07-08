@@ -6,20 +6,38 @@ Based on the book:
 
 https://book.mynavi.jp/support/bookmook/x86/
 
-I've tweak parts and added comments for note-taking purposes. I intend to extend it with additional features as well.
+I've tweaked parts and added comments for note-taking purposes. I intend to extend it with additional features as well.
 
-Architecture of source binaries is i386. To compile source binaries, the command below should be run:
+##### Build
+
+```
+make
+```
+
+##### Run
+
+```
+./dax86 [binary_file]
+```
+
+##### Test
+
+```
+./test.sh
+```
+
+<!-- Architecture of source binaries is i386. To compile source binaries, the command below should be run:
 
 ```
 brew install i386-elf-gcc
-```
+``` -->
 
-##### Useful Commands to Analyze Test Cases and Others
+##### Commands to Analyze Test Cases and Others
 
 - Disassemble Binary
 
 ```
-ndisasm [bin_file]
+ndisasm [binary_file]
 ```
 
 - View Binary
@@ -29,5 +47,5 @@ ndisasm [bin_file]
 xxd [bin_file]
 
 # bin
-xxd -b [bin_file]
+xxd -b [binary_file]
 ```
