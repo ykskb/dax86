@@ -70,12 +70,29 @@ uint32_t get_memory32(Emulator *emu, uint32_t address)
 
 /* Register Operations */
 
-void set_register32(Emulator *emu, int index, uint32_t value)
+void set_register32(Emulator *emu, int reg_index, uint32_t value)
 {
-    emu->registers[index] = value;
+    emu->registers[reg_index] = value;
 }
 
-uint32_t get_register32(Emulator *emu, int index)
+uint32_t get_register32(Emulator *emu, int reg_index)
 {
-    return emu->registers[index];
+    return emu->registers[reg_index];
+}
+
+void push32(Emulator *emu, uint32_t value)
+{
+    /* New address would be ESP value - 4 bytes.  */
+    uint32_t address = get_register32(emu, ESP) - 4;
+    /* Updates ESP with the new address. */
+    set_register32(emu, ESP, value);
+    set_memory32(emu, address, value);
+}
+
+uint32_t pop32(Emulator *emu)
+{
+    uint32_t address = get_register32(emu, ESP);
+    uint32_t value = get_memory32(emu, address);
+    set_register32(emu, ESP, address + 4);
+    return value;
 }

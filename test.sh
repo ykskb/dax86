@@ -3,8 +3,9 @@
 
 ORG_JMP="tests/org_jmp/org_jmp.bin"
 MODRM="tests/modrm/modrm.bin"
+CALL="tests/call/call.bin"
 
-for i in $ORG_JMP $MODRM
+for i in $ORG_JMP $MODRM $CALL
 do
 
 echo

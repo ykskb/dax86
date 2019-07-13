@@ -174,6 +174,56 @@ static void code_ff(Emulator *emu)
     }
 }
 
+/*
+ * push r32: 1 bytes
+ * Pushes 32-bit value into memory from specified register.
+ * 1 byte: op (50) + reg
+ */
+static void push_r32(Emulator *emu)
+{
+    u_int8_t reg = get_code8(emu, 0) - 0x50;
+    push32(emu, get_register32(emu, reg));
+    emu->eip += 1;
+}
+
+/*
+ * pop r32: 1 bytes
+ * Pops 32-bit value into specified register from memory.
+ * 1 byte: op (58) + reg
+ */
+static void pop_r32(Emulator *emu)
+{
+    u_int8_t reg = get_code8(emu, 0) - 0x58;
+    set_register32(emu, reg, pop32(emu));
+    emu->eip += 1;
+}
+
+/*
+ * call rel32: 5 bytes
+ * Jumps by 32-bit number relatively from next address.
+ * 1 byte: op (E8)
+ * 4 bytes: relative number to jump.
+ */
+static void call_rel32(Emulator *emu)
+{
+    /* Offset value should be after the op code of 1 byte. */
+    int32_t offset = get_sign_code32(emu, 1);
+    /* Pushes the address after this call instruction. */
+    push32(emu, emu->eip + 5);
+    /* Adds the offset to EIP. */
+    emu->eip += (offset + 5);
+}
+
+/* 
+ * ret: 1 byte
+ * Jumps to the address pushed by call (address after call instruction).
+ * 1 byte: op (C3)
+ */
+static void ret(Emulator *emu)
+{
+    emu->eip = pop32(emu);
+}
+
 instruction_func_t *instructions[256];
 
 void init_instructions(void)
@@ -181,7 +231,18 @@ void init_instructions(void)
     int i;
     memset(instructions, 0, sizeof(instructions));
 
-    // Why 0xB8 ~ 0xBF: op code includes 8 registers in 1 byte.
+    /* Last 3 digits indicates 8 different registers in op code. */
+    for (i = 0; i < 8; i++)
+    {
+        instructions[0x50 + i] = push_r32;
+    }
+
+    for (i = 0; i < 8; i++)
+    {
+        instructions[0x58 + i] = pop_r32;
+    }
+
+    /* Why 0xB8 ~ 0xBF: op code includes 8 registers in 1 byte. */
     for (i = 0; i < 8; i++)
     {
         instructions[0xB8 + i] = mov_r32_imm32;
@@ -194,4 +255,7 @@ void init_instructions(void)
     instructions[0xE9] = near_jump;
     instructions[0xEB] = short_jump;
     instructions[0xFF] = code_ff;
+
+    instructions[0xC3] = ret;
+    instructions[0xE8] = call_rel32;
 }

@@ -27,8 +27,14 @@ uint32_t get_memory32(Emulator *emu, uint32_t address);
 
 /* Register Operations */
 
-void set_register32(Emulator *emu, int index, uint32_t value);
+void set_register32(Emulator *emu, int reg_index, uint32_t value);
 
-uint32_t get_register32(Emulator *emu, int index);
+uint32_t get_register32(Emulator *emu, int reg_index);
+
+/* Stack Operations */
+
+void push32(Emulator *emu, uint32_t value);
+
+uint32_t pop32(Emulator *emu);
 
 #endif
