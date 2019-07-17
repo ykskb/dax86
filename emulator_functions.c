@@ -85,7 +85,7 @@ void push32(Emulator *emu, uint32_t value)
     /* New address would be ESP value - 4 bytes.  */
     uint32_t address = get_register32(emu, ESP) - 4;
     /* Updates ESP with the new address. */
-    set_register32(emu, ESP, value);
+    set_register32(emu, ESP, address);
     set_memory32(emu, address, value);
 }
 

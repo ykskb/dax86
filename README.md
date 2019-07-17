@@ -8,7 +8,23 @@ https://book.mynavi.jp/support/bookmook/x86/
 
 I've tweaked parts and added comments for note-taking purposes. I intend to extend it with additional features as well.
 
-##### Build
+##### Setup Environment using Docker
+
+The base image of Mini Debian Jessie is used.
+
+The command below will build image, run a container with the image and execute shell in interactive mode.
+
+```
+make create-docker
+```
+
+To clean created container and image, run the command below.
+
+```
+make clean-docker
+```
+
+##### Build dax86
 
 ```
 make
@@ -26,18 +42,12 @@ make
 ./test.sh
 ```
 
-<!-- Architecture of source binaries is i386. To compile source binaries, the command below should be run:
-
-```
-brew install i386-elf-gcc
-``` -->
-
 ##### Commands to Analyze Test Cases and Others
 
 - Disassemble Binary
 
 ```
-ndisasm [binary_file]
+ndisasm -b 32 [binary_file]
 ```
 
 - View Binary

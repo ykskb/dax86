@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 #include "instructions.h"
 #include "emulator_functions.h"
@@ -113,6 +114,21 @@ static void add_rm32_r32(Emulator *emu)
 }
 
 /*
+ * add rm32 imm8: 3 bytes
+ * Adds imm8 to RM32. Op code 83 and ModR/M op code: 0 execute this.
+ * 1 byte: shared op (83)
+ * 1 byte: ModR/M
+ * 1 byte: imm8 to add
+ */
+static void add_rm32_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint32_t rm32 = get_rm32(emu, modrm);
+    uint32_t imm8 = (int32_t)get_sign_code8(emu, 0);
+    emu->eip += 1;
+    set_rm32(emu, modrm, rm32 + imm8);
+}
+
+/*
  * sub rm32 imm8: 3 bytes
  * Subtracts imm8 from RM32. Op code 83 and ModR/M op code: 101 execute this.
  * 1 byte: shared op (83)
@@ -135,6 +151,9 @@ static void code_83(Emulator *emu)
 
     switch (modrm.opcode)
     {
+    case 0:
+        add_rm32_imm8(emu, &modrm);
+        break;
     case 5:
         sub_rm32_r32(emu, &modrm);
         break;
@@ -224,6 +243,21 @@ static void ret(Emulator *emu)
     emu->eip = pop32(emu);
 }
 
+/*
+ * leave: 1byte
+ * Set of mov esp & pop ebp.
+ * 1 byte: op (C9)
+ */
+static void leave(Emulator *emu)
+{
+    uint32_t ebp_val = get_register32(emu, EBP);
+    /* Update ESP with EBP value. */
+    set_register32(emu, ESP, ebp_val);
+    /* Pop from stack and set it on EBP. */
+    set_register32(emu, EBP, pop32(emu));
+    emu->eip += 1;
+}
+
 instruction_func_t *instructions[256];
 
 void init_instructions(void)
@@ -258,4 +292,5 @@ void init_instructions(void)
 
     instructions[0xC3] = ret;
     instructions[0xE8] = call_rel32;
+    instructions[0xC9] = leave;
 }

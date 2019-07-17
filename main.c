@@ -104,6 +104,8 @@ int main(int argc, char *argv[])
 
         instructions[op](emu);
 
+        // dump_registers(emu);
+
         if (emu->eip == 0x00)
         {
             printf("End of program :)\n");
