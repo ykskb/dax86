@@ -1,5 +1,5 @@
-TARGET = main_func.bin
-OBJS = crt0.o main_func.o
+TARGET = args.bin
+OBJS = crt0.o args.o
 
 CC = gcc
 LD = ld

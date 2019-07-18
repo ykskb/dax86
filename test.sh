@@ -5,8 +5,9 @@ ORG_JMP="tests/org_jmp/org_jmp.bin"
 MODRM="tests/modrm/modrm.bin"
 CALL="tests/call/call.bin"
 MAIN_FUNC="tests/main_func/main_func.bin"
+ARGS="tests/args/args.bin"
 
-for i in $ORG_JMP $MODRM $CALL $MAIN_FUNC
+for i in $ORG_JMP $MODRM $CALL $MAIN_FUNC $ARGS
 do
 
 echo

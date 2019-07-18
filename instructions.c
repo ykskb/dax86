@@ -195,7 +195,7 @@ static void code_ff(Emulator *emu)
 
 /*
  * push r32: 1 bytes
- * Pushes 32-bit value into memory from specified register.
+ * Pushes 32-bit value into memory stack from specified register.
  * 1 byte: op (50) + reg
  */
 static void push_r32(Emulator *emu)
@@ -203,6 +203,32 @@ static void push_r32(Emulator *emu)
     u_int8_t reg = get_code8(emu, 0) - 0x50;
     push32(emu, get_register32(emu, reg));
     emu->eip += 1;
+}
+
+/*
+ * push imm32: 5 bytes
+ * Pushes 32-bit immediate value into stack.
+ * 1 byte: op (68)
+ * 4 bytes: immediate 32-bit value
+ */
+static void push_imm32(Emulator *emu)
+{
+    uint32_t value = get_code32(emu, 1);
+    push32(emu, value);
+    emu->eip += 5;
+}
+
+/*
+ * push imm8: 2 bytes
+ * Pushes 8-bit immediate value into stack.
+ * 1 byte: op (6A)
+ * 1 byte: immediate 8-bit value
+ */
+static void push_imm8(Emulator *emu)
+{
+    uint32_t value = get_code8(emu, 1);
+    push32(emu, value);
+    emu->eip += 2;
 }
 
 /*
@@ -275,6 +301,9 @@ void init_instructions(void)
     {
         instructions[0x58 + i] = pop_r32;
     }
+
+    instructions[0x68] = push_imm32;
+    instructions[0x6A] = push_imm8;
 
     /* Why 0xB8 ~ 0xBF: op code includes 8 registers in 1 byte. */
     for (i = 0; i < 8; i++)
