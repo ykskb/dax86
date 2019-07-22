@@ -6,7 +6,7 @@
 #include "emulator_functions.h"
 #include "modrm.h"
 
-void parse_moderm(Emulator *emu, ModRM *modrm)
+void parse_modrm(Emulator *emu, ModRM *modrm)
 {
     uint8_t code;
 

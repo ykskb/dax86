@@ -25,7 +25,7 @@ typedef struct
  * Parses ModR/M, SIB and Displacement.
  * EIP of Emulator needs to be pointing ModR/M Byte.
  */
-void parse_moderm(Emulator *emu, ModRM *modrm);
+void parse_modrm(Emulator *emu, ModRM *modrm);
 
 /* Sets value to register or memory depending on Mod of ModR/M byte. */
 void set_rm32(Emulator *emu, ModRM *modrm, uint32_t value);

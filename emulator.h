@@ -23,7 +23,7 @@ enum Register
 typedef struct
 {
     uint32_t registers[REGISTERS_COUNT];
-    uint32_t eglags;
+    uint32_t eflags;
     uint8_t *memory;
     uint32_t eip;
 } Emulator;

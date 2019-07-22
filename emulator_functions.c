@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#include "emulator.h"
+#include "emulator_functions.h"
 
 /* Source Instruction Operations */
 
@@ -95,4 +95,96 @@ uint32_t pop32(Emulator *emu)
     uint32_t value = get_memory32(emu, address);
     set_register32(emu, ESP, address + 4);
     return value;
+}
+
+/* Eflag Operations */
+
+void set_carry_flag(Emulator *emu, int is_carry)
+{
+    /* Higher 32 bits are pass as int */
+    if (is_carry)
+    {
+        emu->eflags |= CARRY_FLAG;
+    }
+    else
+    {
+        /* Deflag: AND ~(NOT): NOT 0001 = 1110 AND 1001 -> 1000 */
+        emu->eflags &= ~CARRY_FLAG;
+    }
+}
+
+void set_zero_flag(Emulator *emu, int is_zero)
+{
+    if (is_zero)
+    {
+        emu->eflags |= ZERO_FLAG;
+    }
+    else
+    {
+        emu->eflags &= ~ZERO_FLAG;
+    }
+}
+
+void set_sign_flag(Emulator *emu, int is_sign)
+{
+    if (is_sign)
+    {
+        emu->eflags |= SIGN_FLAG;
+    }
+    else
+    {
+        emu->eflags &= ~SIGN_FLAG;
+    }
+}
+
+void set_overflow_flag(Emulator *emu, int is_overflow)
+{
+    if (is_overflow)
+    {
+        emu->eflags |= OVERFLOW_FLAG;
+    }
+    else
+    {
+        emu->eflags &= ~OVERFLOW_FLAG;
+    }
+}
+
+int32_t is_carry(Emulator *emu)
+{
+    return (emu->eflags & CARRY_FLAG) != 0;
+}
+
+int32_t is_zero(Emulator *emu)
+{
+    return (emu->eflags & ZERO_FLAG) != 0;
+}
+
+int32_t is_sign(Emulator *emu)
+{
+    return (emu->eflags & SIGN_FLAG) != 0;
+}
+
+int32_t is_overflow(Emulator *emu)
+{
+    return (emu->eflags & OVERFLOW_FLAG) != 0;
+}
+
+/* 
+ * Overflow might happen only when 2 values have different signs in subtraction.
+ * AND overflow changes the sign of value 1 in result. Ex: 4 bit case:
+ * 1000 (-8) - 0001 (1) = 10111 (-9)
+ * 1000 (-8) - 0010 (2) = 10110 (-10)
+ * 0111 (7) - 1111 (-1) = 1000
+ */
+void update_eflags_sub(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t result)
+{
+    /* sign bits */
+    int sign1 = value1 >> 31;
+    int sign2 = value2 >> 31;
+    int signr = (result >> 31) & 1;
+
+    set_carry_flag(emu, result >> 32); // higher 32 bits
+    set_zero_flag(emu, result == 0);
+    set_sign_flag(emu, signr);
+    set_overflow_flag(emu, sign1 != sign2 && sign1 != signr);
 }

@@ -57,7 +57,7 @@ static void mov_rm32_imm32(Emulator *emu)
 {
     emu->eip += 1;
     ModRM modrm;
-    parse_moderm(emu, &modrm);
+    parse_modrm(emu, &modrm);
     uint32_t value = get_code32(emu, 0);
     emu->eip += 4;
     set_rm32(emu, &modrm, value);
@@ -73,7 +73,7 @@ static void mov_rm32_r32(Emulator *emu)
 {
     emu->eip += 1;
     ModRM modrm;
-    parse_moderm(emu, &modrm);
+    parse_modrm(emu, &modrm);
     /* Reads value from register specified by REG bits. */
     uint32_t r32 = get_r32(emu, &modrm);
     /* Sets value on memory/register specified by ModR/M. */
@@ -90,7 +90,7 @@ static void mov_r32_rm32(Emulator *emu)
 {
     emu->eip += 1;
     ModRM modrm;
-    parse_moderm(emu, &modrm);
+    parse_modrm(emu, &modrm);
     /* Reads value from memory/register specified by ModR/M. */
     uint32_t rm32 = get_rm32(emu, &modrm);
     /* Sets value on register specified by REG bits. */
@@ -107,7 +107,7 @@ static void add_rm32_r32(Emulator *emu)
 {
     emu->eip += 1;
     ModRM modrm;
-    parse_moderm(emu, &modrm);
+    parse_modrm(emu, &modrm);
     uint32_t r32 = get_r32(emu, &modrm);
     uint32_t rm32 = get_rm32(emu, &modrm);
     set_rm32(emu, &modrm, r32 + rm32);
@@ -135,19 +135,58 @@ static void add_rm32_imm8(Emulator *emu, ModRM *modrm)
  * 1 byte: ModR/M
  * 1 byte: imm8 to subtract
  */
-static void sub_rm32_r32(Emulator *emu, ModRM *modrm)
+static void sub_rm32_imm8(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);
     uint32_t imm8 = (int32_t)get_sign_code8(emu, 0);
     emu->eip += 1;
-    set_rm32(emu, modrm, rm32 - imm8);
+    uint64_t result = (uint64_t)rm32 - (uint64_t)imm8;
+
+    set_rm32(emu, modrm, result);
+    update_eflags_sub(emu, rm32, imm8, result);
+}
+
+/*
+ * cmp rm32 imm8: 3 bytes
+ * Compares RM32 value and imm8 value by subtracting in order.
+ * Op code 83 and ModR/M op code: 111 execute this.
+ * 1 byte: shared op (83)
+ * 1 byte: ModR/M
+ * 1 byte: imm8 to subtract
+ */
+static void cmp_rm32_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint32_t rm32 = get_rm32(emu, modrm);
+    uint32_t imm8 = (int32_t)get_sign_code8(emu, 0);
+    emu->eip += 1;
+    uint64_t result = (uint64_t)rm32 - (uint64_t)imm8;
+
+    update_eflags_sub(emu, rm32, imm8, result);
+}
+
+/*
+ * cmp r32 rm32: 2 bytes
+ * Compares register 32-bit value and RM32 value by subtracting in order.
+ * 1 byte: op (3B)
+ * 1 byte: ModR/M
+ */
+static void cmp_r32_rm32(Emulator *emu)
+{
+    emu->eip += 1; // op code
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t r32 = get_r32(emu, &modrm);
+    uint32_t rm32 = get_rm32(emu, &modrm);
+    uint64_t result = (uint64_t)r32 - (uint64_t)rm32;
+    update_eflags_sub(emu, r32, rm32, result);
 }
 
 static void code_83(Emulator *emu)
 {
+    /* Proceed 1 byte for op code 83. */
     emu->eip += 1;
     ModRM modrm;
-    parse_moderm(emu, &modrm);
+    parse_modrm(emu, &modrm);
 
     switch (modrm.opcode)
     {
@@ -155,9 +194,11 @@ static void code_83(Emulator *emu)
         add_rm32_imm8(emu, &modrm);
         break;
     case 5:
-        sub_rm32_r32(emu, &modrm);
+        sub_rm32_imm8(emu, &modrm);
         break;
-
+    case 7:
+        cmp_rm32_imm8(emu, &modrm);
+        break;
     default:
         printf("Not implemented: Op: 83 with ModR/M Op: %d\n", modrm.opcode);
         exit(1);
@@ -179,7 +220,7 @@ static void code_ff(Emulator *emu)
 {
     emu->eip += 1;
     ModRM modrm;
-    parse_moderm(emu, &modrm);
+    parse_modrm(emu, &modrm);
 
     switch (modrm.opcode)
     {
@@ -284,12 +325,63 @@ static void leave(Emulator *emu)
     emu->eip += 1;
 }
 
+/*
+ * Macro for jump with eflag.
+ * Replaces the matching text and ## concatenates strings.
+ * Defined until unescaped line break.
+ */
+#define DEFINE_JX(flag, is_flag)                              \
+    static void j##flag(Emulator *emu)                        \
+    {                                                         \
+        int diff = is_flag(emu) ? get_sign_code8(emu, 1) : 0; \
+        emu->eip += (diff + 2);                               \
+    }                                                         \
+    static void jn##flag(Emulator *emu)                       \
+    {                                                         \
+        int diff = is_flag(emu) ? 0 : get_sign_code8(emu, 1); \
+        emu->eip += (diff + 2);                               \
+    }
+
+/*
+ * jc (72), jnc (73), jz (74), jnz (75), js (78), jns (79), jo (70), jno (71): 2 bytes
+ * 1 byte: op code
+ * 1 byte: offset to jump
+ */
+DEFINE_JX(c, is_carry)
+DEFINE_JX(z, is_zero)
+DEFINE_JX(s, is_sign)
+DEFINE_JX(o, is_overflow)
+
+#undef DEFINE_JX
+
+/*
+ * jl (7C) and jle (7E)
+ * Assuming there's no overflow, which means overflow_flag == 0,
+ * if sign_flag is 0, left is bigger. Ex:
+ * 3, 2: 3 - 2 = 1 => sign_flag: 0 => larger
+ * -3, 2: -3 - (2) = -5 => sign_flag: 1 => smaller
+ * -1, -4: -1 - (-4) = 3 => sign_flag: 0 => larger
+ */
+static void jl(Emulator *emu)
+{
+    int diff = (is_sign(emu) != is_overflow(emu)) ? get_sign_code8(emu, 1) : 0;
+    emu->eip += (diff + 2);
+}
+
+static void jle(Emulator *emu)
+{
+    int diff = (is_zero(emu) || (is_sign(emu) != is_overflow(emu))) ? get_sign_code8(emu, 1) : 0;
+    emu->eip += (diff + 2);
+}
+
 instruction_func_t *instructions[256];
 
 void init_instructions(void)
 {
     int i;
     memset(instructions, 0, sizeof(instructions));
+
+    instructions[0x3B] = cmp_r32_rm32;
 
     /* Last 3 digits indicates 8 different registers in op code. */
     for (i = 0; i < 8; i++)
@@ -304,6 +396,17 @@ void init_instructions(void)
 
     instructions[0x68] = push_imm32;
     instructions[0x6A] = push_imm8;
+
+    instructions[0x70] = jo;
+    instructions[0x71] = jno;
+    instructions[0x72] = jc;
+    instructions[0x73] = jnc;
+    instructions[0x74] = jz;
+    instructions[0x75] = jnz;
+    instructions[0x78] = js;
+    instructions[0x79] = jns;
+    instructions[0x7C] = jl;
+    instructions[0x7E] = jle;
 
     /* Why 0xB8 ~ 0xBF: op code includes 8 registers in 1 byte. */
     for (i = 0; i < 8; i++)
