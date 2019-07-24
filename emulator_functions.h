@@ -33,6 +33,10 @@ uint32_t get_memory32(Emulator *emu, uint32_t address);
 
 /* Register Operations */
 
+void set_register8(Emulator *emu, int index, uint8_t value);
+
+uint8_t get_register8(Emulator *emu, int index);
+
 void set_register32(Emulator *emu, int reg_index, uint32_t value);
 
 uint32_t get_register32(Emulator *emu, int reg_index);

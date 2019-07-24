@@ -70,6 +70,33 @@ uint32_t get_memory32(Emulator *emu, uint32_t address)
 
 /* Register Operations */
 
+void set_register8(Emulator *emu, int index, uint8_t value)
+{
+    if (index < 4)
+    {
+        uint32_t r = emu->registers[index] & 0xffffff00;
+        emu->registers[index] = r | (uint32_t)value;
+    }
+    else
+    {
+        uint32_t r = emu->registers[index - 4] & 0xffff00ff;
+        emu->registers[index - 4] = r | ((int32_t)value << 8);
+    }
+}
+
+uint8_t get_register8(Emulator *emu, int index)
+{
+    if (index < 4)
+    {
+        return emu->registers[index] & 0xff;
+    }
+    else
+    {
+        /* AH - DH: Offset 8 bit higher. */
+        return (emu->registers[index - 4] >> 8) & 0xff;
+    }
+}
+
 void set_register32(Emulator *emu, int reg_index, uint32_t value)
 {
     emu->registers[reg_index] = value;
@@ -79,6 +106,8 @@ uint32_t get_register32(Emulator *emu, int reg_index)
 {
     return emu->registers[reg_index];
 }
+
+/* Stack Operations */
 
 void push32(Emulator *emu, uint32_t value)
 {

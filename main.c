@@ -54,10 +54,43 @@ static void dump_registers(Emulator *emu)
 //     }
 // }
 
+int remove_arg_at(int argc, char *argv[], int index)
+{
+    if (index < 0 || argc <= index)
+    {
+        return argc;
+    }
+    else
+    {
+        int i = index;
+        for (; i < argc - 1; i++)
+        {
+            argv[i] = argv[i + 1];
+        }
+        argv[i] == NULL; // last element
+        return argc - 1;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     FILE *binary; // FILE: pointer to stream
     Emulator *emu;
+    int i;
+    int quiet = 0;
+
+    while (i < argc)
+    {
+        if (strcmp(argv[i], "-q") == 0)
+        {
+            quiet = 1;
+            argc = remove_arg_at(argc, argv, i);
+        }
+        else
+        {
+            i++;
+        }
+    }
 
     if (argc != 2)
     {
@@ -94,7 +127,10 @@ int main(int argc, char *argv[])
     while (emu->eip < MEMORY_SIZE)
     {
         uint8_t op = get_code8(emu, 0);
-        printf("EIP: %X Op: %02X\n", emu->eip, op);
+        if (!quiet)
+        {
+            printf("EIP: %X Op: %02X\n", emu->eip, op);
+        }
 
         if (instructions[op] == NULL)
         {
@@ -108,12 +144,18 @@ int main(int argc, char *argv[])
 
         if (emu->eip == 0x00)
         {
-            printf("End of program :)\n");
+            if (!quiet)
+            {
+                printf("End of program :)\n");
+            }
             break;
         }
     }
 
-    dump_registers(emu);
+    if (!quiet)
+    {
+        dump_registers(emu);
+    }
     destroy_emu(emu);
     return 0;
 }

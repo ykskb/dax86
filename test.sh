@@ -8,8 +8,13 @@ MAIN_FUNC="tests/main_func/main_func.bin"
 ARGS="tests/args/args.bin"
 IF_TEST="tests/if/if.bin"
 LOOP_TEST="tests/loop/loop.bin"
+OUT_TEST="tests/io/out.bin"
 
-for i in $ORG_JMP $MODRM $CALL $MAIN_FUNC $ARGS $IF_TEST $LOOP_TEST
+# Requires Input
+IN_TEST="tests/io/in.bin"
+IN_DISPLAY_TEST="tests/io/in_display.bin"
+
+for i in $ORG_JMP $MODRM $CALL $MAIN_FUNC $ARGS $IF_TEST $LOOP_TEST $OUT_TEST
 do
 
 echo

@@ -116,6 +116,39 @@ uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
     }
 }
 
+void set_rm8(Emulator *emu, ModRM *modrm, uint8_t value)
+{
+    /* Mod:11 is for registers directly. */
+    if (modrm->mod == 3)
+    {
+        set_register8(emu, modrm->rm, value);
+    }
+    else
+    {
+        /*
+         * Mod: Pattern 
+         * 00: [eax], [ecx]...
+         * 01: [eax] + disp8, [ecx] + disp8...
+         * 10: [eax] + disp32 etc, [ecx] + disp32...
+         */
+        uint32_t address = calc_memory_address(emu, modrm);
+        set_memory8(emu, address, value);
+    }
+}
+
+uint8_t get_rm8(Emulator *emu, ModRM *modrm)
+{
+    if (modrm->mod == 3)
+    {
+        return get_register8(emu, modrm->rm);
+    }
+    else
+    {
+        uint32_t address = calc_memory_address(emu, modrm);
+        return get_memory8(emu, address);
+    }
+}
+
 void set_rm32(Emulator *emu, ModRM *modrm, uint32_t value)
 {
     /* Mod:11 is for registers directly. */
@@ -126,7 +159,8 @@ void set_rm32(Emulator *emu, ModRM *modrm, uint32_t value)
     else
     {
         /*
-         * Mod: 00: [eax], [ecx]...
+         * Mod: Pattern 
+         * 00: [eax], [ecx]...
          * 01: [eax] + disp8, [ecx] + disp8...
          * 10: [eax] + disp32 etc, [ecx] + disp32...
          */
@@ -146,6 +180,16 @@ uint32_t get_rm32(Emulator *emu, ModRM *modrm)
         uint32_t address = calc_memory_address(emu, modrm);
         return get_memory32(emu, address);
     }
+}
+
+void set_r8(Emulator *emu, ModRM *modrm, uint8_t value)
+{
+    set_register8(emu, modrm->reg_index, value);
+}
+
+uint8_t get_r8(Emulator *emu, ModRM *modrm)
+{
+    return get_register8(emu, modrm->reg_index);
 }
 
 void set_r32(Emulator *emu, ModRM *modrm, uint32_t value)

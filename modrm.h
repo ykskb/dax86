@@ -27,16 +27,28 @@ typedef struct
  */
 void parse_modrm(Emulator *emu, ModRM *modrm);
 
-/* Sets value to register or memory depending on Mod of ModR/M byte. */
+/* Sets 8-bit value to register or memory depending on Mod of ModR/M byte. */
+void set_rm8(Emulator *emu, ModRM *modrm, uint8_t value);
+
+/* Gets 8-bit value from register or memory depending on Mod of ModR/M byte. */
+uint8_t get_rm8(Emulator *emu, ModRM *modrm);
+
+/* Sets 32-bit value to register or memory depending on Mod of ModR/M byte. */
 void set_rm32(Emulator *emu, ModRM *modrm, uint32_t value);
 
-/* Gets value from register or memory depending on Mod of ModR/M byte. */
+/* Gets 32-bit value from register or memory depending on Mod of ModR/M byte. */
 uint32_t get_rm32(Emulator *emu, ModRM *modrm);
 
-/* Sets value on the register specified by REG of ModR/M. */
+/* Sets 8-bit value on the register specified by REG of ModR/M. */
+void set_r8(Emulator *emu, ModRM *modrm, uint8_t value);
+
+/* Get 8-bit value from the register specified by REG of ModR/M. */
+uint8_t get_r8(Emulator *emu, ModRM *modrm);
+
+/* Sets 32-bit value on the register specified by REG of ModR/M. */
 void set_r32(Emulator *emu, ModRM *modrm, uint32_t value);
 
-/* Get value from the register specified by REG of ModR/M. */
+/* Get 32-bit value from the register specified by REG of ModR/M. */
 uint32_t get_r32(Emulator *emu, ModRM *modrm);
 
 #endif

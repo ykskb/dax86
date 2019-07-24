@@ -7,6 +7,7 @@
 #include "instructions.h"
 #include "emulator_functions.h"
 #include "modrm.h"
+#include "io.h"
 
 /*
  * jmp (short): 2 bytes
@@ -33,9 +34,54 @@ static void near_jump(Emulator *emu)
 }
 
 /*
+ * mov r8 imm8: 2 bytes
+ * Copies 8-bit imm value to register specified in op code.
+ * 1 byte: op (B0) + reg index (3 bits)
+ * 1 byte: value (8-bit unsigned)
+ */
+static void mov_r8_imm8(Emulator *emu)
+{
+    uint8_t reg = get_code8(emu, 0) - 0xB0;
+    set_register8(emu, reg, get_code8(emu, 1));
+    emu->eip += 2;
+}
+
+/*
+ * mov r8 rm8: 2 bytes
+ * Copies 8-bit value from register or memory specified by ModR/M to the register
+ * specified by ModR/M.
+ * 1 byte: op (8A)
+ * 1 byte: ModR/M
+ */
+static void mov_r8_rm8(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t rm8 = get_rm8(emu, &modrm);
+    set_r8(emu, &modrm, rm8);
+}
+
+/*
+ * mov rm8 r8: 2 bytes
+ * Copies 8-bit value from register specified by ModR/M to the register
+ * or memory specified by ModR/M.
+ * 1 byte: op (88)
+ * 1 byte: ModR/M
+ */
+static void mov_rm8_r8(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t r8 = get_r8(emu, &modrm);
+    set_rm8(emu, &modrm, r8);
+}
+
+/*
  * mov r32 imm32: 5 bytes
  * Copies imm value to register specified in op code (r32: 32 bit register).
- * 1 byte: op (B8) + reg (3bits)
+ * 1 byte: op (B8) + reg index (3bits)
  * 4 bytes: value (32 bit unsigned)
  */
 static void mov_r32_imm32(Emulator *emu)
@@ -100,7 +146,7 @@ static void mov_r32_rm32(Emulator *emu)
 /*
  * add rm32 r32: 2 bytes
  * Adds value of REG to ModR/M.
- * 1 byte: (01)
+ * 1 byte: op (01)
  * 1 byte: ModR/M
  */
 static void add_rm32_r32(Emulator *emu)
@@ -164,23 +210,6 @@ static void cmp_rm32_imm8(Emulator *emu, ModRM *modrm)
     update_eflags_sub(emu, rm32, imm8, result);
 }
 
-/*
- * cmp r32 rm32: 2 bytes
- * Compares register 32-bit value and RM32 value by subtracting in order.
- * 1 byte: op (3B)
- * 1 byte: ModR/M
- */
-static void cmp_r32_rm32(Emulator *emu)
-{
-    emu->eip += 1; // op code
-    ModRM modrm;
-    parse_modrm(emu, &modrm);
-    uint32_t r32 = get_r32(emu, &modrm);
-    uint32_t rm32 = get_rm32(emu, &modrm);
-    uint64_t result = (uint64_t)r32 - (uint64_t)rm32;
-    update_eflags_sub(emu, r32, rm32, result);
-}
-
 static void code_83(Emulator *emu)
 {
     /* Proceed 1 byte for op code 83. */
@@ -203,6 +232,53 @@ static void code_83(Emulator *emu)
         printf("Not implemented: Op: 83 with ModR/M Op: %d\n", modrm.opcode);
         exit(1);
     }
+}
+
+/*
+ * cmp al imm8: 2 bytes
+ * Compares AL value and 8-bit imm value by subtracting in order.
+ * 1 byte: op (3C)
+ * 1 byte: 8-bit imm value
+ */
+static void cmp_al_imm8(Emulator *emu)
+{
+    uint8_t value = get_code8(emu, 1);
+    uint8_t al = get_register8(emu, AL);
+    uint64_t result = (uint64_t)al - (uint64_t)value;
+    update_eflags_sub(emu, al, value, result);
+    emu->eip += 2;
+}
+
+/*
+ * cmp eax imm32: 5 bytes
+ * Compares EAX value and 32-bit imm value by subtracting in order.
+ * 1 byte: op (3D)
+ * 4 bytes: 32-bit imm value
+ */
+static void cmp_eax_imm32(Emulator *emu)
+{
+    uint32_t value = get_code32(emu, 1);
+    uint32_t eax = get_register32(emu, EAX);
+    uint64_t result = (uint64_t)eax - (uint64_t)value;
+    update_eflags_sub(emu, eax, value, result);
+    emu->eip += 5;
+}
+
+/*
+ * cmp r32 rm32: 2 bytes
+ * Compares register 32-bit value and RM32 value by subtracting in order.
+ * 1 byte: op (3B)
+ * 1 byte: ModR/M
+ */
+static void cmp_r32_rm32(Emulator *emu)
+{
+    emu->eip += 1; // op code
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t r32 = get_r32(emu, &modrm);
+    uint32_t rm32 = get_rm32(emu, &modrm);
+    uint64_t result = (uint64_t)r32 - (uint64_t)rm32;
+    update_eflags_sub(emu, r32, rm32, result);
 }
 
 /*
@@ -232,6 +308,18 @@ static void code_ff(Emulator *emu)
         printf("Not implemented: Op: FF with ModR/M Op: %d\n", modrm.opcode);
         exit(1);
     }
+}
+
+/*
+ * inc r32: 1 byte
+ * Increments a value of specified 32-bit register in op code.
+ * 1 byte: op (40) + reg index (3 bits)
+ */
+static void inc_r32(Emulator *emu)
+{
+    uint8_t reg = get_code8(emu, 0) - 0x40;
+    set_register32(emu, reg, get_register32(emu, reg) + 1);
+    emu->eip += 1;
 }
 
 /*
@@ -374,6 +462,34 @@ static void jle(Emulator *emu)
     emu->eip += (diff + 2);
 }
 
+/*
+ * in al dx: 1 byte
+ * Input data to AL from IO address specified on DX.
+ * 1 byte: op (EC)
+ */
+static void in_al_dx(Emulator *emu)
+{
+    /* IO Port Address from DX */
+    uint16_t address = get_register32(emu, EDX) & 0xffff;
+    uint8_t value = io_in8(address);
+    set_register8(emu, AL, value);
+    emu->eip += 1;
+}
+
+/*
+ * out dx al: 1 byte
+ * Output data on AL to IO address specified on DX.
+ * 1 byte: op (EE)
+ */
+static void out_dx_al(Emulator *emu)
+{
+    /* IO Port Address from DX */
+    uint16_t address = get_register32(emu, EDX) & 0xffff;
+    uint8_t value = get_register8(emu, AL);
+    io_out8(address, value);
+    emu->eip += 1;
+}
+
 instruction_func_t *instructions[256];
 
 void init_instructions(void)
@@ -382,13 +498,22 @@ void init_instructions(void)
     memset(instructions, 0, sizeof(instructions));
 
     instructions[0x3B] = cmp_r32_rm32;
+    instructions[0x3C] = cmp_al_imm8;
+    instructions[0x3D] = cmp_eax_imm32;
 
-    /* Last 3 digits indicates 8 different registers in op code. */
+    /* op code includes 8 registers in 1 byte: 0x40 ~ 0x47*/
+    for (i = 0; i < 8; i++)
+    {
+        instructions[0x40 + i] = inc_r32;
+    }
+
+    /* op code includes 8 registers in 1 byte: 0x50 ~ 0x57*/
     for (i = 0; i < 8; i++)
     {
         instructions[0x50 + i] = push_r32;
     }
 
+    /* op code includes 8 registers in 1 byte: 0x58 ~ 0x5F */
     for (i = 0; i < 8; i++)
     {
         instructions[0x58 + i] = pop_r32;
@@ -408,18 +533,29 @@ void init_instructions(void)
     instructions[0x7C] = jl;
     instructions[0x7E] = jle;
 
-    /* Why 0xB8 ~ 0xBF: op code includes 8 registers in 1 byte. */
+    /* op code includes 8 registers in 1 byte: 0xB0 ~ 0xB7*/
+    for (i = 0; i < 8; i++)
+    {
+        instructions[0xB0 + i] = mov_r8_imm8;
+    }
+
+    /* op code includes 8 registers in 1 byte: 0xB8 ~ 0xBF */
     for (i = 0; i < 8; i++)
     {
         instructions[0xB8 + i] = mov_r32_imm32;
     }
     instructions[0x01] = add_rm32_r32;
     instructions[0x83] = code_83;
+    instructions[0x88] = mov_rm8_r8;
     instructions[0x89] = mov_rm32_r32;
+    instructions[0x8A] = mov_r8_rm8;
     instructions[0x8B] = mov_r32_rm32;
     instructions[0xC7] = mov_rm32_imm32;
+
     instructions[0xE9] = near_jump;
     instructions[0xEB] = short_jump;
+    instructions[0xEC] = in_al_dx;
+    instructions[0xEE] = out_dx_al;
     instructions[0xFF] = code_ff;
 
     instructions[0xC3] = ret;
