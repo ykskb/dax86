@@ -7,8 +7,9 @@ CALL="tests/call/call.bin"
 MAIN_FUNC="tests/main_func/main_func.bin"
 ARGS="tests/args/args.bin"
 IF_TEST="tests/if/if.bin"
+LOOP_TEST="tests/loop/loop.bin"
 
-for i in $ORG_JMP $MODRM $CALL $MAIN_FUNC $ARGS $IF_TEST
+for i in $ORG_JMP $MODRM $CALL $MAIN_FUNC $ARGS $IF_TEST $LOOP_TEST
 do
 
 echo

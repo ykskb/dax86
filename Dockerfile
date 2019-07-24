@@ -1,6 +1,6 @@
 FROM bitnami/minideb:jessie
 
-RUN apt-get update && apt-get install build-essential nasm
+RUN apt-get -y update && apt-get -y install build-essential nasm
 
 WORKDIR /dax86/
 
