@@ -6,6 +6,29 @@
 #include "emulator_functions.h"
 #include "modrm.h"
 
+/*
+ * Mod R/M: 1 byte
+ * 0 1 | 0 0 0 | 1 0 1
+ * Mod |  REG  |  R/M
+ *
+ *                        |  REG  |EAX |ECX |EDX |EBX |ESP |EBP |ESI |EDI |
+ *                        | (r32) |000 |001 |010 |011 |100 |101 |110 |111 |
+ * | Mod | R/M |    Addressing    |          Mod R/M Value in Hex         |
+ * | 00  | 000 | [eax]            | 00 | 08 | 10 | 18 | 20 | 28 | 30 | 38 |
+ * |     | 001 | [ecx]            | 01 | 09 | 11 | 19 | 21 | 29 | 31 | 39 |
+ * |     | 010 | [edx]            | 02 | 0A | 12 | 1A | 22 | 2A | 32 | 3A |
+ * |     | 011 | [ebx]            | 03 | 0B | 13 | 1B | 23 | 2B | 33 | 3B |
+ * |     | 100 | [-][-]           | 04 | 0C | 14 | 1C | 24 | 2C | 34 | 3C |
+ * |     | 101 | disp32           | 05 | 0D | 15 | 1D | 25 | 2D | 35 | 3D |
+ * |     | 110 | [esi]            | 06 | 0E | 16 | 1E | 26 | 2E | 36 | 3E |
+ * |     | 111 | [edi]            | 07 | 0F | 17 | 1F | 27 | 2F | 37 | 3F |
+ * | 01  | 000 | [eax] + disp8    | 40 | 48 | 50 | 58 | 60 | 68 | 70 | 78 |
+ * ...
+ * | 10  | 000 | [eax] + disp32   | 80 | 88 | 90 | 98 | A0 | A8 | B0 | B8 |
+ * ...
+ * | 11  | 000 | eax              | C0 | C8 | D0 | D8 | E0 | E8 | F0 | F8 |
+ */
+
 void parse_modrm(Emulator *emu, ModRM *modrm)
 {
     uint8_t code;

@@ -2,11 +2,21 @@
 
 x86 simulator for study-purpose.
 
-Based on the book:
+Originally based on the book:
 
 https://book.mynavi.jp/support/bookmook/x86/
 
-I've tweaked parts and added comments for note-taking purposes. I intend to extend it with additional features as well.
+Currently working on extension of this, adding functionalities such as:
+
+- SIB
+- More instructions
+- More eflags
+- Protection mode
+- Paging
+
+and more with comments for note-taking purposes.
+
+Goal is to make xv86 work on this.
 
 ##### Setup Environment using Docker
 
