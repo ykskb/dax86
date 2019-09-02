@@ -490,6 +490,30 @@ static void out_dx_al(Emulator *emu)
     emu->eip += 1;
 }
 
+static void cli(Emulator *emu)
+{
+    set_int_flag(emu, 0);
+    emu->eip += 1;
+}
+
+static void sti(Emulator *emu)
+{
+    set_int_flag(emu, 1);
+    emu->eip += 1;
+}
+
+static void cld(Emulator *emu)
+{
+    set_direction_flag(emu, 0);
+    emu->eip += 1;
+}
+
+static void std(Emulator *emu)
+{
+    set_direction_flag(emu, 1);
+    emu->eip += 1;
+}
+
 instruction_func_t *instructions[256];
 
 void init_instructions(void)
@@ -556,6 +580,10 @@ void init_instructions(void)
     instructions[0xEB] = short_jump;
     instructions[0xEC] = in_al_dx;
     instructions[0xEE] = out_dx_al;
+    instructions[0xFA] = cli;
+    instructions[0xFB] = sti;
+    instructions[0xFC] = cld;
+    instructions[0xFD] = std;
     instructions[0xFF] = code_ff;
 
     instructions[0xC3] = ret;

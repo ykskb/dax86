@@ -54,6 +54,30 @@ static void dump_registers(Emulator *emu)
 //     }
 // }
 
+/* Util for Print Binary */
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
+#define BYTE_TO_BINARY(byte)       \
+    (byte & 0x80 ? '1' : '0'),     \
+        (byte & 0x40 ? '1' : '0'), \
+        (byte & 0x20 ? '1' : '0'), \
+        (byte & 0x10 ? '1' : '0'), \
+        (byte & 0x08 ? '1' : '0'), \
+        (byte & 0x04 ? '1' : '0'), \
+        (byte & 0x02 ? '1' : '0'), \
+        (byte & 0x01 ? '1' : '0')
+
+static void dump_eflags(Emulator *emu)
+{
+    int i;
+    printf("eflags:");
+    for (i = 3; i > -1; i--)
+    {
+        printf(BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(emu->eflags >> (8 * i)));
+        printf(" ");
+    }
+    printf("\n");
+}
+
 int remove_arg_at(int argc, char *argv[], int index)
 {
     if (index < 0 || argc <= index)
@@ -155,6 +179,7 @@ int main(int argc, char *argv[])
     if (!quiet)
     {
         dump_registers(emu);
+        dump_eflags(emu);
     }
     destroy_emu(emu);
     return 0;

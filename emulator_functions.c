@@ -166,6 +166,30 @@ void set_sign_flag(Emulator *emu, int is_sign)
     }
 }
 
+void set_int_flag(Emulator *emu, int is_enabled)
+{
+    if (is_enabled)
+    {
+        emu->eflags |= INT_ENABLE_FLAG;
+    }
+    else
+    {
+        emu->eflags &= ~INT_ENABLE_FLAG;
+    }
+}
+
+void set_direction_flag(Emulator *emu, int is_down)
+{
+    if (is_down)
+    {
+        emu->eflags |= DIRECTION_FLAG;
+    }
+    else
+    {
+        emu->eflags &= ~DIRECTION_FLAG;
+    }
+}
+
 void set_overflow_flag(Emulator *emu, int is_overflow)
 {
     if (is_overflow)
@@ -191,6 +215,16 @@ int32_t is_zero(Emulator *emu)
 int32_t is_sign(Emulator *emu)
 {
     return (emu->eflags & SIGN_FLAG) != 0;
+}
+
+int32_t is_int_enabled(Emulator *emu)
+{
+    return (emu->eflags & INT_ENABLE_FLAG) != 0;
+}
+
+int32_t is_direction_down(Emulator *emu)
+{
+    return (emu->eflags & DIRECTION_FLAG) != 0;
 }
 
 int32_t is_overflow(Emulator *emu)
