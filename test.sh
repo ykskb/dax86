@@ -19,13 +19,23 @@ IN_DISPLAY_TEST="tests/io/in_display.bin"
 for i in $ORG_JMP $MODRM $CALL $MAIN_FUNC $ARGS $IF_TEST $LOOP_TEST $OUT_TEST $CLEAR_FLAGS_TEST $SET_FLAGS_TEST
 do
 
-echo
+echo "------------------------------------------------"
 echo "Running test with $i..."
 echo
 echo "ndisasm -b 32 $i"
+echo
 ndisasm -b 32 $i
 echo
 echo "./dax86 $i"
-./dax86 $i
+echo
+output=$(./dax86 $i)
+echo "$output"
+echo
+if [[ $output == *"End of program :)"* ]]; then
+  echo "[Result: SUCCESS]"
+else
+  echo "[Result: FAILURE]"
+fi
+echo
 
 done
