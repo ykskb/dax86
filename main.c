@@ -19,6 +19,8 @@ static Emulator *create_emu(size_t mem_size, uint32_t eip, uint32_t esp)
 
     /* Resets registers. */
     memset(emu->registers, 0, sizeof(emu->registers));
+    memset(emu->segment_registers, 0, sizeof(emu->segment_registers));
+    memset(emu->control_registers, 0, sizeof(emu->control_registers));
     emu->eip = eip;
     emu->registers[ESP] = esp;
 
@@ -91,7 +93,7 @@ int remove_arg_at(int argc, char *argv[], int index)
         {
             argv[i] = argv[i + 1];
         }
-        argv[i] == NULL; // last element
+        argv[i] = NULL; // last element
         return argc - 1;
     }
 }
