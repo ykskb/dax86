@@ -9,6 +9,8 @@
 #include "modrm.h"
 #include "io.h"
 
+instruction_func_t *instructions[256];
+
 /*
  * jmp (short): 2 bytes
  * Jumps with 8-bit signed offset.
@@ -490,31 +492,70 @@ static void out_dx_al(Emulator *emu)
     emu->eip += 1;
 }
 
+/*
+ * rep: 1 byte prefix
+ * Repeats string operation.
+ * 1 byte: prefix (F2/F3)
+ */
+
+static void rep(Emulator *emu)
+{
+    emu->eip += 1;
+    uint32_t ecx_value = emu->registers[ECX];
+    uint32_t op = get_code8(emu, 0);
+    /* TODO: Add check on supported types: INS, LODS, MOVS, OUTS and STOS */
+    uint32_t op_eip = emu->eip;
+    int i;
+    for (i = 0; i < ecx_value; i++)
+    {
+        emu->eip = op_eip;
+        instructions[op](emu);
+    }
+}
+
+/*
+ * cli: 1 byte
+ * Clears int flag on eflags.
+ * 1 byte: op (FA)
+ */
 static void cli(Emulator *emu)
 {
     set_int_flag(emu, 0);
     emu->eip += 1;
 }
 
+/*
+ * sti: 1 byte
+ * Sets int flag on eflags.
+ * 1 byte: op (FB)
+ */
 static void sti(Emulator *emu)
 {
     set_int_flag(emu, 1);
     emu->eip += 1;
 }
 
+/*
+ * cld: 1 byte
+ * Clears directional on eflags. (0: up)
+ * 1 byte: op (FC)
+ */
 static void cld(Emulator *emu)
 {
     set_direction_flag(emu, 0);
     emu->eip += 1;
 }
 
+/*
+ * std: 1 byte
+ * Sets directional on eflags. (1: down)
+ * 1 byte: op (FD)
+ */
 static void std(Emulator *emu)
 {
     set_direction_flag(emu, 1);
     emu->eip += 1;
 }
-
-instruction_func_t *instructions[256];
 
 void init_instructions(void)
 {
@@ -580,6 +621,8 @@ void init_instructions(void)
     instructions[0xEB] = short_jump;
     instructions[0xEC] = in_al_dx;
     instructions[0xEE] = out_dx_al;
+
+    instructions[0xF3] = rep;
     instructions[0xFA] = cli;
     instructions[0xFB] = sti;
     instructions[0xFC] = cld;
