@@ -8,4 +8,4 @@ ADD . /dax86/
 
 USER root
 
-CMD ["/bin/sh"]
+CMD ["/bin/bash"]
