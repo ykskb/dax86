@@ -1,6 +1,6 @@
 # dax86
 
-x86 simulator for study-purpose.
+x86 simulator for study-purpose (without reading QEMU)
 
 Originally based on the book:
 
@@ -9,12 +9,15 @@ https://book.mynavi.jp/support/bookmook/x86/
 Currently working on extension of this, adding functionalities such as:
 
 - SIB
+- Instruction prefixes
+- More registers
 - More instructions
 - More eflags
 - Protection mode
 - Paging
+- more
 
-and more with comments for note-taking purposes.
+with bunch of comments for note-taking purposes.
 
 Goal is to make xv86 work on this.
 
