@@ -15,6 +15,7 @@ CLEAR_FLAGS_TEST="tests/eflags/clear_flags.bin"
 # Requires Input
 IN_TEST="tests/io/in.bin"
 IN_DISPLAY_TEST="tests/io/in_display.bin"
+REP_TEST="tests/rep/rep.bin"
 
 for i in $ORG_JMP $MODRM $CALL $MAIN_FUNC $ARGS $IF_TEST $LOOP_TEST $OUT_TEST $CLEAR_FLAGS_TEST $SET_FLAGS_TEST
 do
