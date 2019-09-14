@@ -1,4 +1,4 @@
-TARGET = list.bin
+TARGET = list.bin mov_rel8.bin
 
 CC = gcc
 LD = ld

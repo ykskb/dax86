@@ -1,20 +1,8 @@
 BITS 32
 label0:
     org 0x7c00
-    sub esp, 16 ; 83
-    mov ebp, esp
-    mov eax, 2
-    mov dword [ebp+4], 5 ; C7
     
-    mov esi, [ebp+4] ; 8B
-    inc dword [ebp+4] ; FF
-    mov edi, [ebp+4] ; 8B
-    add word [ebp+4], 5 ; 66 (prefix) 83 rm32 imm8
-    add byte [ebp], 5 ; 80 rm8 imm8
-
-    ; start of lists ;
-    
-    add byte [ebp], ah; 00 add rm8 r8
+    add byte [eax], ah; 00 add rm8 r8
     add dword [ebp+4], eax ; 01 add rm32 r32
     add byte ah, [ebp] ; 02 add r8 rm8
     add dword eax, [ebp+4] ; 03 add r32, rm32
