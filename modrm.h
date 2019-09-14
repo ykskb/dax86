@@ -7,19 +7,29 @@
 
 typedef struct
 {
-    uint8_t mod; // 2 bits
+    uint8_t scale; // 2 bits
+    uint8_t index; // 3 bits
+    uint8_t base;  // 3 bits
+} SIB;
+
+typedef struct
+{
+    /* Mod: 2 bits */
+    uint8_t mod;
     /* REG: 3 bits */
     union {                // union: different data at the same location
         uint8_t opcode;    // used to extend opcode (e.g. inc: ff + 000 and dec: ff + 001)
         uint8_t reg_index; // used to specify register (target or source)
     };
-    uint8_t rm;  // 3 bits
-    uint8_t sib; // 1 byte
+    uint8_t rm; // 3 bits
+    SIB sib;    // 1 byte
     union {
         int8_t disp8;
         uint32_t disp32;
     };
 } ModRM;
+
+ModRM create_modrm();
 
 /*
  * Parses ModR/M, SIB and Displacement.

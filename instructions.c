@@ -12,12 +12,77 @@
 instruction_func_t *instructions[256];
 
 /*
+ * add rm8 r8: 2 bytes (add byte [eax], ah;)
+ * Adds value of ModR/M to REG.
+ * 1 byte: op (00)
+ * 1 byte: ModR/M
+ */
+static void add_rm8_r8(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t r8 = get_r8(emu, &modrm);
+    set_rm8(emu, &modrm, rm8_val + r8);
+}
+
+/*
+ * add rm32 r32: 2 bytes
+ * Adds value of REG to ModR/M.
+ * 1 byte: op (01)
+ * 1 byte: ModR/M
+ */
+static void add_rm32_r32(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t r32 = get_r32(emu, &modrm);
+    uint32_t rm32 = get_rm32(emu, &modrm);
+    set_rm32(emu, &modrm, r32 + rm32);
+}
+
+/*
+ * add r8 rm8: 2 bytes
+ * Adds value of ModR/M to r8.
+ * 1 byte: op (02)
+ * 1/2 byte: ModR/M
+ */
+static void add_r8_rm8(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t r8 = get_r8(emu, &modrm);
+    set_r8(emu, &modrm, rm8_val + r8);
+}
+
+/*
+ * add r32 rm32: 2 - 3 bytes
+ * Adds value of ModR/M to r32.
+ * 1 byte: op (03)
+ * 1 - 2 byte: ModR/M
+ */
+static void add_r32_rm32(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t r32 = get_r32(emu, &modrm);
+    uint32_t rm32 = get_rm32(emu, &modrm);
+    set_r32(emu, &modrm, r32 + rm32);
+}
+
+/*
  * jmp (short): 2 bytes
  * Jumps with 8-bit signed offset.
  * 1 byte: op (EB)
  * 1 byte: offset from eip (8 bit signed) -127 ~ 127
  */
-static void short_jump(Emulator *emu)
+static void
+short_jump(Emulator *emu)
 {
     int8_t offset = get_sign_code8(emu, 1);
     emu->eip += (offset + 2);
@@ -58,7 +123,7 @@ static void mov_r8_imm8(Emulator *emu)
 static void mov_r8_rm8(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint32_t rm8 = get_rm8(emu, &modrm);
     set_r8(emu, &modrm, rm8);
@@ -74,7 +139,7 @@ static void mov_r8_rm8(Emulator *emu)
 static void mov_rm8_r8(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint32_t r8 = get_r8(emu, &modrm);
     set_rm8(emu, &modrm, r8);
@@ -143,22 +208,6 @@ static void mov_r32_rm32(Emulator *emu)
     uint32_t rm32 = get_rm32(emu, &modrm);
     /* Sets value on register specified by REG bits. */
     set_r32(emu, &modrm, rm32);
-}
-
-/*
- * add rm32 r32: 2 bytes
- * Adds value of REG to ModR/M.
- * 1 byte: op (01)
- * 1 byte: ModR/M
- */
-static void add_rm32_r32(Emulator *emu)
-{
-    emu->eip += 1;
-    ModRM modrm;
-    parse_modrm(emu, &modrm);
-    uint32_t r32 = get_r32(emu, &modrm);
-    uint32_t rm32 = get_rm32(emu, &modrm);
-    set_rm32(emu, &modrm, r32 + rm32);
 }
 
 /*
@@ -562,6 +611,15 @@ void init_instructions(void)
     int i;
     memset(instructions, 0, sizeof(instructions));
 
+    instructions[0x00] = add_rm8_r8;
+    instructions[0x01] = add_rm32_r32;
+    instructions[0x02] = add_r8_rm8;
+    instructions[0x03] = add_r32_rm32;
+/*
+    instructions[0x04] = add_al_imm8;
+    instructions[0x05] = add_eax_imm32;
+*/
+
     instructions[0x3B] = cmp_r32_rm32;
     instructions[0x3C] = cmp_al_imm8;
     instructions[0x3D] = cmp_eax_imm32;
@@ -598,6 +656,12 @@ void init_instructions(void)
     instructions[0x7C] = jl;
     instructions[0x7E] = jle;
 
+    instructions[0x83] = code_83;
+    instructions[0x88] = mov_rm8_r8;
+    instructions[0x89] = mov_rm32_r32;
+    instructions[0x8A] = mov_r8_rm8;
+    instructions[0x8B] = mov_r32_rm32;
+
     /* op code includes 8 registers in 1 byte: 0xB0 ~ 0xB7*/
     for (i = 0; i < 8; i++)
     {
@@ -609,13 +673,10 @@ void init_instructions(void)
     {
         instructions[0xB8 + i] = mov_r32_imm32;
     }
-    instructions[0x01] = add_rm32_r32;
-    instructions[0x83] = code_83;
-    instructions[0x88] = mov_rm8_r8;
-    instructions[0x89] = mov_rm32_r32;
-    instructions[0x8A] = mov_r8_rm8;
-    instructions[0x8B] = mov_r32_rm32;
+
+    instructions[0xC3] = ret;
     instructions[0xC7] = mov_rm32_imm32;
+    instructions[0xC9] = leave;
 
     instructions[0xE9] = near_jump;
     instructions[0xEB] = short_jump;
@@ -629,7 +690,5 @@ void init_instructions(void)
     instructions[0xFD] = std;
     instructions[0xFF] = code_ff;
 
-    instructions[0xC3] = ret;
     instructions[0xE8] = call_rel32;
-    instructions[0xC9] = leave;
 }

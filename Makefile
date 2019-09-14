@@ -15,7 +15,7 @@ all :
 	$(CC) $(CFLAGS) -c $< 
 
 $(TARGET) : $(OBJS) Makefile
-	$(CC) -o $@ $(OBJS)
+	$(CC) -o $@ $(OBJS) -lm
 
 create-docker:
 	docker build -t dax86 .

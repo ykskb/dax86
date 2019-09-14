@@ -2,14 +2,24 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "emulator_functions.h"
 #include "modrm.h"
 
 /*
  * Mod R/M: 1 byte
- * 0 1 | 0 0 0 | 1 0 1
- * Mod |  REG  |  R/M
+ * | 0 1 | 0 0 0 | 1 0 1 |
+ * | Mod |  REG  |  R/M  |
+ * 
+ * SIB: 1 byte after ModRM byte
+ * |  1 0  |   1 1 0   |  1 0 1   |
+ * | Scale | Index REG | Base REG |
+ * | 00: 1 |
+ * | 01: 2 |
+ * | 10: 4 |
+ * | 11: 8 |
+ * Base + (Index * Scale)
  *
  *                        |  REG  |EAX |ECX |EDX |EBX |ESP |EBP |ESI |EDI |
  *                        | (r32) |000 |001 |010 |011 |100 |101 |110 |111 |
@@ -23,11 +33,25 @@
  * |     | 110 | [esi]            | 06 | 0E | 16 | 1E | 26 | 2E | 36 | 3E |
  * |     | 111 | [edi]            | 07 | 0F | 17 | 1F | 27 | 2F | 37 | 3F |
  * | 01  | 000 | [eax] + disp8    | 40 | 48 | 50 | 58 | 60 | 68 | 70 | 78 |
- * ...
+ * |     | 001 | [ecx] + disp8    | 41 | 49 | 51 | 59 | 61 | 69 | 71 | 79 |
+ * |     | 002 | [edx] + disp8    | 42 | 4A | 52 | 5A | 62 | 6A | 72 | 7A |
+ * |                               ...                                    |
+ * |     | 111 | [edi] + disp8    | 47 | 4F | 57 | 5F | 67 | 6F | 79 | 7F |
  * | 10  | 000 | [eax] + disp32   | 80 | 88 | 90 | 98 | A0 | A8 | B0 | B8 |
- * ...
+ * |                               ...                                    |
+ * |     | 111 | [edi] + disp32   | 87 | 8F | 97 | 9F | A7 | AF | B7 | BF |
  * | 11  | 000 | eax              | C0 | C8 | D0 | D8 | E0 | E8 | F0 | F8 |
+ * |                               ...                                    |
+ * |     | 111 | edi              | C7 | CF | D7 | DF | E7 | EF | F7 | FF |
  */
+
+ModRM create_modrm()
+{
+    ModRM modrm;
+    SIB sib;
+    modrm.sib = sib;
+    return modrm;
+}
 
 void parse_modrm(Emulator *emu, ModRM *modrm)
 {
@@ -38,9 +62,9 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
     code = get_code8(emu, 0);
 
     /* Mod (2 bits) Reg (3 bits) R/M (3 bits) */
-    modrm->mod = ((code & 0xC0) >> 6);
-    modrm->opcode = ((code & 0x38) >> 3);
-    modrm->rm = code & 0x07;
+    modrm->mod = ((code & 0xC0) >> 6);    /* 1100 0000 */
+    modrm->opcode = ((code & 0x38) >> 3); /* 0011 1000 */
+    modrm->rm = code & 0x07;              /* 0000 0111 */
 
     emu->eip += 1;
 
@@ -53,7 +77,12 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
      */
     if (modrm->mod != 3 && modrm->rm == 4)
     {
-        modrm->sib = get_code8(emu, 0);
+        u_int8_t sib_byte = get_code8(emu, 0);
+        /* SIB sib; */
+        modrm->sib.scale = ((sib_byte & 0xC0) >> 6);
+        modrm->sib.index = ((sib_byte & 0x38) >> 3);
+        modrm->sib.base = sib_byte & 0x07;
+        /* modrm->sib = &sib;*/
         emu->eip += 1;
     }
 
@@ -80,16 +109,23 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
     }
 }
 
+u_int32_t calc_cib_address(Emulator *emu, ModRM *modrm)
+{
+    u_int32_t scale = pow(2, modrm->sib.scale);
+    u_int32_t index_val = get_register32(emu, modrm->sib.index);
+    u_int32_t base_val = get_register32(emu, modrm->sib.base);
+    return index_val * scale + base_val;
+}
+
 uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
 {
     /* Mod:0 [reg] */
     if (modrm->mod == 0)
     {
-        /* SIB not implemented (Mod: 00 R/M: 100) */
+        /* SIB (Mod: 00 R/M: 100) */
         if (modrm->rm == 4)
         {
-            printf("Not implemented: ModRM with Mod: 00 and RM: 100\n");
-            exit(0);
+            return calc_cib_address(emu, modrm);
         }
         /* Mod:0 R/M: 101 uses disp32 as memory address. */
         else if (modrm->rm == 5)
@@ -105,11 +141,10 @@ uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
     /* Mod: 01 [reg] + disp8 */
     else if (modrm->mod == 1)
     {
-        /* SIB not implemented (Mod: 01 R/M: 100) */
+        /* SIB (Mod: 01 R/M: 100) */
         if (modrm->rm == 4)
         {
-            printf("Not implemented: ModRM with Mod: 01 and RM: 100\n");
-            exit(0);
+            return calc_cib_address(emu, modrm) + modrm->disp8;
         }
         /* Mod: 1 R/M: 000 - 011, 101 - 111 uses [reg] + disp8 */
         else
@@ -120,11 +155,10 @@ uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
     /* Mod: 10 [reg] + disp32 */
     else if (modrm->mod == 2)
     {
-        /* SIB not implemented (MOD: 10 R/M: 100) */
+        /* SIB (MOD: 10 R/M: 100) */
         if (modrm->rm == 4)
         {
-            printf("Not implemented: ModRM with Mod: 10 and RM: 100\n");
-            exit(0);
+            return calc_cib_address(emu, modrm) + modrm->disp32;
         }
         /* Mod: 10 R/M: 000 - 011, 101 - 111 uses [reg] + disp32 */
         else
