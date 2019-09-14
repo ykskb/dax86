@@ -43,18 +43,47 @@ static void dump_registers(Emulator *emu)
     printf("EIP: %08x\n", emu->eip);
 }
 
-// static void dump_input(Emulator *emu)
-// {
-//     printf("Input:\n");
-//     int i;
-//     for (i = 0; i < MEMORY_SIZE; i++)
-//     {
-//         if (emu->memory[i])
-//         {
-//             printf("%08x\n", emu->memory[i]);
-//         }
-//     }
-// }
+/* 
+static void dump_input(Emulator *emu)
+{
+    printf("Input:\n");
+    int i;
+    for (i = 0; i < MEMORY_SIZE; i++)
+    {
+        if (emu->memory[i])
+        {
+            printf("%08x\n", emu->memory[i]);
+        }
+    }
+}
+*/
+
+static void dump_memory(Emulator *emu)
+{
+    int i = 0x7b00;
+    int i_per_line = 32;
+    int display_length = 1024;
+    int end_i = i + display_length;
+    int j;
+    printf("memory %X to %X:\n", i, end_i);
+    printf("          ");
+    for (j = 0; j < i_per_line; j++)
+    {
+        printf("%02X ", j);
+    }
+    printf("\n");
+    while (i < end_i)
+    {
+        printf("%08X: ", i);
+        for (j = 0; j < i_per_line; j++)
+        {
+            printf("%02X", emu->memory[i + j]);
+            printf(" ");
+        }
+        i += i_per_line;
+        printf("\n");
+    }
+}
 
 /* Util for Print Binary */
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
@@ -182,6 +211,7 @@ int main(int argc, char *argv[])
     {
         dump_registers(emu);
         dump_eflags(emu);
+        dump_memory(emu);
     }
     destroy_emu(emu);
     return 0;
