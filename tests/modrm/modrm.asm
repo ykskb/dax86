@@ -2,7 +2,9 @@ BITS 32
     org 0x7c00
     sub esp, 16 ; 7BF0
     mov ebp, esp ; EBP: 7BF0
-    mov eax, 2 ; EAX: 2
+    mov eax, 0 ; EAX: 0
+    add al, 2 ; EAX: 1
+    add dword eax, 0x1000 ; EAX: 1
     add byte [ebp], al ; op: 00 ; 7BF0: 2
     add byte al, [ebp] ; op: 02 ; EAX: 4
     mov dword [ebp+4], 5 ; 7BF4: 5

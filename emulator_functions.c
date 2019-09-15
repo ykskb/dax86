@@ -232,12 +232,32 @@ int32_t is_overflow(Emulator *emu)
     return (emu->eflags & OVERFLOW_FLAG) != 0;
 }
 
+void update_eflags_add(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t result)
+{
+    /* sign bits */
+    int sign1 = value1 >> 31;
+    int sign2 = value2 >> 31;
+    int signr = (result >> 31) & 1;
+
+    /* 1111 1111 (255) + 1111 1111 (255) = 1 1111 1110 (510)*/
+    set_carry_flag(emu, result >> 32);
+    /* 
+     * For assumed signed numbers.
+     * Overflow: Most significant bit (sign bit) is changed. 
+     * Happens only with +n + +n or +n - -n.
+     * 0111 1111 (127) + 0111 1111 (127) = 1111 1110 (254)
+    */
+    set_overflow_flag(emu, sign1 == sign2 && sign1 != signr);
+    set_sign_flag(emu, signr);
+}
+
 /* 
+ * 1000 (-8) - 0001 (1) = 10111 (-9) -> carry
+ * 1000 (-8) - 0010 (2) = 10110 (-10) -> carry
  * Overflow might happen only when 2 values have different signs in subtraction.
  * AND overflow changes the sign of value 1 in result. Ex: 4 bit case:
- * 1000 (-8) - 0001 (1) = 10111 (-9)
- * 1000 (-8) - 0010 (2) = 10110 (-10)
- * 0111 (7) - 1111 (-1) = 1000
+ * 0111 (7) - 1111 (-1) = 1000 (-8) *wrong (sign1 != sign2 && sign1 != signr)* -> overflow
+ * 0111 (7) - 1000 (-8) = 1111 (-1) *wrong (sign1 != sign2 && sign1 != signr)* -> overflow
  */
 void update_eflags_sub(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t result)
 {

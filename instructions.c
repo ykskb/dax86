@@ -23,8 +23,10 @@ static void add_rm8_r8(Emulator *emu)
     ModRM modrm;
     parse_modrm(emu, &modrm);
     uint32_t rm8_val = get_rm8(emu, &modrm);
-    uint8_t r8 = get_r8(emu, &modrm);
-    set_rm8(emu, &modrm, rm8_val + r8);
+    uint8_t r8_val = get_r8(emu, &modrm);
+    uint64_t result = (uint64_t)rm8_val + (uint64_t)r8_val;
+    set_rm8(emu, &modrm, result);
+    update_eflags_add(emu, rm8_val, r8_val, result);
 }
 
 /*
@@ -38,9 +40,11 @@ static void add_rm32_r32(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t r32 = get_r32(emu, &modrm);
-    uint32_t rm32 = get_rm32(emu, &modrm);
-    set_rm32(emu, &modrm, r32 + rm32);
+    uint32_t rm32_val = get_rm32(emu, &modrm);
+    uint32_t r32_val = get_r32(emu, &modrm);
+    uint64_t result = (uint64_t)rm32_val + (uint64_t)r32_val;
+    set_rm32(emu, &modrm, result);
+    update_eflags_add(emu, rm32_val, r32_val, result);
 }
 
 /*
@@ -55,8 +59,10 @@ static void add_r8_rm8(Emulator *emu)
     ModRM modrm;
     parse_modrm(emu, &modrm);
     uint32_t rm8_val = get_rm8(emu, &modrm);
-    uint8_t r8 = get_r8(emu, &modrm);
-    set_r8(emu, &modrm, rm8_val + r8);
+    uint8_t r8_val = get_r8(emu, &modrm);
+    uint64_t result = (uint64_t)r8_val + (uint64_t)rm8_val;
+    set_r8(emu, &modrm, result);
+    update_eflags_add(emu, r8_val, rm8_val, result);
 }
 
 /*
@@ -70,9 +76,42 @@ static void add_r32_rm32(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t r32 = get_r32(emu, &modrm);
-    uint32_t rm32 = get_rm32(emu, &modrm);
-    set_r32(emu, &modrm, r32 + rm32);
+    uint32_t r32_val = get_r32(emu, &modrm);
+    uint32_t rm32_val = get_rm32(emu, &modrm);
+    uint64_t result = (uint64_t)r32_val + (uint64_t)rm32_val;
+    set_r32(emu, &modrm, result);
+    update_eflags_add(emu, r32_val, rm32_val, result);
+}
+
+/*
+ * add al imm8: 2 bytes
+ * Adds imm8 to al.
+ * 1 byte: op (04)
+ * 1 byte: imm8
+ */
+static void add_al_imm8(Emulator *emu)
+{
+    uint8_t imm8_val = get_code8(emu, 1);
+    uint8_t al_val = get_register8(emu, AL);
+    uint64_t result = (uint64_t)al_val + (uint64_t)imm8_val;
+    set_register8(emu, AL, result);
+    emu->eip += 2;
+}
+
+/*
+ * add al imm32: 5 bytes
+ * Adds imm32 to eax.
+ * 1 byte: op (05)
+ * 4 byte: imm32
+ */
+static void add_eax_imm32(Emulator *emu)
+{
+    uint32_t eax_val = get_register32(emu, EAX);
+    uint32_t imm32_val = get_code32(emu, 1);
+    uint64_t result = (uint64_t)eax_val + (uint64_t)imm32_val;
+    set_register32(emu, EAX, result);
+    update_eflags_add(emu, eax_val, imm32_val, result);
+    emu->eip += 5;
 }
 
 /*
@@ -615,10 +654,8 @@ void init_instructions(void)
     instructions[0x01] = add_rm32_r32;
     instructions[0x02] = add_r8_rm8;
     instructions[0x03] = add_r32_rm32;
-/*
     instructions[0x04] = add_al_imm8;
     instructions[0x05] = add_eax_imm32;
-*/
 
     instructions[0x3B] = cmp_r32_rm32;
     instructions[0x3C] = cmp_al_imm8;
