@@ -1,41 +1,50 @@
-# This does not run after 0x7c00 offset.
-# ./dax86 tests/mov_jmp/mov_jmp.bin
+# Files below do not run after 0x7c00 offset.
+# tests/mov_jmp/mov_jmp.bin
 
-ORG_JMP="tests/org_jmp/org_jmp.bin"
-MODRM="tests/modrm/modrm.bin"
-CALL="tests/call/call.bin"
-MAIN_FUNC="tests/main_func/main_func.bin"
-ARGS="tests/args/args.bin"
-IF_TEST="tests/if/if.bin"
-LOOP_TEST="tests/loop/loop.bin"
-OUT_TEST="tests/io/out.bin"
-SET_FLAGS_TEST="tests/eflags/set_flags.bin"
-CLEAR_FLAGS_TEST="tests/eflags/clear_flags.bin"
+# Files below require input
+# tests/io/in.bin
+# tests/io/in_display.bin
+# tests/rep/rep.bin
 
-# Requires Input
-IN_TEST="tests/io/in.bin"
-IN_DISPLAY_TEST="tests/io/in_display.bin"
-REP_TEST="tests/rep/rep.bin"
-
-for i in $ORG_JMP $MODRM $CALL $MAIN_FUNC $ARGS $IF_TEST $LOOP_TEST $OUT_TEST $CLEAR_FLAGS_TEST $SET_FLAGS_TEST
+for i in "modrm" "org_jmp" "call" "main_func" "args" "if" "flags_set" "flags_clear" "if" "loop" "io_out"
 do
+
+test_path="./tests/${i}/${i}.bin"
+expected_path="./tests/${i}/expected.txt"
 
 echo "------------------------------------------------"
 echo "Running test with $i..."
 echo
-echo "ndisasm -b 32 $i"
+echo "ndisasm -b 32 $test_path"
 echo
-ndisasm -b 32 $i
+ndisasm -b 32 $test_path
 echo
-echo "./dax86 $i"
+echo "./dax86 $test_path"
 echo
-output=$(./dax86 $i)
+output=$(./dax86 $test_path)
 echo "$output"
 echo
 if [[ $output == *"End of program :)"* ]]; then
-  echo "[Result: SUCCESS]"
+  echo "[Run: SUCCESS]"
 else
-  echo "[Result: FAILURE]"
+  echo "[Run: FAILURE]"
+  exit 1
+fi
+if [ -f "${expected_path}" ]
+then
+  echo "[Assertion]"
+  line_num=0
+  while IFS= read -r line; do
+    if [[ $output == *"$line"* ]]; then
+      echo "Line ${line_num}: Pass"
+    else
+      echo "Line ${line_num}: Fail"
+      exit 1
+    fi
+    line_num=$((line_num+1))
+  done < "${expected_path}"
+else
+  echo "expected.txt Not Found"
 fi
 echo
 

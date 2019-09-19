@@ -5,7 +5,7 @@ CC = gcc
 LD = ld
 AS = nasm
 CFLAGS += -nostdlib -fno-asynchronous-unwind-tables \
-	-g -fno-stack-protector -m32
+	-g -fno-stack-protector -m32 -O0
 LDFLAGS += -m elf_i386 --entry=start --oformat=binary -Ttext 0x7c00
 
 .PHONY: all

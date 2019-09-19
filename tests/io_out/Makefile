@@ -1,11 +1,11 @@
-TARGET = set_flags.bin clear_flags.bin
+TARGET = io_out.bin
 
 CC = gcc
 LD = ld
 AS = nasm
 CFLAGS += -nostdlib -fno-asynchronous-unwind-tables \
-	-g -fno-stack-protector
-LDFLAGS += --entry=func --oformat=binary
+	-g -fno-stack-protector -m32
+LDFLAGS += -m elf_i386 --entry=start --oformat=binary -Ttext 0x7c00
 
 .PHONY: all
 all :
@@ -13,6 +13,9 @@ all :
 
 %.o : %.c Makefile
 	$(CC) $(CFLAGS) -c $<
+
+%.o : %.asm Makefile
+	$(AS) -f elf $<
 
 %.bin : %.o Makefile
 	$(LD) $(LDFLAGS) -o $@ $<
