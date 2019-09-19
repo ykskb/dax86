@@ -11,8 +11,11 @@
 #define MEMORY_SIZE (1024 * 1024)
 
 char *register_names[] = {"EAX", "ECX", "EDX", "EBX", "ESP", "EBP", "ESI", "EDI"};
+char *seg_register_names[] = {"CS", "DS", "ES", "SS", "FS", "GS"};
+char *ctr_register_names[] = {"CR0", "CR1", "CR2", "CR3", "CR4"};
 
-static Emulator *create_emu(size_t mem_size, uint32_t eip, uint32_t esp)
+static Emulator *
+create_emu(size_t mem_size, uint32_t eip, uint32_t esp)
 {
     Emulator *emu = malloc(sizeof(Emulator));
     emu->memory = malloc(mem_size);
@@ -41,6 +44,14 @@ static void dump_registers(Emulator *emu)
         printf("%s: %08x\n", register_names[i], emu->registers[i]); // %08x: prepends 0 to make 8 digits.
     }
     printf("EIP: %08x\n", emu->eip);
+    for (i = 0; i < SEGMENT_REGISTERS_COUNT; i++)
+    {
+        printf("%s: %08x\n", seg_register_names[i], emu->segment_registers[i]);
+    }
+    for (i = 0; i < CONTROL_REGISTER_COUNT; i++)
+    {
+        printf("%s: %08x\n", ctr_register_names[i], emu->control_registers[i]);
+    }
 }
 
 /* 
