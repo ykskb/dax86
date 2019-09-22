@@ -115,6 +115,17 @@ static void add_eax_imm32(Emulator *emu)
 }
 
 /*
+ * push es: 1 byte
+ * Pushes value of ES to stack.
+ * 1 byte: op (06)
+ */
+static void push_es(Emulator *emu)
+{
+    push_segment_register(emu, ES);
+    emu->eip += 1;
+}
+
+/*
  * jmp (short): 2 bytes
  * Jumps with 8-bit signed offset.
  * 1 byte: op (EB)
@@ -247,6 +258,21 @@ static void mov_r32_rm32(Emulator *emu)
     uint32_t rm32 = get_rm32(emu, &modrm);
     /* Sets value on register specified by REG bits. */
     set_r32(emu, &modrm, rm32);
+}
+
+/*
+ * mov rm16 seg: 2 bytes
+ * Copes rm16 to segment register.
+ * 1 byte: op (8E)
+ * 1 byte: RodR/M
+ */
+static void mov_seg_rm16(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t rm32 = get_rm32(emu, &modrm);
+    set_seg_r(emu, &modrm, rm32);
 }
 
 /*
@@ -490,13 +516,13 @@ static void ret(Emulator *emu)
 
 /*
  * leave: 1byte
- * Set of mov esp & pop ebp.
+ * Set of mov esp, ebp & pop ebp.
  * 1 byte: op (C9)
  */
 static void leave(Emulator *emu)
 {
     uint32_t ebp_val = get_register32(emu, EBP);
-    /* Update ESP with EBP value. */
+    /* Update ESP with current EBP value. */
     set_register32(emu, ESP, ebp_val);
     /* Pop from stack and set it on EBP. */
     set_register32(emu, EBP, pop32(emu));
@@ -657,6 +683,8 @@ void init_instructions(void)
     instructions[0x04] = add_al_imm8;
     instructions[0x05] = add_eax_imm32;
 
+    instructions[0x06] = push_es;
+
     instructions[0x3B] = cmp_r32_rm32;
     instructions[0x3C] = cmp_al_imm8;
     instructions[0x3D] = cmp_eax_imm32;
@@ -698,6 +726,7 @@ void init_instructions(void)
     instructions[0x89] = mov_rm32_r32;
     instructions[0x8A] = mov_r8_rm8;
     instructions[0x8B] = mov_r32_rm32;
+    instructions[0x8E] = mov_seg_rm16;
 
     /* op code includes 8 registers in 1 byte: 0xB0 ~ 0xB7*/
     for (i = 0; i < 8; i++)

@@ -22,6 +22,7 @@
  * Base + (Index * Scale)
  *
  *                        |  REG  |EAX |ECX |EDX |EBX |ESP |EBP |ESI |EDI |
+ *                        | SREG  | ES | CS | SS | DS | FS | GS |rsvd|rsvd|
  *                        | (r32) |000 |001 |010 |011 |100 |101 |110 |111 |
  * | Mod | R/M |    Addressing    |          Mod R/M Value in Hex         |
  * | 00  | 000 | [eax]            | 00 | 08 | 10 | 18 | 20 | 28 | 30 | 38 |
@@ -257,4 +258,14 @@ void set_r32(Emulator *emu, ModRM *modrm, uint32_t value)
 uint32_t get_r32(Emulator *emu, ModRM *modrm)
 {
     return get_register32(emu, modrm->reg_index);
+}
+
+void set_seg_r(Emulator *emu, ModRM *modrm, uint16_t value)
+{
+    set_seg_register16(emu, modrm->reg_index, value);
+}
+
+uint16_t get_seg_r(Emulator *emu, ModRM *modrm)
+{
+    return get_seg_register16(emu, modrm->reg_index);
 }

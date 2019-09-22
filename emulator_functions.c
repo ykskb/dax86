@@ -41,6 +41,16 @@ void set_memory8(Emulator *emu, uint32_t address, uint32_t value)
     emu->memory[address] = value & 0xFF;
 }
 
+void set_memory16(Emulator *emu, uint32_t address, uint16_t value)
+{
+    int i;
+    for (i = 0; i < 2; i++)
+    {
+        /* passes right-most 8 bits first (little endian) */
+        set_memory8(emu, address + i, value >> (i * 8));
+    }
+}
+
 void set_memory32(Emulator *emu, uint32_t address, uint32_t value)
 {
     int i;
@@ -54,6 +64,18 @@ void set_memory32(Emulator *emu, uint32_t address, uint32_t value)
 uint32_t get_memory8(Emulator *emu, uint32_t address)
 {
     return emu->memory[address];
+}
+
+uint32_t get_memory16(Emulator *emu, uint32_t address)
+{
+    int i;
+    uint32_t mem_read = 0;
+    for (i = 0; i < 2; i++)
+    {
+        /* little endian: first to far right */
+        mem_read |= get_memory8(emu, address + i) << (8 * i);
+    }
+    return mem_read;
 }
 
 uint32_t get_memory32(Emulator *emu, uint32_t address)
@@ -74,11 +96,13 @@ void set_register8(Emulator *emu, int index, uint8_t value)
 {
     if (index < 4)
     {
+        /* Resets lowest byte keeping the rest same. */
         uint32_t r = emu->registers[index] & 0xffffff00;
         emu->registers[index] = r | (uint32_t)value;
     }
     else
     {
+        /* Resets 2nd byte keeping the rest same. */
         uint32_t r = emu->registers[index - 4] & 0xffff00ff;
         emu->registers[index - 4] = r | ((int32_t)value << 8);
     }
@@ -109,6 +133,14 @@ uint32_t get_register32(Emulator *emu, int reg_index)
 
 /* Stack Operations */
 
+void push16(Emulator *emu, uint16_t value)
+{
+    /* New address would be ESP value - 2 bytes.  */
+    uint32_t address = get_register32(emu, ESP) - 2;
+    set_register32(emu, ESP, address);
+    set_memory16(emu, address, value);
+}
+
 void push32(Emulator *emu, uint32_t value)
 {
     /* New address would be ESP value - 4 bytes.  */
@@ -124,6 +156,24 @@ uint32_t pop32(Emulator *emu)
     uint32_t value = get_memory32(emu, address);
     set_register32(emu, ESP, address + 4);
     return value;
+}
+
+/* Segment Register Operations */
+
+void set_seg_register16(Emulator *emu, int reg_index, uint16_t value)
+{
+    emu->segment_registers[reg_index] = value;
+}
+
+uint16_t get_seg_register16(Emulator *emu, int reg_index)
+{
+    return emu->segment_registers[reg_index];
+}
+
+void push_segment_register(Emulator *emu, int reg_index)
+{
+    uint16_t value = get_seg_register16(emu, reg_index);
+    push16(emu, value);
 }
 
 /* Eflag Operations */

@@ -61,4 +61,10 @@ void set_r32(Emulator *emu, ModRM *modrm, uint32_t value);
 /* Get 32-bit value from the register specified by REG of ModR/M. */
 uint32_t get_r32(Emulator *emu, ModRM *modrm);
 
+/* Sets 16-bit value on the segment register specified by REG of ModR/M. */
+void set_seg_r(Emulator *emu, ModRM *modrm, uint16_t value);
+
+/* Get 16-bit value from the segment register specified by REG of ModR/M. */
+uint16_t get_seg_r(Emulator *emu, ModRM *modrm);
+
 #endif

@@ -11,7 +11,7 @@
 #define MEMORY_SIZE (1024 * 1024)
 
 char *register_names[] = {"EAX", "ECX", "EDX", "EBX", "ESP", "EBP", "ESI", "EDI"};
-char *seg_register_names[] = {"CS", "DS", "ES", "SS", "FS", "GS"};
+char *seg_register_names[] = {"ES", "CS", "SS", "DS", "FS", "GS"};
 char *ctr_register_names[] = {"CR0", "CR1", "CR2", "CR3", "CR4"};
 
 static Emulator *

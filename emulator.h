@@ -40,10 +40,10 @@ enum Register
 
 enum SegmentRegister
 {
-    CS,
-    DS,
     ES,
+    CS,
     SS,
+    DS,
     FS,
     GS,
     SEGMENT_REGISTERS_COUNT
