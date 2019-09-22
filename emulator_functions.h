@@ -45,10 +45,12 @@ void push32(Emulator *emu, uint32_t value);
 uint32_t pop32(Emulator *emu);
 
 /* Segment Register Operations */
+
 void set_seg_register16(Emulator *emu, int reg_index, uint16_t value);
 uint16_t get_seg_register16(Emulator *emu, int reg_index);
 
 void push_segment_register(Emulator *emu, int reg_index);
+void pop_segment_register(Emulator *emu, int reg_index);
 
 /* Eflag Operations */
 

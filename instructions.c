@@ -126,6 +126,72 @@ static void push_es(Emulator *emu)
 }
 
 /*
+ * pop es: 1 byte
+ * Pops value from stack to ES.
+ * 1 byte: op (07)
+ */
+static void pop_es(Emulator *emu)
+{
+    pop_segment_register(emu, ES);
+    emu->eip += 1;
+}
+
+/*
+ * push cs: 1 byte
+ * Pushes value of CS to stack.
+ * 1 byte: op (0E)
+ */
+static void push_cs(Emulator *emu)
+{
+    push_segment_register(emu, CS);
+    emu->eip += 1;
+}
+
+/*
+ * push ss: 1 byte
+ * Pushes value of SS to stack.
+ * 1 byte: op (16)
+ */
+static void push_ss(Emulator *emu)
+{
+    push_segment_register(emu, SS);
+    emu->eip += 1;
+}
+
+/*
+ * pop es: 1 byte
+ * Pops value from stack to SS.
+ * 1 byte: op (17)
+ */
+static void pop_ss(Emulator *emu)
+{
+    pop_segment_register(emu, SS);
+    emu->eip += 1;
+}
+
+/*
+ * push ds: 1 byte
+ * Pushes value of DS to stack.
+ * 1 byte: op (1E)
+ */
+static void push_ds(Emulator *emu)
+{
+    push_segment_register(emu, DS);
+    emu->eip += 1;
+}
+
+/*
+ * pop ds: 1 byte
+ * Pops value from stack to DS.
+ * 1 byte: op (1F)
+ */
+static void pop_ds(Emulator *emu)
+{
+    pop_segment_register(emu, DS);
+    emu->eip += 1;
+}
+
+/*
  * jmp (short): 2 bytes
  * Jumps with 8-bit signed offset.
  * 1 byte: op (EB)
@@ -684,6 +750,15 @@ void init_instructions(void)
     instructions[0x05] = add_eax_imm32;
 
     instructions[0x06] = push_es;
+    instructions[0x07] = pop_es;
+
+    instructions[0x0E] = push_cs;
+
+    instructions[0x16] = push_ss;
+    instructions[0x17] = pop_ss;
+
+    instructions[0x1E] = push_ds;
+    instructions[0x1F] = pop_ds;
 
     instructions[0x3B] = cmp_r32_rm32;
     instructions[0x3C] = cmp_al_imm8;

@@ -150,6 +150,14 @@ void push32(Emulator *emu, uint32_t value)
     set_memory32(emu, address, value);
 }
 
+uint16_t pop16(Emulator *emu)
+{
+    uint32_t address = get_register32(emu, ESP);
+    uint16_t value = get_memory16(emu, address);
+    set_register32(emu, ESP, address + 2);
+    return value;
+}
+
 uint32_t pop32(Emulator *emu)
 {
     uint32_t address = get_register32(emu, ESP);
@@ -174,6 +182,12 @@ void push_segment_register(Emulator *emu, int reg_index)
 {
     uint16_t value = get_seg_register16(emu, reg_index);
     push16(emu, value);
+}
+
+void pop_segment_register(Emulator *emu, int reg_index)
+{
+    uint16_t value = pop16(emu);
+    set_seg_register16(emu, reg_index, value);
 }
 
 /* Eflag Operations */
