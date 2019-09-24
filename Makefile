@@ -1,5 +1,22 @@
 TARGET = dax86
-OBJS = main.o emulator_functions.o instructions.o modrm.o io.o
+OBJS = \
+	main.o\
+	emulator_functions.o\
+	instructions.o\
+	modrm.o\
+	io.o\
+	instructions_00.o\
+	instructions_10.o\
+	instructions_30.o\
+	instructions_40.o\
+	instructions_50.o\
+	instructions_60.o\
+	instructions_70.o\
+	instructions_80.o\
+	instructions_B0.o\
+	instructions_C0.o\
+	instructions_E0.o\
+	instructions_F0.o
 
 CC = /usr/bin/gcc
 CFLAGS += -Wall
