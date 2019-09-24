@@ -335,3 +335,12 @@ void update_eflags_sub(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t
     set_sign_flag(emu, signr);
     set_overflow_flag(emu, sign1 != sign2 && sign1 != signr);
 }
+
+void update_eflags_or(Emulator *emu, uint32_t result)
+{
+    int signr = (result >> 31) & 1;
+    set_carry_flag(emu, 0);
+    set_zero_flag(emu, result == 0);
+    set_sign_flag(emu, signr);
+    set_overflow_flag(emu, 0);
+}

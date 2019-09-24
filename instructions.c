@@ -95,6 +95,7 @@ static void add_al_imm8(Emulator *emu)
     uint8_t al_val = get_register8(emu, AL);
     uint64_t result = (uint64_t)al_val + (uint64_t)imm8_val;
     set_register8(emu, AL, result);
+    update_eflags_add(emu, al_val, imm8_val, result);
     emu->eip += 2;
 }
 
@@ -134,6 +135,110 @@ static void pop_es(Emulator *emu)
 {
     pop_segment_register(emu, ES);
     emu->eip += 1;
+}
+
+/*
+ * or rm8 r8: 2/3 bytes (or byte [eax], ah;)
+ * Logical inclusive OR between value of ModR/M and REG, storing result to destination.
+ * 1 byte: op (08)
+ * 1/2 byte: ModR/M
+ */
+static void or_rm8_r8(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t r8_val = get_r8(emu, &modrm);
+    uint32_t result = rm8_val | (uint32_t)r8_val;
+    set_rm8(emu, &modrm, result);
+    update_eflags_or(emu, result);
+}
+
+/*
+ * or rm32 r32: 2/3 bytes
+ * Logical inclusive OR between value of REG and ModR/M, storing result to destination.
+ * 1 byte: op (09)
+ * 1/2 byte: ModR/M
+ */
+static void or_rm32_r32(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t rm32_val = get_rm32(emu, &modrm);
+    uint32_t r32_val = get_r32(emu, &modrm);
+    uint32_t result = rm32_val | r32_val;
+    set_rm32(emu, &modrm, result);
+    update_eflags_or(emu, result);
+}
+
+/*
+ * or r8 rm8: 2/3 bytes
+ * Logical inclusive OR between value of ModR/M and r8, storing result of destination.
+ * 1 byte: op (0A)
+ * 1/2 byte: ModR/M
+ */
+static void or_r8_rm8(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t r8_val = get_r8(emu, &modrm);
+    uint32_t result = (uint32_t)r8_val | rm8_val;
+    set_r8(emu, &modrm, result);
+    update_eflags_or(emu, result);
+}
+
+/*
+ * or r32 rm32: 2/3 bytes
+ * Logical inclusive OR between value of ModR/M and r32, storing result of destination.
+ * 1 byte: op (0B)
+ * 1/2 byte: ModR/M
+ */
+static void or_r32_rm32(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint32_t r32_val = get_r32(emu, &modrm);
+    uint32_t rm32_val = get_rm32(emu, &modrm);
+    uint32_t result = r32_val | rm32_val;
+    set_r32(emu, &modrm, result);
+    update_eflags_or(emu, result);
+}
+
+/*
+ * add al imm8: 2 bytes
+ * Logical inclusive OR between imm8 and al, storing result to destination.
+ * 1 byte: op (0C)
+ * 1 byte: imm8
+ */
+static void or_al_imm8(Emulator *emu)
+{
+    uint8_t imm8_val = get_code8(emu, 1);
+    uint8_t al_val = get_register8(emu, AL);
+    uint32_t result = (uint32_t)al_val | (uint32_t)imm8_val;
+    set_register8(emu, AL, result);
+    update_eflags_or(emu, result);
+    emu->eip += 2;
+}
+
+/*
+ * or al imm32: 5 bytes
+ * Logical inclusive OR between imm32 to eax, storing result to destination.
+ * 1 byte: op (0D)
+ * 4 byte: imm32
+ */
+static void or_eax_imm32(Emulator *emu)
+{
+    uint32_t eax_val = get_register32(emu, EAX);
+    uint32_t imm32_val = get_code32(emu, 1);
+    uint32_t result = eax_val | imm32_val;
+    set_register32(emu, EAX, result);
+    update_eflags_or(emu, result);
+    emu->eip += 5;
 }
 
 /*
@@ -357,6 +462,24 @@ static void add_rm32_imm8(Emulator *emu, ModRM *modrm)
 }
 
 /*
+ * or rm32 imm8: 3 bytes
+ * Logical inclusive OR between rm32 and imm8, storing result to destination.
+ * 1 byte: shared op (83)
+ * 1 byte: ModR/M
+ * 1 byte: imm8 to or
+ */
+static void or_rm32_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint32_t rm32 = get_rm32(emu, modrm);
+    uint32_t imm8 = (int32_t)get_sign_code8(emu, 0);
+    emu->eip += 1;
+    uint32_t result = rm32 | imm8;
+
+    set_rm32(emu, modrm, result);
+    update_eflags_or(emu, result);
+}
+
+/*
  * sub rm32 imm8: 3 bytes
  * Subtracts imm8 from RM32. Op code 83 and ModR/M op code: 101 execute this.
  * 1 byte: shared op (83)
@@ -403,6 +526,9 @@ static void code_83(Emulator *emu)
     {
     case 0:
         add_rm32_imm8(emu, &modrm);
+        break;
+    case 1:
+        or_rm32_imm8(emu, &modrm);
         break;
     case 5:
         sub_rm32_imm8(emu, &modrm);
@@ -751,6 +877,13 @@ void init_instructions(void)
 
     instructions[0x06] = push_es;
     instructions[0x07] = pop_es;
+
+    instructions[0x08] = or_rm8_r8;
+    instructions[0x09] = or_rm32_r32;
+    instructions[0x0A] = or_r8_rm8;
+    instructions[0x0B] = or_r32_rm32;
+    instructions[0x0C] = or_al_imm8;
+    instructions[0x0D] = or_eax_imm32;
 
     instructions[0x0E] = push_cs;
 
