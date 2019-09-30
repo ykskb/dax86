@@ -20,6 +20,23 @@ void ret(Emulator *emu)
 }
 
 /*
+ * mov rm8 imm8: 3/4 bytes
+ * Copies imm8 value to register or memory specified by ModR/M(rm8).
+ * 1 byte: op (C6)
+ * 1/2 byte: ModR/M
+ * 1 byte: imm8 value
+ */
+void mov_rm8_imm8(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+    uint8_t value = get_code8(emu, 0);
+    emu->eip += 1;
+    set_rm8(emu, &modrm, value);
+}
+
+/*
  * mov rm32 imm32: 5 bytes
  * Copies imm value to register or memory specified by ModR/M (rm32).
  * 1 byte: op (C7)

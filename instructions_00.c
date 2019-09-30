@@ -98,7 +98,7 @@ void add_al_imm8(Emulator *emu)
 }
 
 /*
- * add al imm32: 5 bytes
+ * add eax imm32: 5 bytes
  * Adds imm32 to eax.
  * 1 byte: op (05)
  * 4 byte: imm32
@@ -150,7 +150,7 @@ void or_rm8_r8(Emulator *emu)
     uint8_t r8_val = get_r8(emu, &modrm);
     uint32_t result = rm8_val | (uint32_t)r8_val;
     set_rm8(emu, &modrm, result);
-    update_eflags_or(emu, result);
+    update_eflags_logical_ops(emu, result);
 }
 
 /*
@@ -168,7 +168,7 @@ void or_rm32_r32(Emulator *emu)
     uint32_t r32_val = get_r32(emu, &modrm);
     uint32_t result = rm32_val | r32_val;
     set_rm32(emu, &modrm, result);
-    update_eflags_or(emu, result);
+    update_eflags_logical_ops(emu, result);
 }
 
 /*
@@ -186,7 +186,7 @@ void or_r8_rm8(Emulator *emu)
     uint8_t r8_val = get_r8(emu, &modrm);
     uint32_t result = (uint32_t)r8_val | rm8_val;
     set_r8(emu, &modrm, result);
-    update_eflags_or(emu, result);
+    update_eflags_logical_ops(emu, result);
 }
 
 /*
@@ -204,11 +204,11 @@ void or_r32_rm32(Emulator *emu)
     uint32_t rm32_val = get_rm32(emu, &modrm);
     uint32_t result = r32_val | rm32_val;
     set_r32(emu, &modrm, result);
-    update_eflags_or(emu, result);
+    update_eflags_logical_ops(emu, result);
 }
 
 /*
- * add al imm8: 2 bytes
+ * or al imm8: 2 bytes
  * Logical inclusive OR between imm8 and al, storing result to destination.
  * 1 byte: op (0C)
  * 1 byte: imm8
@@ -219,7 +219,7 @@ void or_al_imm8(Emulator *emu)
     uint8_t al_val = get_register8(emu, AL);
     uint32_t result = (uint32_t)al_val | (uint32_t)imm8_val;
     set_register8(emu, AL, result);
-    update_eflags_or(emu, result);
+    update_eflags_logical_ops(emu, result);
     emu->eip += 2;
 }
 
@@ -235,7 +235,7 @@ void or_eax_imm32(Emulator *emu)
     uint32_t imm32_val = get_code32(emu, 1);
     uint32_t result = eax_val | imm32_val;
     set_register32(emu, EAX, result);
-    update_eflags_or(emu, result);
+    update_eflags_logical_ops(emu, result);
     emu->eip += 5;
 }
 

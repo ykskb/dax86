@@ -56,11 +56,43 @@ void init_instructions(void)
 
     instructions[0x0E] = push_cs;
 
+    instructions[0x10] = adc_rm8_r8;
+    instructions[0x11] = adc_rm32_r32;
+    instructions[0x12] = adc_r8_rm8;
+    instructions[0x13] = adc_r32_rm32;
+    instructions[0x14] = adc_al_imm8;
+    instructions[0x15] = adc_eax_imm32;
+
     instructions[0x16] = push_ss;
     instructions[0x17] = pop_ss;
 
+    instructions[0x18] = sbb_rm8_r8;
+    instructions[0x19] = sbb_rm32_r32;
+    instructions[0x1A] = sbb_r8_rm8;
+    instructions[0x1B] = sbb_r32_rm32;
+    instructions[0x1C] = sbb_al_imm8;
+    instructions[0x1D] = sbb_eax_imm32;
+
     instructions[0x1E] = push_ds;
     instructions[0x1F] = pop_ds;
+
+    instructions[0x20] = and_rm8_r8;
+    instructions[0x21] = and_rm32_r32;
+    instructions[0x22] = and_r8_rm8;
+    instructions[0x23] = and_r32_rm32;
+    instructions[0x24] = and_al_imm8;
+    instructions[0x25] = and_eax_imm32;
+
+    /* instructions[0x26] = prefix_override; */
+
+    instructions[0x28] = sub_rm8_r8;
+    instructions[0x29] = sub_rm32_r32;
+    instructions[0x2A] = sub_r8_rm8;
+    instructions[0x2B] = sub_r32_rm32;
+    instructions[0x2C] = sub_al_imm8;
+    instructions[0x2D] = sub_eax_imm32;
+
+    /* instructions[0x2E] = prefix_override; */
 
     instructions[0x3B] = cmp_r32_rm32;
     instructions[0x3C] = cmp_al_imm8;
@@ -118,6 +150,7 @@ void init_instructions(void)
     }
 
     instructions[0xC3] = ret;
+    instructions[0xC6] = mov_rm8_imm8;
     instructions[0xC7] = mov_rm32_imm32;
     instructions[0xC9] = leave;
 

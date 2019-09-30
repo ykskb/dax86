@@ -6,7 +6,22 @@
 # tests/io/in_display.bin
 # tests/rep/rep.bin
 
-for i in "modrm" "org_jmp" "call" "main_func" "args" "if" "flags_set" "flags_clear" "if" "loop" "io_out" "seg" "or"
+for i in \
+ "modrm"\
+ "org_jmp"\
+ "call"\
+ "main_func"\
+ "args"\
+ "if"\
+ "flags_set"\
+ "flags_clear"\
+ "if"\
+ "loop"\
+ "io_out"\
+ "seg"\
+ "or"\
+ "sub"\
+ "and"
 do
 
 test_path="./tests/${i}/${i}.bin"

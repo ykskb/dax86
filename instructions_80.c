@@ -39,7 +39,25 @@ static void or_rm32_imm8(Emulator *emu, ModRM *modrm)
     uint32_t result = rm32 | imm8;
 
     set_rm32(emu, modrm, result);
-    update_eflags_or(emu, result);
+    update_eflags_logical_ops(emu, result);
+}
+
+/*
+ * and rm32 imm8: 3/4 bytes
+ * Logical AND between rm32 and imm8, storing the result to destination.
+ * 1 byte: shared op (83)
+ * 1/2 bytes: ModR/M
+ * 1 byte: imm8 to AND
+ */
+static void and_rm32_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint32_t rm32 = get_rm32(emu, modrm);
+    uint32_t imm8 = (int32_t)get_sign_code8(emu, 0);
+    emu->eip += 1;
+    uint32_t result = rm32 & imm8;
+
+    set_rm32(emu, modrm, result);
+    update_eflags_logical_ops(emu, result);
 }
 
 /*
@@ -92,6 +110,9 @@ void code_83(Emulator *emu)
         break;
     case 1:
         or_rm32_imm8(emu, &modrm);
+        break;
+    case 4:
+        and_rm32_imm8(emu, &modrm);
         break;
     case 5:
         sub_rm32_imm8(emu, &modrm);

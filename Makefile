@@ -7,6 +7,7 @@ OBJS = \
 	io.o\
 	instructions_00.o\
 	instructions_10.o\
+	instructions_20.o\
 	instructions_30.o\
 	instructions_40.o\
 	instructions_50.o\

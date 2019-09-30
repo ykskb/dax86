@@ -23,7 +23,7 @@ label0:
 
     ; 0f: 2-byte instructions
 
-    adc byte [ebp], ah; 10 abc rm8 r8
+    adc byte [ebp], ah; 10 adc rm8 r8
     adc dword [ebp], eax ; 11 adc rm32 r32
     adc byte ah, [ebp] ; 12 adc r8 rm8
     adc dword eax, [ebp] ; 13 adc r32, rm32

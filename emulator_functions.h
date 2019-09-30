@@ -71,6 +71,6 @@ int32_t is_overflow(Emulator *emu);
 void update_eflags_add(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t result);
 void update_eflags_sub(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t result);
 
-void update_eflags_or(Emulator *emu, uint32_t result);
+void update_eflags_logical_ops(Emulator *emu, uint32_t result);
 
 #endif
