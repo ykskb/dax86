@@ -1,20 +1,24 @@
 # dax86
 
-x86 simulator for study-purpose (without reading QEMU)
+x86 simulator for study-purpose (without reading the source code of QEMU)
 
-Originally based on the book:
+Referenced these publications with many thanks:
 
-https://book.mynavi.jp/support/bookmook/x86/
+- https://software.intel.com/en-us/articles/intel-sdm
+- http://ref.x86asm.net/
+- https://x86.puri.sm/
+- https://c9x.me/x86/
+- https://book.mynavi.jp/support/bookmook/x86/
 
-Currently working on extension of this, adding functionalities such as:
+Currently working on functionalities such as:
 
-- SIB
-- Instruction prefixes
-- More registers
-- More instructions
-- More eflags
-- Protection mode
-- Paging
+- More instructions (in-progress)
+- Instruction prefixes (in-progress)
+- More registers (in-progress)
+- More eflags (in-progress)
+- Protection mode (starting-soon)
+- Paging (starting-soon)
+- SIB (done)
 - more
 
 with bunch of comments for note-taking purposes.
