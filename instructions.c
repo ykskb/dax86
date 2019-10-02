@@ -94,6 +94,16 @@ void init_instructions(void)
 
     /* instructions[0x2E] = prefix_override; */
 
+    instructions[0x30] = xor_rm8_r8;
+    instructions[0x31] = xor_rm32_r32;
+    instructions[0x32] = xor_r8_rm8;
+    instructions[0x33] = xor_r32_rm32;
+    instructions[0x34] = xor_al_imm8;
+    instructions[0x35] = xor_eax_imm32;
+
+    instructions[0x38] = cmp_rm8_r8;
+    instructions[0x39] = cmp_rm32_r32;
+    instructions[0x3A] = cmp_r8_rm8;
     instructions[0x3B] = cmp_r32_rm32;
     instructions[0x3C] = cmp_al_imm8;
     instructions[0x3D] = cmp_eax_imm32;
@@ -102,6 +112,12 @@ void init_instructions(void)
     for (i = 0; i < 8; i++)
     {
         instructions[0x40 + i] = inc_r32;
+    }
+
+    /* op code includes 8 registers in 1 byte: 0x48 ~ 0x4F*/
+    for (i = 0; i < 8; i++)
+    {
+        instructions[0x48 + i] = dec_r32;
     }
 
     /* op code includes 8 registers in 1 byte: 0x50 ~ 0x57*/
@@ -116,6 +132,8 @@ void init_instructions(void)
         instructions[0x58 + i] = pop_r32;
     }
 
+    instructions[0x60] = pushad;
+    instructions[0x61] = popad;
     instructions[0x68] = push_imm32;
     instructions[0x6A] = push_imm8;
 

@@ -20,3 +20,15 @@ void inc_r32(Emulator *emu)
     set_register32(emu, reg, get_register32(emu, reg) + 1);
     emu->eip += 1;
 }
+
+/*
+ * dec r32: 1 byte
+ * Decrements a value of specified 32-bit register in op code.
+ * 1 byte: op (48) + reg index (3 bits)
+ */
+void dec_r32(Emulator *emu)
+{
+    uint8_t reg = get_code8(emu, 0) - 0x48;
+    set_register32(emu, reg, get_register32(emu, reg) - 1);
+    emu->eip += 1;
+}

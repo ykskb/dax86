@@ -78,6 +78,17 @@ static void sub_rm32_imm8(Emulator *emu, ModRM *modrm)
     update_eflags_sub(emu, rm32, imm8, result);
 }
 
+static void xor_rm32_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint32_t rm32 = get_rm32(emu, modrm);
+    uint32_t imm8 = (int32_t)get_sign_code8(emu, 0);
+    emu->eip += 1;
+    uint32_t result = rm32 ^ imm8;
+
+    set_rm32(emu, modrm, result);
+    update_eflags_logical_ops(emu, result);
+}
+
 /*
  * cmp rm32 imm8: 3 bytes
  * Compares RM32 value and imm8 value by subtracting in order.
@@ -116,6 +127,9 @@ void code_83(Emulator *emu)
         break;
     case 5:
         sub_rm32_imm8(emu, &modrm);
+        break;
+    case 6:
+        xor_rm32_imm8(emu, &modrm);
         break;
     case 7:
         cmp_rm32_imm8(emu, &modrm);

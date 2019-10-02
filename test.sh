@@ -21,7 +21,9 @@ for i in \
  "seg"\
  "or"\
  "sub"\
- "and"
+ "and"\
+ "xor"\
+ "pusha"
 do
 
 test_path="./tests/${i}/${i}.bin"

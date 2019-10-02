@@ -93,18 +93,18 @@ label0:
 
     ; 3F aas al ah ; ?
 
-    ; 40 + r inc r32 ;
+    ; 40 + r inc r32 ; implemented ;
 
-    ; 48 + r dec r32 ;
+    ; 48 + r dec r32 ; implemented ;
 
-    ; 50 + r push r32 ;
+    ; 50 + r push r32 ; implemented ;
 
-    ; 58 + r pop r32 ;
+    ; 58 + r pop r32 ; implemented ;
 
-    ; 60 pusha ; push all general register to stack
-    ; 61 pushad ;
-    ; 62 popa ;
-    ; 63 popad ;
+    pusha ; 60 pusha ; push all general register to stack
+    pushad ; 61 pushad ;
+    popa ; 62 popa ;
+    popad ; 63 popad ;
 
     ; 64 FS override prefix ;
     ; 65 GS override prefix ;

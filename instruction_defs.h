@@ -57,18 +57,30 @@ void sub_eax_imm32(Emulator *emu);
 /* 2E CS override prefix */
 
 /* 0x3 */
+void xor_rm8_r8(Emulator *emu);
+void xor_rm32_r32(Emulator *emu);
+void xor_r8_rm8(Emulator *emu);
+void xor_r32_rm32(Emulator *emu);
+void xor_al_imm8(Emulator *emu);
+void xor_eax_imm32(Emulator *emu);
+void cmp_rm8_r8(Emulator *emu);
+void cmp_rm32_r32(Emulator *emu);
+void cmp_r8_rm8(Emulator *emu);
+void cmp_r32_rm32(Emulator *emu);
 void cmp_al_imm8(Emulator *emu);
 void cmp_eax_imm32(Emulator *emu);
-void cmp_r32_rm32(Emulator *emu);
 
 /* 0x4 */
 void inc_r32(Emulator *emu);
+void dec_r32(Emulator *emu);
 
 /* 0x5 */
 void push_r32(Emulator *emu);
 void pop_r32(Emulator *emu);
 
 /* 0x6 */
+void pushad(Emulator *emu);
+void popad(Emulator *emu);
 void push_imm32(Emulator *emu);
 void push_imm8(Emulator *emu);
 
