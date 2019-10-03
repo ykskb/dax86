@@ -20,11 +20,11 @@ void adc_rm8_r8(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm) + (uint8_t)is_carry(emu);
-    uint64_t result = (uint64_t)rm8_val + (uint64_t)r8_val;
+    uint16_t result = (uint16_t)rm8_val + (uint16_t)r8_val;
     set_rm8(emu, &modrm, result);
-    update_eflags_add(emu, rm8_val, r8_val, result);
+    update_eflags_add_8bit(emu, rm8_val, r8_val, result);
 }
 
 /*
@@ -56,11 +56,11 @@ void adc_r8_rm8(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm) + (uint8_t)is_carry(emu);
-    uint64_t result = (uint64_t)r8_val + (uint64_t)rm8_val;
+    uint16_t result = (uint16_t)r8_val + (uint16_t)rm8_val;
     set_r8(emu, &modrm, result);
-    update_eflags_add(emu, r8_val, rm8_val, result);
+    update_eflags_add_8bit(emu, r8_val, rm8_val, result);
 }
 
 /*
@@ -89,11 +89,11 @@ void adc_r32_rm32(Emulator *emu)
  */
 void adc_al_imm8(Emulator *emu)
 {
-    uint8_t imm8_val = get_sign_code8(emu, 1);
+    uint8_t imm8_val = (int8_t)get_sign_code8(emu, 1);
     uint8_t al_val = get_register8(emu, AL) + (uint8_t)is_carry(emu);
-    uint64_t result = (uint64_t)al_val + (uint64_t)imm8_val;
+    uint16_t result = (uint16_t)al_val + (uint16_t)imm8_val;
     set_register8(emu, AL, result);
-    update_eflags_add(emu, al_val, imm8_val, result);
+    update_eflags_add_8bit(emu, al_val, imm8_val, result);
     emu->eip += 2;
 }
 
@@ -106,7 +106,7 @@ void adc_al_imm8(Emulator *emu)
 void adc_eax_imm32(Emulator *emu)
 {
     uint32_t eax_val = get_register32(emu, EAX);
-    uint32_t imm32_val = get_sign_code32(emu, 1) + is_carry(emu);
+    uint32_t imm32_val = (int32_t)get_sign_code32(emu, 1) + is_carry(emu);
     uint64_t result = (uint64_t)eax_val + (uint64_t)imm32_val;
     set_register32(emu, EAX, result);
     update_eflags_add(emu, eax_val, imm32_val, result);
@@ -146,11 +146,11 @@ void sbb_rm8_r8(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm) + (uint8_t)is_carry(emu);
-    uint64_t result = (uint64_t)rm8_val - (uint64_t)r8_val;
+    uint16_t result = (uint16_t)rm8_val - (uint16_t)r8_val;
     set_rm8(emu, &modrm, result);
-    update_eflags_add(emu, rm8_val, r8_val, result);
+    update_eflags_sub_8bit(emu, rm8_val, r8_val, result);
 }
 
 /*
@@ -168,7 +168,7 @@ void sbb_rm32_r32(Emulator *emu)
     uint32_t r32_val = get_r32(emu, &modrm) + is_carry(emu);
     uint64_t result = (uint64_t)rm32_val - (uint64_t)r32_val;
     set_rm32(emu, &modrm, result);
-    update_eflags_add(emu, rm32_val, r32_val, result);
+    update_eflags_sub(emu, rm32_val, r32_val, result);
 }
 
 /*
@@ -182,11 +182,11 @@ void sbb_r8_rm8(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm) + (uint8_t)is_carry(emu);
-    uint64_t result = (uint64_t)r8_val - (uint64_t)rm8_val;
+    uint16_t result = (uint16_t)r8_val - (uint16_t)rm8_val;
     set_r8(emu, &modrm, result);
-    update_eflags_add(emu, r8_val, rm8_val, result);
+    update_eflags_sub_8bit(emu, r8_val, rm8_val, result);
 }
 
 /*
@@ -204,7 +204,7 @@ void sbb_r32_rm32(Emulator *emu)
     uint32_t rm32_val = get_rm32(emu, &modrm) + is_carry(emu);
     uint64_t result = (uint64_t)r32_val - (uint64_t)rm32_val;
     set_r32(emu, &modrm, result);
-    update_eflags_add(emu, r32_val, rm32_val, result);
+    update_eflags_sub(emu, r32_val, rm32_val, result);
 }
 
 /*
@@ -215,11 +215,11 @@ void sbb_r32_rm32(Emulator *emu)
  */
 void sbb_al_imm8(Emulator *emu)
 {
-    uint8_t imm8_val = get_sign_code8(emu, 1);
+    uint8_t imm8_val = (int8_t)get_sign_code8(emu, 1);
     uint8_t al_val = get_register8(emu, AL) + (uint8_t)is_carry(emu);
-    uint64_t result = (uint64_t)al_val - (uint64_t)imm8_val;
+    uint16_t result = (uint16_t)al_val - (uint16_t)imm8_val;
     set_register8(emu, AL, result);
-    update_eflags_add(emu, al_val, imm8_val, result);
+    update_eflags_sub_8bit(emu, al_val, imm8_val, result);
     emu->eip += 2;
 }
 
@@ -232,7 +232,7 @@ void sbb_al_imm8(Emulator *emu)
 void sbb_eax_imm32(Emulator *emu)
 {
     uint32_t eax_val = get_register32(emu, EAX);
-    uint32_t imm32_val = get_sign_code32(emu, 1) + is_carry(emu);
+    uint32_t imm32_val = (int32_t)get_sign_code32(emu, 1) + is_carry(emu);
     uint64_t result = (uint64_t)eax_val - (uint64_t)imm32_val;
     set_register32(emu, EAX, result);
     update_eflags_add(emu, eax_val, imm32_val, result);

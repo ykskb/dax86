@@ -10,6 +10,187 @@
 #include "io.h"
 
 /*
+ * add rm8 imm8: 3|4 bytes
+ * Adds imm8 to ModR/M(8 bit). Op code 80 and ModR/M op code: 0 execute this.
+ * 1 byte: shared op (80)
+ * 1|2 byte: ModR/M
+ * 1 byte: imm8 to add
+ */
+static void add_rm8_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8 = get_rm8(emu, modrm);
+    uint8_t imm8 = (int8_t)get_sign_code8(emu, 0);
+    emu->eip += 1;
+    set_rm8(emu, modrm, rm8 + imm8);
+    uint16_t result = (uint16_t)rm8 + (uint16_t)imm8;
+    update_eflags_add_8bit(emu, rm8, imm8, result);
+}
+
+/*
+ * or rm8 imm8: 3|4 bytes
+ * Logical inclusive OR between rm8 and imm8, storing result to destination.
+ * 1 byte: shared op (80)
+ * 1|2 byte: ModR/M
+ * 1 byte: imm8 to or
+ */
+static void or_rm8_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8 = get_rm8(emu, modrm);
+    uint8_t imm8 = get_sign_code8(emu, 0);
+    emu->eip += 1;
+    uint8_t result = rm8 | imm8;
+
+    set_rm8(emu, modrm, result);
+    update_eflags_logical_ops_8bit(emu, result);
+}
+
+/*
+ * adc rm8 imm8: 3|4 bytes
+ * Adds imm8 to ModR/M(8 bit) with carry flag. Op code 80 and ModR/M op code: 2 execute this.
+ * 1 byte: shared op (80)
+ * 1|2 byte: ModR/M
+ * 1 byte: imm8 to add
+ */
+static void adc_rm8_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8 = get_rm8(emu, modrm);
+    uint8_t imm8 = (int8_t)get_sign_code8(emu, 0) + (uint8_t)is_carry(emu);
+    emu->eip += 1;
+    set_rm8(emu, modrm, rm8 + imm8);
+    uint16_t result = (uint16_t)rm8 + (uint16_t)imm8;
+    update_eflags_add_8bit(emu, rm8, imm8, result);
+}
+
+/*
+ * sbb rm8 imm8: 3 bytes
+ * Subtracts imm8 and carry flag from rm8. Op code 80 and ModR/M op code: 3 execute this.
+ * 1 byte: shared op (80)
+ * 1 byte: ModR/M
+ * 1 byte: imm8 to subtract
+ */
+static void sbb_rm8_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8 = get_rm8(emu, modrm);
+    uint8_t imm8 = get_sign_code8(emu, 0) + (uint8_t)is_carry(emu);
+    emu->eip += 1;
+    uint16_t result = (uint16_t)rm8 - (uint16_t)imm8;
+
+    set_rm8(emu, modrm, result);
+    update_eflags_sub_8bit(emu, rm8, imm8, result);
+}
+
+/*
+ * and rm8 imm8: 3|4 bytes
+ * Logical AND between rm8 and imm8, storing the result to destination.
+ * 1 byte: shared op (80)
+ * 1|2 bytes: ModR/M
+ * 1 byte: imm8 to AND
+ */
+static void and_rm8_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8 = get_rm8(emu, modrm);
+    uint8_t imm8 = get_sign_code8(emu, 0);
+    emu->eip += 1;
+    uint8_t result = rm8 & imm8;
+
+    set_rm8(emu, modrm, result);
+    update_eflags_logical_ops_8bit(emu, result);
+}
+
+/*
+ * sub rm8 imm8: 3 bytes
+ * Subtracts imm8 from rm8. Op code 80 and ModR/M op code: 101 execute this.
+ * 1 byte: shared op (80)
+ * 1 byte: ModR/M
+ * 1 byte: imm8 to subtract
+ */
+static void sub_rm8_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8 = get_rm8(emu, modrm);
+    uint8_t imm8 = get_sign_code8(emu, 0);
+    emu->eip += 1;
+    uint16_t result = (uint16_t)rm8 - (uint16_t)imm8;
+
+    set_rm8(emu, modrm, result);
+    update_eflags_sub_8bit(emu, rm8, imm8, result);
+}
+
+/*
+ * xor rm8 imm8: 3 bytes
+ * Logical XOR between rm8 and imm8, storing result to destination.
+ * 1 byte: shared op (80)
+ * 1 byte: ModR/M
+ * 1 byte: imm8 to xor
+ */
+static void xor_rm8_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8 = get_rm8(emu, modrm);
+    uint8_t imm8 = get_sign_code8(emu, 0);
+    emu->eip += 1;
+    uint8_t result = rm8 ^ imm8;
+
+    set_rm8(emu, modrm, result);
+    update_eflags_logical_ops_8bit(emu, result);
+}
+
+/*
+ * cmp rm8 imm8: 3 bytes
+ * Compares RM8 value and imm8 value by subtracting in order.
+ * Op code 80 and ModR/M op code: 111 execute this.
+ * 1 byte: shared op (80)
+ * 1 byte: ModR/M
+ * 1 byte: imm8 to subtract
+ */
+static void cmp_rm8_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8 = get_rm8(emu, modrm);
+    uint8_t imm8 = get_sign_code8(emu, 0);
+    emu->eip += 1;
+    uint16_t result = (uint16_t)rm8 - (uint16_t)imm8;
+
+    update_eflags_sub_8bit(emu, rm8, imm8, result);
+}
+
+void code_80(Emulator *emu)
+{
+    /* Proceed 1 byte for op code 80. */
+    emu->eip += 1;
+    ModRM modrm;
+    parse_modrm(emu, &modrm);
+
+    switch (modrm.opcode)
+    {
+    case 0:
+        add_rm8_imm8(emu, &modrm);
+        break;
+    case 1:
+        or_rm8_imm8(emu, &modrm);
+        break;
+    case 2:
+        adc_rm8_imm8(emu, &modrm);
+        break;
+    case 3:
+        sbb_rm8_imm8(emu, &modrm);
+        break;
+    case 4:
+        and_rm8_imm8(emu, &modrm);
+        break;
+    case 5:
+        sub_rm8_imm8(emu, &modrm);
+        break;
+    case 6:
+        xor_rm8_imm8(emu, &modrm);
+        break;
+    case 7:
+        cmp_rm8_imm8(emu, &modrm);
+        break;
+    default:
+        printf("Not implemented: Op: 83 with ModR/M Op: %d\n", modrm.opcode);
+        exit(1);
+    }
+}
+
+/*
  * add rm32 imm8: 3 bytes
  * Adds imm8 to RM32. Op code 83 and ModR/M op code: 0 execute this.
  * 1 byte: shared op (83)
@@ -78,6 +259,13 @@ static void sub_rm32_imm8(Emulator *emu, ModRM *modrm)
     update_eflags_sub(emu, rm32, imm8, result);
 }
 
+/*
+ * xor rm32 imm8: 3 bytes
+ * Logical XOR between rm32 and imm8, storing result to destination.
+ * 1 byte: shared op (83)
+ * 1 byte: ModR/M
+ * 1 byte: imm8 to xor
+ */
 static void xor_rm32_imm8(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);

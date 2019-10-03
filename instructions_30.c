@@ -20,11 +20,11 @@ void xor_rm8_r8(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm);
-    uint32_t result = rm8_val ^ (uint32_t)r8_val;
+    uint8_t result = rm8_val ^ r8_val;
     set_rm8(emu, &modrm, result);
-    update_eflags_logical_ops(emu, result);
+    update_eflags_logical_ops_8bit(emu, result);
 }
 
 /*
@@ -56,11 +56,11 @@ void xor_r8_rm8(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm);
-    uint32_t result = (uint32_t)r8_val ^ rm8_val;
+    uint8_t result = (uint8_t)r8_val ^ rm8_val;
     set_r8(emu, &modrm, result);
-    update_eflags_logical_ops(emu, result);
+    update_eflags_logical_ops_8bit(emu, result);
 }
 
 /*
@@ -91,9 +91,9 @@ void xor_al_imm8(Emulator *emu)
 {
     uint8_t imm8_val = get_code8(emu, 1);
     uint8_t al_val = get_register8(emu, AL);
-    uint32_t result = (uint32_t)al_val ^ (uint32_t)imm8_val;
+    uint8_t result = (uint8_t)al_val ^ (uint8_t)imm8_val;
     set_register8(emu, AL, result);
-    update_eflags_logical_ops(emu, result);
+    update_eflags_logical_ops_8bit(emu, result);
     emu->eip += 2;
 }
 
@@ -124,10 +124,10 @@ void cmp_rm8_r8(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm);
-    uint64_t result = (uint64_t)rm8_val - (uint64_t)r8_val;
-    update_eflags_sub(emu, rm8_val, r8_val, result);
+    uint16_t result = (uint16_t)rm8_val - (uint16_t)r8_val;
+    update_eflags_sub_8bit(emu, rm8_val, r8_val, result);
 }
 
 /*
@@ -158,10 +158,10 @@ void cmp_r8_rm8(Emulator *emu)
     emu->eip += 1;
     ModRM modrm;
     parse_modrm(emu, &modrm);
-    uint32_t rm8_val = get_rm8(emu, &modrm);
+    uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm);
-    uint64_t result = (uint64_t)r8_val - (uint64_t)rm8_val;
-    update_eflags_sub(emu, r8_val, rm8_val, result);
+    uint16_t result = (uint16_t)r8_val - (uint16_t)rm8_val;
+    update_eflags_sub_8bit(emu, r8_val, rm8_val, result);
 }
 
 /*
@@ -189,10 +189,10 @@ void cmp_r32_rm32(Emulator *emu)
  */
 void cmp_al_imm8(Emulator *emu)
 {
-    uint8_t value = get_sign_code8(emu, 1);
+    uint8_t value = (int8_t)get_sign_code8(emu, 1);
     uint8_t al = get_register8(emu, AL);
-    uint64_t result = (uint64_t)al - (uint64_t)value;
-    update_eflags_sub(emu, al, value, result);
+    uint16_t result = (uint16_t)al - (uint16_t)value;
+    update_eflags_sub_8bit(emu, al, value, result);
     emu->eip += 2;
 }
 
@@ -204,7 +204,7 @@ void cmp_al_imm8(Emulator *emu)
  */
 void cmp_eax_imm32(Emulator *emu)
 {
-    uint32_t value = get_sign_code32(emu, 1);
+    uint32_t value = (int32_t)get_sign_code32(emu, 1);
     uint32_t eax = get_register32(emu, EAX);
     uint64_t result = (uint64_t)eax - (uint64_t)value;
     update_eflags_sub(emu, eax, value, result);

@@ -315,6 +315,16 @@ void update_eflags_add(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t
     set_sign_flag(emu, signr);
 }
 
+void update_eflags_add_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint16_t result)
+{
+    int sign1 = value1 >> 7;
+    int sign2 = value2 >> 7;
+    int signr = (result >> 7) & 1;
+    set_carry_flag(emu, result >> 8);
+    set_overflow_flag(emu, sign1 == sign2 && sign1 != signr);
+    set_sign_flag(emu, signr);
+}
+
 /* 
  * 1000 (-8) - 0001 (1) = 10111 (-9) -> carry
  * 1000 (-8) - 0010 (2) = 10110 (-10) -> carry
@@ -336,9 +346,30 @@ void update_eflags_sub(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t
     set_overflow_flag(emu, sign1 != sign2 && sign1 != signr);
 }
 
+void update_eflags_sub_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint16_t result)
+{
+    int sign1 = value1 >> 7;
+    int sign2 = value2 >> 7;
+    int signr = (result >> 7) & 1;
+
+    set_carry_flag(emu, result >> 8); // higher 32 bits
+    set_zero_flag(emu, result == 0);
+    set_sign_flag(emu, signr);
+    set_overflow_flag(emu, sign1 != sign2 && sign1 != signr);
+}
+
 void update_eflags_logical_ops(Emulator *emu, uint32_t result)
 {
     int signr = (result >> 31) & 1;
+    set_carry_flag(emu, 0);
+    set_zero_flag(emu, result == 0);
+    set_sign_flag(emu, signr);
+    set_overflow_flag(emu, 0);
+}
+
+void update_eflags_logical_ops_8bit(Emulator *emu, uint8_t result)
+{
+    int signr = (result >> 7) & 1;
     set_carry_flag(emu, 0);
     set_zero_flag(emu, result == 0);
     set_sign_flag(emu, signr);
