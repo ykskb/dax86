@@ -27,5 +27,7 @@ BITS 32
     ; no pop cs ; CS: 0x2
     pop ds ; DS: 0x1003 from SS
     pop ss ; SS: 0x2 from CS
+
+    mov eax, ss ; EAX: 0x2 from SS
     
     jmp 0

@@ -140,7 +140,7 @@ label0:
     ; 7D JNL/JGE jump short if not less/greater or equal (SF=OF)
     ; 7F JNLE/JG jump short if not less nor equal/greater ((ZF=0) AND (SF=OF))
 
-    ; 80 + n ; rm8 imm8 pattern ;
+    ; 80 + n ; rm8 imm8 pattern ; implemented (test needed) ;
     add byte [eax], 3
     or byte [eax], 3
     adc byte [eax], 3
@@ -150,7 +150,7 @@ label0:
     xor byte [eax], 3
     cmp byte [eax], 3
 
-    ; 81 + n ; rm32 imm32 pattern ;
+    ; 81 + n ; rm32 imm32 pattern ; implemented (test needed) ;
     add dword [eax], 0x1000
     or dword [eax], 0x1000
     adc dword [eax], 0x1000
@@ -163,7 +163,7 @@ label0:
     ; 82 aliases to 80 pattern ;
     ; https://stackoverflow.com/questions/41791470/assembler-what-is-seventh-bit-in-sub-instruction-used-for ;
 
-    ; 83 + n ; rm32 imm8 pattern ;
+    ; 83 + n ; rm32 imm8 pattern ; implemented (test needed) ;
     add dword [eax], 3
     or dword [eax], 3
     adc dword [eax], 3
@@ -173,22 +173,22 @@ label0:
     xor dword [eax], 3
     cmp dword [eax], 3
 
-    test byte [eax], al ; 84 test rm8 r8
-    test dword [eax], eax ; 85 test rm32 r32
+    test byte [eax], al ; 84 test rm8 r8 ; implemented ;
+    test dword [eax], eax ; 85 test rm32 r32 ; implemented ;
 
-    xchg byte [eax], al ; 86 xchg rm8 r8
-    xchg dword [eax], eax ; 87 xchg rm32 r32
+    xchg byte [eax], al ; 86 xchg rm8 r8 ; implemented ;
+    xchg dword [eax], eax ; 87 xchg rm32 r32 ; implemented ;
 
-    mov byte [eax], al ; 88 mov rm8 r8
-    mov dword [eax], eax ; 89 mov rm32 r32
-    mov byte al, [eax] ; 8A mov r8 rm8
-    mov dword eax, [eax] ; 8B mov r32 rm32
+    mov byte [eax], al ; 88 mov rm8 r8 ; implemented ;
+    mov dword [eax], eax ; 89 mov rm32 r32 ; implemented ;
+    mov byte al, [eax] ; 8A mov r8 rm8 ; implemented ;
+    mov dword eax, [eax] ; 8B mov r32 rm32 ; implemented ;
 
-    mov eax, ds ; 8C mov m32/r32 sreg
+    mov eax, ds ; 8C mov rm32 sreg ; implemented ;
 
-    lea eax, [eax] ; 8D lea r32 m
+    lea eax, [eax] ; 8D lea r32 m ; implemented ;
 
-    mov ds, eax ; 8E mov sreg rm32 
+    mov ds, eax ; 8E mov sreg rm32 ; implemented ;
 
     pop dword [eax] ; 8F pop rm32
 

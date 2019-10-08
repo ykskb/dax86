@@ -23,7 +23,12 @@ for i in \
  "sub"\
  "and"\
  "xor"\
- "pusha"
+ "pusha"\
+ "code_80"\
+ "test"\
+ "xchg"\
+ "mov"\
+ "pop"
 do
 
 test_path="./tests/${i}/${i}.bin"

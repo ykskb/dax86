@@ -18,7 +18,7 @@
 void and_rm8_r8(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm);
@@ -36,7 +36,7 @@ void and_rm8_r8(Emulator *emu)
 void and_rm32_r32(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint32_t rm32_val = get_rm32(emu, &modrm);
     uint32_t r32_val = get_r32(emu, &modrm);
@@ -54,7 +54,7 @@ void and_rm32_r32(Emulator *emu)
 void and_r8_rm8(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm);
@@ -72,7 +72,7 @@ void and_r8_rm8(Emulator *emu)
 void and_r32_rm32(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint32_t r32_val = get_r32(emu, &modrm);
     uint32_t rm32_val = get_rm32(emu, &modrm);
@@ -125,7 +125,7 @@ void and_eax_imm32(Emulator *emu)
 void sub_rm8_r8(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm);
@@ -143,7 +143,7 @@ void sub_rm8_r8(Emulator *emu)
 void sub_rm32_r32(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint32_t rm32_val = get_rm32(emu, &modrm);
     uint32_t r32_val = get_r32(emu, &modrm);
@@ -161,7 +161,7 @@ void sub_rm32_r32(Emulator *emu)
 void sub_r8_rm8(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint8_t rm8_val = get_rm8(emu, &modrm);
     uint8_t r8_val = get_r8(emu, &modrm);
@@ -179,7 +179,7 @@ void sub_r8_rm8(Emulator *emu)
 void sub_r32_rm32(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint32_t r32_val = get_r32(emu, &modrm);
     uint32_t rm32_val = get_rm32(emu, &modrm);

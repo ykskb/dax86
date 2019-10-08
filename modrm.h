@@ -37,6 +37,9 @@ ModRM create_modrm();
  */
 void parse_modrm(Emulator *emu, ModRM *modrm);
 
+/* Calcurates the memory address. Exposed for LEA instruction. */
+uint32_t calc_memory_address(Emulator *emu, ModRM *modrm);
+
 /* Sets 8-bit value to register or memory depending on Mod of ModR/M byte. */
 void set_rm8(Emulator *emu, ModRM *modrm, uint8_t value);
 

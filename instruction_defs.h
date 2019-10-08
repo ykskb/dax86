@@ -97,12 +97,21 @@ void jl(Emulator *emu);
 void jle(Emulator *emu);
 
 /* 0x8 */
+void code_80(Emulator *emu);
+void code_81(Emulator *emu);
 void code_83(Emulator *emu);
+void test_rm8_r8(Emulator *emu);
+void test_rm32_r32(Emulator *emu);
+void xchg_rm8_r8(Emulator *emu);
+void xchg_rm32_r32(Emulator *emu);
 void mov_rm8_r8(Emulator *emu);
 void mov_rm32_r32(Emulator *emu);
 void mov_r8_rm8(Emulator *emu);
 void mov_r32_rm32(Emulator *emu);
-void mov_seg_rm16(Emulator *emu);
+void mov_rm32_seg(Emulator *emu);
+void lea_r32_m(Emulator *emu);
+void mov_seg_rm32(Emulator *emu);
+void pop_rm32(Emulator *emu);
 
 /* 0xB */
 void mov_r8_imm8(Emulator *emu);

@@ -67,7 +67,7 @@ void inc_rm32(Emulator *emu, ModRM *modrm)
 void code_ff(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
 
     switch (modrm.opcode)

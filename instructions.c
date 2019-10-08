@@ -148,12 +148,21 @@ void init_instructions(void)
     instructions[0x7C] = jl;
     instructions[0x7E] = jle;
 
+    instructions[0x80] = code_80;
+    instructions[0x81] = code_81;
     instructions[0x83] = code_83;
+    instructions[0x84] = test_rm8_r8;
+    instructions[0x85] = test_rm32_r32;
+    instructions[0x86] = xchg_rm8_r8;
+    instructions[0x87] = xchg_rm32_r32;
     instructions[0x88] = mov_rm8_r8;
     instructions[0x89] = mov_rm32_r32;
     instructions[0x8A] = mov_r8_rm8;
     instructions[0x8B] = mov_r32_rm32;
-    instructions[0x8E] = mov_seg_rm16;
+    instructions[0x8C] = mov_rm32_seg;
+    instructions[0x8D] = lea_r32_m;
+    instructions[0x8E] = mov_seg_rm32;
+    instructions[0x8F] = pop_rm32;
 
     /* op code includes 8 registers in 1 byte: 0xB0 ~ 0xB7*/
     for (i = 0; i < 8; i++)

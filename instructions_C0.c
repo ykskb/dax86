@@ -29,7 +29,7 @@ void ret(Emulator *emu)
 void mov_rm8_imm8(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint8_t value = get_code8(emu, 0);
     emu->eip += 1;
@@ -46,7 +46,7 @@ void mov_rm8_imm8(Emulator *emu)
 void mov_rm32_imm32(Emulator *emu)
 {
     emu->eip += 1;
-    ModRM modrm;
+    ModRM modrm = create_modrm();
     parse_modrm(emu, &modrm);
     uint32_t value = get_code32(emu, 0);
     emu->eip += 4;
