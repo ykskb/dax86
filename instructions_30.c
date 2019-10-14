@@ -189,7 +189,7 @@ void cmp_r32_rm32(Emulator *emu)
  */
 void cmp_al_imm8(Emulator *emu)
 {
-    uint8_t value = (int8_t)get_sign_code8(emu, 1);
+    uint8_t value = get_sign_code8(emu, 1);
     uint8_t al = get_register8(emu, AL);
     uint16_t result = (uint16_t)al - (uint16_t)value;
     update_eflags_sub_8bit(emu, al, value, result);
@@ -204,7 +204,7 @@ void cmp_al_imm8(Emulator *emu)
  */
 void cmp_eax_imm32(Emulator *emu)
 {
-    uint32_t value = (int32_t)get_sign_code32(emu, 1);
+    uint32_t value = get_sign_code32(emu, 1);
     uint32_t eax = get_register32(emu, EAX);
     uint64_t result = (uint64_t)eax - (uint64_t)value;
     update_eflags_sub(emu, eax, value, result);

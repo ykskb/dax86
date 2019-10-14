@@ -202,16 +202,16 @@ label0:
     cdq ; 99 cdq edx, eax
 
     ; https://stackoverflow.com/questions/20264452/x86-function-call-types ;
-    call dword 0x10:0x1000 ; 9A call far ptr16:16/32 ; absolute jump ;
+    call dword 0x10:0x1000 ; 9A call far ptr16:16/32 (cs: addr); absolute far jump ;
 
     ; https://www.felixcloutier.com/x86/wait:fwait ;
     fwait ; prefix 9B checks for and handle pending, unmasked, floating-point exceptions before proceeding. ;
 
-    pushf ; 9C pushf ; pushes flags register to stack ;
-    pushfd ; 9C pushfd ; pushes eflags register to stack ;
+    pushf ; 9C pushf ; pushes flags register to stack ; implemented ;
+    pushfd ; 9C pushfd ; pushes eflags register to stack ; implemented ;
 
-    popf ; 9D popf ; pops stack to flags register ;
-    popfd ; 9D popfd ; pops stack to eflags register ;
+    popf ; 9D popf ; pops stack to flags register ; implemented ;
+    popfd ; 9D popfd ; pops stack to eflags register ; implemented ;
 
     sahf ; 9E sahf ; stores ah into flags ;
     lahf ; 9F lahf ; load flags to ah register ;

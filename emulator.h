@@ -59,6 +59,25 @@ enum ControlRegister
     CONTROL_REGISTER_COUNT
 };
 
+/*
+ * FLAGS:
+ * | n-th bit                                      |
+ * | 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   |
+ * | CF  | Rsv | PF  | Rsv | AF  | Rsv | ZF  | SF  |
+ * 
+ * | 8   | 9   | 10  | 11  | 12  | 13  | 14  | 15  |
+ * | TF  | IF  | DF  | OF  |   IOPL    | NT  | Rsv |
+ * 
+ * EFLAGS:
+ * | 16  | 17  | 18  | 19  | 20  | 21  | 22  | 23  |
+ * | RF  | VM  | AC  | VIF | VIP | ID  |    Rsv    |
+ * 
+ * | 24  | 25  | 26  | 27  | 28  | 29  | 30  | 31  |
+ * |                     Rsvd                      |
+ * 
+ * RFLAGS:
+ * Rsv...
+ */
 typedef struct
 {
     uint32_t eflags;

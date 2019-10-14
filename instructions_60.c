@@ -68,7 +68,7 @@ void push_imm32(Emulator *emu)
  */
 void push_imm8(Emulator *emu)
 {
-    uint32_t value = get_code8(emu, 1);
-    push32(emu, value);
+    uint8_t value = get_code8(emu, 1);
+    push32(emu, (uint32_t)value);
     emu->eip += 2;
 }

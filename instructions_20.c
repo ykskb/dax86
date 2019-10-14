@@ -196,7 +196,7 @@ void sub_r32_rm32(Emulator *emu)
  */
 void sub_al_imm8(Emulator *emu)
 {
-    uint8_t imm8_val = (int8_t)get_sign_code8(emu, 1);
+    uint8_t imm8_val = get_sign_code8(emu, 1);
     uint8_t al_val = get_register8(emu, AL);
     uint16_t result = (uint16_t)al_val - (uint16_t)imm8_val;
     set_register8(emu, AL, result);
@@ -213,7 +213,7 @@ void sub_al_imm8(Emulator *emu)
 void sub_eax_imm32(Emulator *emu)
 {
     uint32_t eax_val = get_register32(emu, EAX);
-    uint32_t imm32_val = (int32_t)get_sign_code32(emu, 1);
+    uint32_t imm32_val = get_sign_code32(emu, 1);
     uint64_t result = (uint64_t)eax_val - (uint64_t)imm32_val;
     set_register32(emu, EAX, result);
     update_eflags_sub(emu, eax_val, imm32_val, result);

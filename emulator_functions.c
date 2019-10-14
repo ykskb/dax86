@@ -5,12 +5,12 @@
 /* Source Instruction Operations */
 
 /* Retrieves code from memory by offset from EIP. */
-uint32_t get_code8(Emulator *emu, int index)
+uint8_t get_code8(Emulator *emu, int index)
 {
     return emu->memory[emu->eip + index];
 }
 
-int32_t get_sign_code8(Emulator *emu, int index)
+int8_t get_sign_code8(Emulator *emu, int index)
 {
     return (int8_t)emu->memory[emu->eip + index];
 }

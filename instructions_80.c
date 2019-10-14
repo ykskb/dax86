@@ -202,7 +202,7 @@ void code_80(Emulator *emu)
 static void add_rm32_imm32(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);
-    uint32_t imm32 = (int32_t)get_sign_code32(emu, 0);
+    uint32_t imm32 = get_sign_code32(emu, 0);
     emu->eip += 4;
 
     set_rm32(emu, modrm, rm32 + imm32);
@@ -220,7 +220,7 @@ static void add_rm32_imm32(Emulator *emu, ModRM *modrm)
 static void or_rm32_imm32(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);
-    uint32_t imm32 = (int32_t)get_sign_code32(emu, 0);
+    uint32_t imm32 = get_sign_code32(emu, 0);
     emu->eip += 4;
 
     uint32_t result = rm32 | imm32;
@@ -238,7 +238,7 @@ static void or_rm32_imm32(Emulator *emu, ModRM *modrm)
 static void adc_rm32_imm32(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);
-    uint32_t imm32 = (int32_t)get_sign_code32(emu, 0) + (uint32_t)is_carry(emu);
+    uint32_t imm32 = get_sign_code32(emu, 0) + (uint32_t)is_carry(emu);
     emu->eip += 4;
 
     set_rm32(emu, modrm, rm32 + imm32);
@@ -256,7 +256,7 @@ static void adc_rm32_imm32(Emulator *emu, ModRM *modrm)
 static void sbb_rm32_imm32(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);
-    uint32_t imm32 = (int32_t)get_sign_code32(emu, 0) + (uint32_t)is_carry(emu);
+    uint32_t imm32 = get_sign_code32(emu, 0) + (uint32_t)is_carry(emu);
     emu->eip += 4;
 
     uint64_t result = (uint64_t)rm32 - (uint64_t)imm32;
@@ -274,7 +274,7 @@ static void sbb_rm32_imm32(Emulator *emu, ModRM *modrm)
 static void and_rm32_imm32(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);
-    uint32_t imm32 = (int32_t)get_sign_code32(emu, 0);
+    uint32_t imm32 = get_sign_code32(emu, 0);
     emu->eip += 4;
 
     uint32_t result = rm32 & imm32;
@@ -292,7 +292,7 @@ static void and_rm32_imm32(Emulator *emu, ModRM *modrm)
 static void sub_rm32_imm32(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);
-    uint32_t imm32 = (int32_t)get_sign_code32(emu, 0);
+    uint32_t imm32 = get_sign_code32(emu, 0);
     emu->eip += 4;
 
     uint64_t result = (uint64_t)rm32 - (uint64_t)imm32;
@@ -310,7 +310,7 @@ static void sub_rm32_imm32(Emulator *emu, ModRM *modrm)
 static void xor_rm32_imm32(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);
-    uint32_t imm32 = (int32_t)get_sign_code32(emu, 0);
+    uint32_t imm32 = get_sign_code32(emu, 0);
     emu->eip += 4;
 
     uint32_t result = rm32 ^ imm32;
@@ -329,7 +329,7 @@ static void xor_rm32_imm32(Emulator *emu, ModRM *modrm)
 static void cmp_rm32_imm32(Emulator *emu, ModRM *modrm)
 {
     uint32_t rm32 = get_rm32(emu, modrm);
-    uint32_t imm32 = (int32_t)get_sign_code32(emu, 0);
+    uint32_t imm32 = get_sign_code32(emu, 0);
     emu->eip += 4;
 
     uint64_t result = (uint64_t)rm32 - (uint64_t)imm32;

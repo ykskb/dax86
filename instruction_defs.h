@@ -113,6 +113,15 @@ void lea_r32_m(Emulator *emu);
 void mov_seg_rm32(Emulator *emu);
 void pop_rm32(Emulator *emu);
 
+/* 0x9 */
+void xchg_r32_r32(Emulator *emu);
+void cwde(Emulator *emu);
+void cdq(Emulator *emu);
+void pushfd(Emulator *emu);
+void popfd(Emulator *emu);
+void sahf(Emulator *emu);
+void lahf(Emulator *emu);
+
 /* 0xB */
 void mov_r8_imm8(Emulator *emu);
 void mov_r32_imm32(Emulator *emu);

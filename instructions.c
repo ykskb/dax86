@@ -19,7 +19,7 @@ static void rep(Emulator *emu)
 {
     emu->eip += 1;
     uint32_t ecx_value = emu->registers[ECX];
-    uint32_t op = get_code8(emu, 0);
+    uint8_t op = get_code8(emu, 0);
     /* TODO: Add check on supported types: INS, LODS, MOVS, OUTS and STOS */
     uint32_t op_eip = emu->eip;
     int i;
@@ -163,6 +163,19 @@ void init_instructions(void)
     instructions[0x8D] = lea_r32_m;
     instructions[0x8E] = mov_seg_rm32;
     instructions[0x8F] = pop_rm32;
+
+    /* op code includes 8 registers in 1 byte: 0x90 ~ 0x97 */
+    for (i = 0; i < 8; i++)
+    {
+        instructions[0x90 + i] = xchg_r32_r32;
+    }
+
+    instructions[0x98] = cwde;
+    instructions[0x99] = cdq;
+    instructions[0x9C] = pushfd;
+    instructions[0x9D] = popfd;
+    instructions[0x9E] = sahf;
+    instructions[0x9F] = lahf;
 
     /* op code includes 8 registers in 1 byte: 0xB0 ~ 0xB7*/
     for (i = 0; i < 8; i++)
