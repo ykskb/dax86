@@ -15,6 +15,7 @@ OBJS = \
 	instructions_70.o\
 	instructions_80.o\
 	instructions_90.o\
+	instructions_A0.o\
 	instructions_B0.o\
 	instructions_C0.o\
 	instructions_E0.o\

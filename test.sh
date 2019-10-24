@@ -28,7 +28,8 @@ for i in \
  "test"\
  "xchg"\
  "mov"\
- "pop"
+ "pop"\
+ "code_c0"
 do
 
 test_path="./tests/${i}/${i}.bin"

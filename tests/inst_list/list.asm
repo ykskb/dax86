@@ -216,7 +216,8 @@ label0:
     sahf ; 9E sahf ; stores ah into flags ;
     lahf ; 9F lahf ; load flags to ah register ;
 
-    mov byte al, [0x10] ; A0 mov al moffs8
+    ; offset to segment base ;
+    mov byte al, [0x10] ; A0 mov al moffs8 ;
     mov dword eax, [0x10] ; A1 mov eax moffs32
     mov byte [0x10], al ; A2 mov moffs8 al
     mov dword [0x10], eax ; A3 mov moffs32 eax

@@ -177,6 +177,9 @@ void init_instructions(void)
     instructions[0x9E] = sahf;
     instructions[0x9F] = lahf;
 
+    instructions[0xA8] = test_al_imm8;
+    instructions[0xA9] = test_eax_imm32;
+
     /* op code includes 8 registers in 1 byte: 0xB0 ~ 0xB7*/
     for (i = 0; i < 8; i++)
     {
@@ -189,6 +192,8 @@ void init_instructions(void)
         instructions[0xB8 + i] = mov_r32_imm32;
     }
 
+    instructions[0xC0] = code_c0;
+    instructions[0xC1] = code_c01;
     instructions[0xC3] = ret;
     instructions[0xC6] = mov_rm8_imm8;
     instructions[0xC7] = mov_rm32_imm32;

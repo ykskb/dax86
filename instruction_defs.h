@@ -122,11 +122,17 @@ void popfd(Emulator *emu);
 void sahf(Emulator *emu);
 void lahf(Emulator *emu);
 
+/* 0xA */
+void test_al_imm8(Emulator *emu);
+void test_eax_imm32(Emulator *emu);
+
 /* 0xB */
 void mov_r8_imm8(Emulator *emu);
 void mov_r32_imm32(Emulator *emu);
 
 /* 0xC */
+void code_c0(Emulator *emu);
+void code_c01(Emulator *emu);
 void ret(Emulator *emu);
 void mov_rm8_imm8(Emulator *emu);
 void mov_rm32_imm32(Emulator *emu);
