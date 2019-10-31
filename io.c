@@ -16,7 +16,18 @@ uint8_t io_in8(uint16_t address)
          * while ((ch = getchar()) != '\n' && ch != EOF) continue;
          */
         return getchar();
+        break;
+    default:
+        return 0;
+    }
+}
 
+uint32_t io_in32(uint16_t address)
+{
+    switch (address)
+    {
+    case 0x03f8:
+        return getchar();
         break;
     default:
         return 0;
@@ -24,6 +35,16 @@ uint8_t io_in8(uint16_t address)
 }
 
 void io_out8(uint16_t address, uint8_t value)
+{
+    switch (address)
+    {
+    case 0x03f8:
+        putchar(value);
+        break;
+    }
+}
+
+void io_out32(uint16_t address, uint32_t value)
 {
     switch (address)
     {

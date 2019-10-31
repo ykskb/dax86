@@ -360,11 +360,11 @@ label1:
     jecxz label1 ; E3 jecsx rel8 ; jumps short if ECX is 0
     jcxz label1 ; 67 E3 jcxz rel8 ; jumps short if CX is 0
 
-    in al, 0x10 ; E4 in al imm8 ; inputs byte from imm8 I/O port address into AL ;
-    in eax, 0x10 ; E5 in eax imm8 ; inputs byte from imm8 I/O port address into EAX ;
+    in al, 0x10 ; E4 in al imm8 ; inputs byte from imm8 I/O port address into AL ; used?
+    in eax, 0x10 ; E5 in eax imm8 ; inputs byte from imm8 I/O port address into EAX ; used?
 
-    out 0x10, al ; E6 out imm8 al ; outputs byte from AL to imm8 I/O port
-    out 0x10, eax ; E7 out imm8 eax ; outputs byte from EAX to imm8 I/O port
+    out 0x10, al ; E6 out imm8 al ; outputs byte from AL to imm8 I/O port ; used?
+    out 0x10, eax ; E7 out imm8 eax ; outputs byte from EAX to imm8 I/O port ; used?
 
     call label0 ; E8 call rel32 ; implemented ;
     jmp label0 ; E9 jmp rel32 ; implemented ;

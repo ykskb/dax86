@@ -154,7 +154,9 @@ void call_rel32(Emulator *emu);
 void near_jump(Emulator *emu);
 void short_jump(Emulator *emu);
 void in_al_dx(Emulator *emu);
+void in_eax_dx(Emulator *emu);
 void out_dx_al(Emulator *emu);
+void out_dx_eax(Emulator *emu);
 
 /* 0xF */
 void cli(Emulator *emu);

@@ -166,6 +166,20 @@ void in_al_dx(Emulator *emu)
 }
 
 /*
+ * in eax dx: 1 byte
+ * Input data to EAX from IO address specified on DX.
+ * 1 byte: op (ED)
+ */
+void in_eax_dx(Emulator *emu)
+{
+    /* IO Port Address from DX */
+    uint16_t address = get_register32(emu, EDX) & 0xffff;
+    uint32_t value = io_in32(address);
+    set_register32(emu, EAX, value);
+    emu->eip += 1;
+}
+
+/*
  * out dx al: 1 byte
  * Output data on AL to IO address specified on DX.
  * 1 byte: op (EE)
@@ -176,5 +190,19 @@ void out_dx_al(Emulator *emu)
     uint16_t address = get_register32(emu, EDX) & 0xffff;
     uint8_t value = get_register8(emu, AL);
     io_out8(address, value);
+    emu->eip += 1;
+}
+
+/*
+ * out dx eax: 1 byte
+ * Output data on EAX to IO address specified on DX.
+ * 1 byte: op (EF)
+ */
+void out_dx_eax(Emulator *emu)
+{
+    /* IO Port Address from DX */
+    uint16_t address = get_register32(emu, EDX) & 0xffff;
+    uint32_t value = get_register8(emu, EAX);
+    io_out32(address, value);
     emu->eip += 1;
 }

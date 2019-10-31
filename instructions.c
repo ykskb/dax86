@@ -206,7 +206,9 @@ void init_instructions(void)
     instructions[0xE9] = near_jump;
     instructions[0xEB] = short_jump;
     instructions[0xEC] = in_al_dx;
+    instructions[0xED] = in_eax_dx;
     instructions[0xEE] = out_dx_al;
+    instructions[0xEF] = out_dx_eax;
 
     instructions[0xF3] = rep;
     instructions[0xFA] = cli;

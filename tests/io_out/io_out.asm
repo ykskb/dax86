@@ -3,4 +3,5 @@ BITS 32
     mov edx, 0x03f8
     mov eax, 0x41
     out dx, al
+    out dx, eax
     jmp 0
