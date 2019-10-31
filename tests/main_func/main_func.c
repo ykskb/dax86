@@ -6,7 +6,7 @@ int main(void)
 }
 /*
  * 00000000  E805000000        call dword 0xa ; pushes ret addr ; ESP 0x7C00 - 4 = 0x7BFC: 7C05 (7C00 + 5)
- * 00000005  E9F683FFFF        jmp dword 0xffff8400
+ * 00000005  E9F683FFFF        jmp dword 0xffff8400 (-31744) <-0x7C00: 31744
  * 0000000A  55                push ebp ; pushes current EBP ; ESP 0x7BFC - 4 = 0x7BF8: 0x0000
  * 0000000B  89E5              mov ebp,esp ; brings current ESP to EBP ; EBP: 0x7BF8
  * 0000000D  83EC10            sub esp,byte +0x10 ; moves ESP down by 16 ; ESP: 0x7BF8 - 16 = 7BE8

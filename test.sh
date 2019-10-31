@@ -16,7 +16,7 @@ for i in \
  "flags_set"\
  "flags_clear"\
  "if"\
- "loop"\
+ "jmp_c"\
  "io_out"\
  "seg"\
  "or"\
@@ -29,7 +29,8 @@ for i in \
  "xchg"\
  "mov"\
  "pop"\
- "code_c0"
+ "code_c0"\
+ "loop"
 do
 
 test_path="./tests/${i}/${i}.bin"

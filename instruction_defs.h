@@ -138,7 +138,18 @@ void mov_rm8_imm8(Emulator *emu);
 void mov_rm32_imm32(Emulator *emu);
 void leave(Emulator *emu);
 
+/* 0xD */
+void code_d0(Emulator *emu);
+void code_d1(Emulator *emu);
+void code_d2(Emulator *emu);
+void code_d3(Emulator *emu);
+void set_al_on_c(Emulator *emu);
+
 /* 0xE */
+void loopnz(Emulator *emu);
+void loopz(Emulator *emu);
+void loop(Emulator *emu);
+void jecxz(Emulator *emu);
 void call_rel32(Emulator *emu);
 void near_jump(Emulator *emu);
 void short_jump(Emulator *emu);

@@ -199,6 +199,10 @@ void init_instructions(void)
     instructions[0xC7] = mov_rm32_imm32;
     instructions[0xC9] = leave;
 
+    instructions[0xE0] = loopnz;
+    instructions[0xE1] = loopz;
+    instructions[0xE2] = loop;
+    instructions[0xE3] = jecxz;
     instructions[0xE9] = near_jump;
     instructions[0xEB] = short_jump;
     instructions[0xEC] = in_al_dx;

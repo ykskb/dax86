@@ -5,6 +5,7 @@ OBJS = \
 	instructions.o\
 	modrm.o\
 	io.o\
+	shift.o\
 	instructions_00.o\
 	instructions_10.o\
 	instructions_20.o\
@@ -18,6 +19,7 @@ OBJS = \
 	instructions_A0.o\
 	instructions_B0.o\
 	instructions_C0.o\
+	instructions_D0.o\
 	instructions_E0.o\
 	instructions_F0.o
 

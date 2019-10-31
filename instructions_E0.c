@@ -10,6 +10,108 @@
 #include "io.h"
 
 /*
+ * loopnz rel8: 2 bytes
+ * Jumps short after decrementing ECX (CX) if count != 0 and ZF==0.
+ * 1 byte: op (E0)
+ * 1 byte: rel8 value
+ * Address size is assumed to be 32 bits here.
+ */
+void loopnz(Emulator *emu)
+{
+    uint32_t ecx_val = get_register32(emu, ECX);
+    if (is_zero(emu))
+    {
+        emu->eip += 2;
+        return;
+    }
+    if (ecx_val > 0)
+    {
+        ecx_val -= 1;
+        set_register32(emu, ECX, ecx_val);
+    }
+    if (ecx_val != 0)
+    {
+        int8_t offset = get_sign_code8(emu, 1);
+        emu->eip += (offset + 2);
+        return;
+    }
+    emu->eip += 2;
+}
+
+/*
+ * loopz rel8: 2 bytes
+ * Jumps short after decrementing ECX (CX) if count != 0 and ZF==1.
+ * 1 byte: op (E1)
+ * 1 byte: rel8 value
+ * Address size is assumed to be 32 bits here.
+ */
+void loopz(Emulator *emu)
+{
+    uint32_t ecx_val = get_register32(emu, ECX);
+    if (!is_zero(emu))
+    {
+        emu->eip += 2;
+        return;
+    }
+    if (ecx_val > 0)
+    {
+        ecx_val -= 1;
+        set_register32(emu, ECX, ecx_val);
+    }
+    if (ecx_val != 0)
+    {
+        int8_t offset = get_sign_code8(emu, 1);
+        emu->eip += (offset + 2);
+        return;
+    }
+    emu->eip += 2;
+}
+
+/*
+ * loop rel8: 2 bytes
+ * Jumps short after decrementing ECX (CX) if count != 0.
+ * 1 byte: op (E2)
+ * 1 byte: rel8 value
+ * Address size is assumed to be 32 bits here.
+ */
+void loop(Emulator *emu)
+{
+    uint32_t ecx_val = get_register32(emu, ECX);
+    if (ecx_val > 0)
+    {
+        ecx_val -= 1;
+        set_register32(emu, ECX, ecx_val);
+    }
+    if (ecx_val != 0)
+    {
+        int8_t offset = get_sign_code8(emu, 1);
+        emu->eip += (offset + 2);
+        return;
+    }
+    emu->eip += 2;
+}
+
+/*
+ * jecxz rel8: 2 bytes
+ * Jumps if ecx == 0.
+ * 1 byte: op (E3)
+ * 1 byte: rel8 value
+ */
+void jecxz(Emulator *emu)
+{
+    uint32_t ecx_val = get_register32(emu, ECX);
+    if (ecx_val == 0)
+    {
+        int8_t offset = get_sign_code8(emu, 1);
+        emu->eip += (offset + 2);
+    }
+    else
+    {
+        emu->eip += 2;
+    }
+}
+
+/*
  * call rel32: 5 bytes
  * Jumps by 32-bit number relatively from next address.
  * 1 byte: op (E8)
