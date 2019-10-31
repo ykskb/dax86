@@ -211,6 +211,7 @@ void init_instructions(void)
     instructions[0xEF] = out_dx_eax;
 
     instructions[0xF3] = rep;
+    instructions[0xF5] = cmc;
     instructions[0xFA] = cli;
     instructions[0xFB] = sti;
     instructions[0xFC] = cld;

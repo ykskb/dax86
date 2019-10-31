@@ -159,6 +159,7 @@ void out_dx_al(Emulator *emu);
 void out_dx_eax(Emulator *emu);
 
 /* 0xF */
+void cmc(Emulator *emu);
 void cli(Emulator *emu);
 void sti(Emulator *emu);
 void cld(Emulator *emu);

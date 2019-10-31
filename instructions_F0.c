@@ -10,6 +10,17 @@
 #include "io.h"
 
 /*
+ * cmc: 1 byte
+ * Flips carry flag.
+ * 1 byte: op (F5)
+ */
+void cmc(Emulator *emu)
+{
+    set_carry_flag(emu, !is_carry(emu));
+    emu->eip += 1;
+}
+
+/*
  * cli: 1 byte
  * Clears int flag on eflags.
  * 1 byte: op (FA)

@@ -349,15 +349,15 @@ label0:
 
     ; D8 ~ DF ; floating point instructions
 label1:
-    loopnz label1 ; E0 loopnz rel8 ; Decrement count; jump short if count != 0 and ZF=0. ;
+    loopnz label1 ; E0 loopnz rel8 ; Decrement count; jump short if count != 0 and ZF=0. ; implemented ;
     loopne label1 ; E0 loopne rel8; identical to loopnz ;
 
-    loopz label1 ; E1 loopz rel8 ; Decrement count; jump short if count != 0 and ZF=1. ;
+    loopz label1 ; E1 loopz rel8 ; Decrement count; jump short if count != 0 and ZF=1. ; implemented ;
     loope label1 ; E1 loope rel8 ; idential to loopz
 
-    loop label1 ; E2 loop rel8 ; Decrement count; jump short if count != 0. ;
+    loop label1 ; E2 loop rel8 ; Decrement count; jump short if count != 0. ; implemented ;
 
-    jecxz label1 ; E3 jecsx rel8 ; jumps short if ECX is 0
+    jecxz label1 ; E3 jecsx rel8 ; jumps short if ECX is 0 ; implemented ;
     jcxz label1 ; 67 E3 jcxz rel8 ; jumps short if CX is 0
 
     in al, 0x10 ; E4 in al imm8 ; inputs byte from imm8 I/O port address into AL ; used?
@@ -372,10 +372,10 @@ label1:
     jmp label1 ; EB jmp rel8 ; implemented
 
     in al, dx ; EC in al dx ; inputs byte from dx I/O port address into AL ; implemented ;
-    in eax, dx ; ED in eax dx ; inputs byte from dx I/O port address into EAX ;
+    in eax, dx ; ED in eax dx ; inputs byte from dx I/O port address into EAX ; implemented ;
 
     out dx, al ; EE out dx al ; outputs byte from AL to dx I/O port ; implemented ;
-    out dx, eax ; EF out dx eax ; outputs byte from EAX to dx I/O port
+    out dx, eax ; EF out dx eax ; outputs byte from EAX to dx I/O port ; implemented ;
 
     ; F0 lock prefix ;
 
@@ -395,7 +395,7 @@ label1:
     ; terminates if ECX=0 ;
     rep insb ; F3 rep preifx implemented ; inputs (E)CX bytes from port DX into ES:[(E)DI] ;
 
-    cmc ; F5 cmc ;
+    cmc ; F5 cmc ; reverses carry flag ; implemented ;
     test byte [eax], 0x10 ; F6 test rm8 imm8 ;
     not dword [eax] ; F7 not rm32 ;
     neg dword [eax] ; F7 neg rm32 ;
