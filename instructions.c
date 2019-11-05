@@ -212,6 +212,8 @@ void init_instructions(void)
 
     instructions[0xF3] = rep;
     instructions[0xF5] = cmc;
+    instructions[0xF6] = code_f6;
+    instructions[0xF7] = code_f7;
     instructions[0xFA] = cli;
     instructions[0xFB] = sti;
     instructions[0xFC] = cld;

@@ -21,6 +21,140 @@ void cmc(Emulator *emu)
 }
 
 /*
+ * test rm8 imm8: 3|4 bytes
+ * Performs logical AND of operands and updates flags. No result store.
+ * 1 byte: op (F6: 0|1)
+ * 1|2 byte: ModRM
+ * 1 byte: imm8
+ */
+static void test_rm8_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8_val = get_rm8(emu, modrm);
+    uint8_t imm8_val = get_code8(emu, 0);
+    uint8_t result = rm8_val & imm8_val;
+    update_eflags_logical_ops_8bit(emu, result);
+    emu->eip += 1;
+}
+
+/*
+ * not rm8: 2|3 bytes
+ * One's complement negation.
+ * 1 byte: op (F6: 2)
+ * 1|2 byte: ModRM
+ */
+static void not_rm8(Emulator *emu, ModRM *modrm)
+{
+    set_rm8(emu, modrm, ~(get_rm8(emu, modrm)));
+}
+
+/*
+ * neg rm8: 2|3 bytes
+ * Two's complement negation.
+ * 1 byte: op (F6: 2)
+ * 1|2 byte: ModRM
+ */
+static void neg_rm8(Emulator *emu, ModRM *modrm)
+{
+    int8_t rm8_val = (int8_t)get_rm8(emu, modrm);
+    int8_t result = 0 - rm8_val;
+    set_rm8(emu, modrm, (uint8_t)result);
+}
+
+void code_f6(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm = create_modrm();
+    parse_modrm(emu, &modrm);
+
+    switch (modrm.opcode)
+    {
+    case 0:
+        test_rm8_imm8(emu, &modrm);
+        break;
+    case 1:
+        test_rm8_imm8(emu, &modrm);
+        break;
+    case 2:
+        not_rm8(emu, &modrm);
+        break;
+    case 3:
+        neg_rm8(emu, &modrm);
+        break;
+    default:
+        printf("Not implemented: Op: F6 with ModR/M Op: %d\n", modrm.opcode);
+        exit(1);
+    }
+}
+
+/*
+ * test rm32 imm32: 6|7 bytes
+ * Performs logical AND of operands and updates flags. No result store.
+ * 1 byte: op (F7: 0|1)
+ * 1|2 byte: ModRM
+ * 4 byte: imm32
+ */
+static void test_rm32_imm32(Emulator *emu, ModRM *modrm)
+{
+    uint32_t rm32_val = get_rm32(emu, modrm);
+    uint32_t imm32_val = get_code32(emu, 0);
+    emu->eip += 4;
+    uint32_t result = rm32_val & imm32_val;
+    update_eflags_logical_ops_8bit(emu, result);
+}
+
+/*
+ * not rm32: 2|3 bytes
+ * One's complement negation.
+ * 1 byte: op (F7: 2)
+ * 1|2 byte: ModRM
+ */
+static void not_rm32(Emulator *emu, ModRM *modrm)
+{
+    set_rm32(emu, modrm, ~(get_rm32(emu, modrm)));
+}
+
+/*
+ * neg rm32: 2|3 bytes
+ * Two's complement negation.
+ * 1 byte: op (F7: 2)
+ * 1|2 byte: ModRM
+ */
+static void neg_rm32(Emulator *emu, ModRM *modrm)
+{
+    int32_t rm32_val = (int32_t)get_rm32(emu, modrm);
+    printf("rm32: %d\n", rm32_val);
+    int32_t result = 0 - rm32_val;
+    printf("result: %d\n", result);
+    set_rm32(emu, modrm, (uint32_t)result);
+}
+
+void code_f7(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm = create_modrm();
+    parse_modrm(emu, &modrm);
+
+    switch (modrm.opcode)
+    {
+    case 0:
+        test_rm32_imm32(emu, &modrm);
+        break;
+    case 1:
+        test_rm32_imm32(emu, &modrm);
+        break;
+    case 2:
+        not_rm32(emu, &modrm);
+        break;
+    case 3:
+        neg_rm32(emu, &modrm);
+        break;
+    default:
+        printf("Not implemented: Op: F7 with ModR/M Op: %d\n", modrm.opcode);
+        exit(1);
+    }
+}
+
+/*
  * cli: 1 byte
  * Clears int flag on eflags.
  * 1 byte: op (FA)
@@ -69,7 +203,7 @@ void std(Emulator *emu)
  * Increments ModR/M. Op code 83 and ModR/M op code: 000 execute this.
  * 1 byte: shared op (FF)
  */
-void inc_rm32(Emulator *emu, ModRM *modrm)
+static void inc_rm32(Emulator *emu, ModRM *modrm)
 {
     uint32_t value = get_rm32(emu, modrm);
     set_rm32(emu, modrm, value + 1);

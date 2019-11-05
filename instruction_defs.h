@@ -160,11 +160,12 @@ void out_dx_eax(Emulator *emu);
 
 /* 0xF */
 void cmc(Emulator *emu);
+void code_f6(Emulator *emu);
+void code_f7(Emulator *emu);
 void cli(Emulator *emu);
 void sti(Emulator *emu);
 void cld(Emulator *emu);
 void std(Emulator *emu);
-void inc_rm32(Emulator *emu, ModRM *modrm);
 void code_ff(Emulator *emu);
 
 #endif

@@ -396,7 +396,16 @@ label1:
     rep insb ; F3 rep preifx implemented ; inputs (E)CX bytes from port DX into ES:[(E)DI] ;
 
     cmc ; F5 cmc ; reverses carry flag ; implemented ;
-    test byte [eax], 0x10 ; F6 test rm8 imm8 ;
+
+    test byte [eax], 0x10 ; F6 0|1 test rm8 imm8 ; implemented ;
+    not byte [eax], 0x10 ; F6 2 not rm8 imm8 ; implemented ;
+    neg byte [eax], 0x10 ; F6 3 neg rm8 imm8 ; implemented ;
+    mul byte [eax] ; F6 4 mul ax al rm8 ; 
+    imul byte [eax] ; F6 5 imul ax al rm8 ; 
+    div byte [eax] ; F6 6 div al ah ax rm8 ; 
+    idiv byte [eax] ; F6 7 idiv al ah ax rm8 ; 
+
+    test dword [eax], 0x1000 ; F7 0|1 test rm32 imm32
     not dword [eax] ; F7 not rm32 ;
     neg dword [eax] ; F7 neg rm32 ;
     mul dword [eax] ; F7 mul edx dax rm32 ; 
