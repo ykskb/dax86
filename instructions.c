@@ -214,10 +214,13 @@ void init_instructions(void)
     instructions[0xF5] = cmc;
     instructions[0xF6] = code_f6;
     instructions[0xF7] = code_f7;
+    instructions[0xF8] = clc;
+    instructions[0xF9] = stc;
     instructions[0xFA] = cli;
     instructions[0xFB] = sti;
     instructions[0xFC] = cld;
     instructions[0xFD] = std;
+    instructions[0xFE] = code_fe;
     instructions[0xFF] = code_ff;
 
     instructions[0xE8] = call_rel32;

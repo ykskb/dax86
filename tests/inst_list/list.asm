@@ -405,27 +405,27 @@ label1:
     div byte [eax] ; F6 6 div al ah ax rm8 ; 
     idiv byte [eax] ; F6 7 idiv al ah ax rm8 ; 
 
-    test dword [eax], 0x1000 ; F7 0|1 test rm32 imm32
-    not dword [eax] ; F7 not rm32 ;
-    neg dword [eax] ; F7 neg rm32 ;
+    test dword [eax], 0x1000 ; F7 0|1 test rm32 imm32 ; implemented ;
+    not dword [eax] ; F7 not rm32 ; implemented ;
+    neg dword [eax] ; F7 neg rm32 ; implemented ;
     mul dword [eax] ; F7 mul edx dax rm32 ; 
     imul dword [eax] ; F7 imul edx dax rm32 ; 
     div dword [eax] ; F7 div edx dax rm32 ; 
     idiv dword [eax] ; F7 idiv edx dax rm32 ; 
 
-    clc ; F8 clc ; clears carry flag ;
-    stc ; F9 stc ; sets carry flag ;
+    clc ; F8 clc ; clears carry flag ; implemented ;
+    stc ; F9 stc ; sets carry flag ; implemented ;
 
-    ; FA ~ FD interrupt & direction flags ;
+    ; FA ~ FD interrupt & direction flags ; implemented ;
 
-    inc byte [eax] ; FE inc rm8 ;
-    dec byte [eax] ; FE dec rm8 ;
+    inc byte [eax] ; FE inc rm8 ; implemented ;
+    dec byte [eax] ; FE dec rm8 ; implemented ;
     
     ; FF 0 inc rm32 implemented ;
-    dec dword [eax] ; FF /1 dec rm32 ;
-    call [eax]; FF /2 call rm32 ;
+    dec dword [eax] ; FF /1 dec rm32 ; implemented ;
+    call [eax]; FF /2 call rm32 ; implemented but test with protect mode ;
     call [0x1000] ; FF /3 call m16:16/32 ;
-    jmp [eax] ; FF /4 jmp rm32 ;
+    jmp [eax] ; FF /4 jmp rm32 ; implemented but test with protect mode ;
     jmp [0x1000] ; FF /5 jmp m16:16/32 ;
     push dword [eax] ; FF /6 push rm32 ;
 

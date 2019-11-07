@@ -155,6 +155,28 @@ void code_f7(Emulator *emu)
 }
 
 /*
+ * clc: 1 byte
+ * Clears carry flag.
+ * 1 byte: op (F8)
+ */
+void clc(Emulator *emu)
+{
+    set_carry_flag(emu, 0);
+    emu->eip += 1;
+}
+
+/*
+ * stc: 1 byte
+ * Sets carry flag.
+ * 1 byte: op (F9)
+ */
+void stc(Emulator *emu)
+{
+    set_carry_flag(emu, 1);
+    emu->eip += 1;
+}
+
+/*
  * cli: 1 byte
  * Clears int flag on eflags.
  * 1 byte: op (FA)
@@ -199,14 +221,117 @@ void std(Emulator *emu)
 }
 
 /*
- * inc rm32: 2 bytes
- * Increments ModR/M. Op code 83 and ModR/M op code: 000 execute this.
- * 1 byte: shared op (FF)
+ * inc rm8: 2|3 bytes
+ * Increments ModR/M. Op code FE and ModR/M op code: 000 execute this.
+ * 1 byte: shared op (FE)
+ * 1|2 byte: rm8
+ */
+static void inc_rm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8_val = get_rm8(emu, modrm);
+    uint16_t result = rm8_val + 1;
+    set_rm8(emu, modrm, (uint8_t)result);
+    update_eflags_add_8bit(emu, rm8_val, 1, result);
+}
+
+/*
+ * dec rm8: 2|3 bytes
+ * Decrements ModR/M. Op code FE and ModR/M op code: 001 execute this.
+ * 1 byte: shared op (FE)
+ * 1|2 byte: rm8
+ */
+static void dec_rm8(Emulator *emu, ModRM *modrm)
+{
+    uint8_t rm8_val = get_rm8(emu, modrm);
+    uint16_t result = rm8_val - 1;
+    set_rm8(emu, modrm, (uint8_t)result);
+    update_eflags_sub_8bit(emu, rm8_val, 1, result);
+}
+
+void code_fe(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm = create_modrm();
+    parse_modrm(emu, &modrm);
+
+    switch (modrm.opcode)
+    {
+    case 0:
+        inc_rm8(emu, &modrm);
+        break;
+    case 1:
+        dec_rm8(emu, &modrm);
+        break;
+
+    default:
+        printf("Not implemented: Op: FE with ModR/M Op: %d\n", modrm.opcode);
+        exit(1);
+    }
+}
+
+/*
+ * inc rm32: 2|3 bytes
+ * Increments ModR/M. Op code FF and ModR/M op code: 000 execute this.
+ * 1 byte: shared op (FF/0)
+ * 1|2 bytes: ModRM
  */
 static void inc_rm32(Emulator *emu, ModRM *modrm)
 {
-    uint32_t value = get_rm32(emu, modrm);
-    set_rm32(emu, modrm, value + 1);
+    uint32_t rm32_val = get_rm32(emu, modrm);
+    uint64_t result = rm32_val + 1;
+    set_rm32(emu, modrm, (uint32_t)result);
+    update_eflags_add(emu, rm32_val, 1, result);
+}
+
+/*
+ * dec rm32: 2|3 bytes
+ * Decrements ModR/M. Op code FF and ModR/M op code: 001 execute this.
+ * 1 byte: shared op (FF/1)
+ * 1|2 bytes: ModRM
+ */
+static void dec_rm32(Emulator *emu, ModRM *modrm)
+{
+    uint32_t rm32_val = get_rm32(emu, modrm);
+    uint64_t result = rm32_val - 1;
+    set_rm32(emu, modrm, (uint32_t)result);
+    update_eflags_sub(emu, rm32_val, 1, result);
+}
+
+/*
+ * call rm32: 2|3 bytes
+ * Jumps to 32-bit absolute address after pushing the return address.
+ * 1 byte: op (FF/2)
+ * 1|2 bytes: ModRM
+ */
+static void call_rm32(Emulator *emu, ModRM *modrm)
+{
+    int32_t address = get_rm32(emu, modrm);
+    push32(emu, emu->eip);
+    emu->eip = address;
+}
+
+/*
+ * jmp rm32: 2|3 bytes
+ * Jumps to 32-bit absolute address.
+ * 1 byte: op (FF/4)
+ * 1|2 bytes: ModRM
+ */
+static void jmp_rm32(Emulator *emu, ModRM *modrm)
+{
+    int32_t address = get_rm32(emu, modrm);
+    emu->eip = address;
+}
+
+/*
+ * push rm32: 2|3 bytes
+ * Pushes 32-bit value from R/M.
+ * 1 byte: op (FF/6)
+ * 1|2 bytes: ModRM
+ */
+static void push_rm32(Emulator *emu, ModRM *modrm)
+{
+    int32_t rm32_val = get_rm32(emu, modrm);
+    push32(emu, rm32_val);
 }
 
 void code_ff(Emulator *emu)
@@ -219,6 +344,18 @@ void code_ff(Emulator *emu)
     {
     case 0:
         inc_rm32(emu, &modrm);
+        break;
+    case 1:
+        dec_rm32(emu, &modrm);
+        break;
+    case 2:
+        call_rm32(emu, &modrm);
+        break;
+    case 4:
+        jmp_rm32(emu, &modrm);
+        break;
+    case 6:
+        push_rm32(emu, &modrm);
         break;
 
     default:

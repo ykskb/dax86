@@ -19,4 +19,17 @@ BITS 32
     mov [ebp + edx * 4 + 0x1000], edi ; 8BF0: 10 ;
     mov ecx, [ebp + edx * 4 + 0x1000] ; ECX: 10 ;
     add dword eax, 0x1000 ; EAX: 1
+    
+
+    inc byte [ebp - 4] ; 7BF0(EBP) - 4 = 7BEC: 01
+    inc byte [ebp - 4]
+    dec byte [ebp - 4]
+
+    inc dword [ebp - 8] ; 7BF0 (EBP)-8 = 7BE8: 01
+    inc dword [ebp - 8]
+    dec dword [ebp - 8]
+
+    sub esp, 8 ; 7BF0 (EBP) - 8 = 7BE8
+    push dword [ebp - 8] ; FF/6 ; 7BE4: 01
+    
     jmp 0

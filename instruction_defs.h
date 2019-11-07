@@ -162,10 +162,13 @@ void out_dx_eax(Emulator *emu);
 void cmc(Emulator *emu);
 void code_f6(Emulator *emu);
 void code_f7(Emulator *emu);
+void clc(Emulator *emu);
+void stc(Emulator *emu);
 void cli(Emulator *emu);
 void sti(Emulator *emu);
 void cld(Emulator *emu);
 void std(Emulator *emu);
+void code_fe(Emulator *emu);
 void code_ff(Emulator *emu);
 
 #endif
