@@ -18,7 +18,7 @@
 static void rep(Emulator *emu)
 {
     emu->eip += 1;
-    uint32_t ecx_value = emu->registers[ECX];
+    uint32_t ecx_value = get_register32(emu, ECX);
     uint8_t op = get_code8(emu, 0);
     /* TODO: Add check on supported types: INS, LODS, MOVS, OUTS and STOS */
     uint32_t op_eip = emu->eip;

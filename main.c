@@ -14,8 +14,7 @@ char *register_names[] = {"EAX", "ECX", "EDX", "EBX", "ESP", "EBP", "ESI", "EDI"
 char *seg_register_names[] = {"ES", "CS", "SS", "DS", "FS", "GS"};
 char *ctr_register_names[] = {"CR0", "CR1", "CR2", "CR3", "CR4"};
 
-static Emulator *
-create_emu(size_t mem_size, uint32_t eip, uint32_t esp)
+static Emulator *create_emu(size_t mem_size, uint32_t eip, uint32_t esp)
 {
     Emulator *emu = malloc(sizeof(Emulator));
     emu->memory = malloc(mem_size);
