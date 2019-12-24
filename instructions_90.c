@@ -66,6 +66,20 @@ void cdq(Emulator *emu)
 }
 
 /*
+ * call ptr16:16/32: 7 bytes
+ * Pushes CS and EIP in order and jumps to ptr16:32.
+ * 1 byte: op (9A)
+ * 2 byte: cs value
+ * 4 byte: eip
+ */
+void ptr_call(Emulator *emu)
+{
+    push_segment_register(emu, CS);
+    push32(emu, emu->eip + 7);
+    ptr_jump(emu);
+}
+
+/*
  * pushf / pushfd: 1 byte
  * Pushes EFLAGS into stack.
  * 1 byte: op (9C)

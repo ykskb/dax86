@@ -172,6 +172,7 @@ void init_instructions(void)
 
     instructions[0x98] = cwde;
     instructions[0x99] = cdq;
+    instructions[0x9A] = ptr_call;
     instructions[0x9C] = pushfd;
     instructions[0x9D] = popfd;
     instructions[0x9E] = sahf;
@@ -198,12 +199,15 @@ void init_instructions(void)
     instructions[0xC6] = mov_rm8_imm8;
     instructions[0xC7] = mov_rm32_imm32;
     instructions[0xC9] = leave;
+    instructions[0xCB] = ret_far;
 
     instructions[0xE0] = loopnz;
     instructions[0xE1] = loopz;
     instructions[0xE2] = loop;
     instructions[0xE3] = jecxz;
+    instructions[0xE8] = call_rel32;
     instructions[0xE9] = near_jump;
+    instructions[0xEA] = ptr_jump;
     instructions[0xEB] = short_jump;
     instructions[0xEC] = in_al_dx;
     instructions[0xED] = in_eax_dx;
@@ -222,6 +226,4 @@ void init_instructions(void)
     instructions[0xFD] = std;
     instructions[0xFE] = code_fe;
     instructions[0xFF] = code_ff;
-
-    instructions[0xE8] = call_rel32;
 }

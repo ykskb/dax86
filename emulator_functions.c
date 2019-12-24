@@ -4,25 +4,49 @@
 
 /* Source Instruction Operations */
 
+static uint32_t get_code_address(Emulator *emu)
+{
+    /* Real mode */
+    uint32_t seg_addr = (uint32_t)get_seg_register16(emu, CS) << 4;
+    return seg_addr + emu->eip;
+}
+
 /* Retrieves code from memory by offset from EIP. */
 uint8_t get_code8(Emulator *emu, int index)
 {
-    return emu->memory[emu->eip + index];
+    uint32_t linear_addr = get_code_address(emu);
+    return emu->memory[linear_addr + index];
 }
 
 int8_t get_sign_code8(Emulator *emu, int index)
 {
-    return (int8_t)emu->memory[emu->eip + index];
+    return (int8_t)get_code8(emu, index);
+}
+
+uint16_t get_code16(Emulator *emu, int index)
+{
+    int i;
+    uint32_t code = 0;
+    /* i386 uses little endian (lower bytes to right). */
+    for (i = 0; i < 2; i++)
+    {
+        /* Shift 8 bits to left per byte read */
+        code |= get_code8(emu, index + i) << (i * 8);
+    }
+    return code;
+}
+
+int16_t get_sign_code16(Emulator *emu, int index)
+{
+    return (int16_t)get_code16(emu, index);
 }
 
 uint32_t get_code32(Emulator *emu, int index)
 {
     int i;
     uint32_t code = 0;
-    /* i386 uses little endian (lower bytes to right). */
     for (i = 0; i < 4; i++)
     {
-        /* Shift 8 bits to left per byte read */
         code |= get_code8(emu, index + i) << (i * 8);
     }
     return code;
@@ -66,10 +90,10 @@ uint32_t get_memory8(Emulator *emu, uint32_t address)
     return emu->memory[address];
 }
 
-uint32_t get_memory16(Emulator *emu, uint32_t address)
+uint16_t get_memory16(Emulator *emu, uint32_t address)
 {
     int i;
-    uint32_t mem_read = 0;
+    uint16_t mem_read = 0;
     for (i = 0; i < 2; i++)
     {
         /* little endian: first to far right */

@@ -323,6 +323,35 @@ static void jmp_rm32(Emulator *emu, ModRM *modrm)
 }
 
 /*
+ * jmp m16:32: 2|3 bytes
+ * Jumps far to absolute address indirectly specified with m16:16/32.
+ * 1 byte: op (FF/5)
+ * 1|2 bytes: ModRM
+ */
+static void jmp_m_ptr(Emulator *emu, ModRM *modrm)
+{
+    uint32_t address = calc_memory_address(emu, modrm);
+    uint16_t cs_val = get_memory16(emu, address);
+    uint32_t eip_val = get_memory32(emu, address + 2);
+
+    set_seg_register16(emu, CS, cs_val);
+    emu->eip = eip_val;
+}
+
+/*
+ * call m16:32: 2|3 bytes
+ * Jumps with m16:16/32 after pushing CS and EIP.
+ * 1 byte: op (FF/3)
+ * 1|2 bytes: ModRM
+ */
+static void call_m_ptr(Emulator *emu, ModRM *modrm)
+{
+    push_segment_register(emu, CS);
+    push32(emu, emu->eip);
+    jmp_m_ptr(emu, modrm);
+}
+
+/*
  * push rm32: 2|3 bytes
  * Pushes 32-bit value from R/M.
  * 1 byte: op (FF/6)
@@ -351,8 +380,14 @@ void code_ff(Emulator *emu)
     case 2:
         call_rm32(emu, &modrm);
         break;
+    case 3:
+        call_m_ptr(emu, &modrm);
+        break;
     case 4:
         jmp_rm32(emu, &modrm);
+        break;
+    case 5:
+        jmp_m_ptr(emu, &modrm);
         break;
     case 6:
         push_rm32(emu, &modrm);

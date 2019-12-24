@@ -20,7 +20,7 @@
  * | 10: 4 |
  * | 11: 8 |
  * Base + (Index * Scale)
- *
+ * ________________________________________________________________________
  *                        |  REG  |EAX |ECX |EDX |EBX |ESP |EBP |ESI |EDI |
  *                        | SREG  | ES | CS | SS | DS | FS | GS |rsvd|rsvd|
  *                        | (r32) |000 |001 |010 |011 |100 |101 |110 |111 |
@@ -44,6 +44,12 @@
  * | 11  | 000 | eax              | C0 | C8 | D0 | D8 | E0 | E8 | F0 | F8 |
  * |                               ...                                    |
  * |     | 111 | edi              | C7 | CF | D7 | DF | E7 | EF | F7 | FF |
+ * ________________________________________________________________________
+ * 
+ * Examples:
+ * op eax, [ebx]: 03 (EAX|[EBX])
+ * op eax, [0x7c00]: 05 007C 0000 (EAX|disp32)
+ * (op eax, [label1] becomes [0x7c00]: translated by assempler)
  */
 
 ModRM create_modrm()
@@ -110,11 +116,11 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
     }
 }
 
-u_int32_t calc_cib_address(Emulator *emu, ModRM *modrm)
+uint32_t calc_cib_address(Emulator *emu, ModRM *modrm)
 {
-    u_int32_t scale = pow(2, modrm->sib.scale);
-    u_int32_t index_val = get_register32(emu, modrm->sib.index);
-    u_int32_t base_val = get_register32(emu, modrm->sib.base);
+    uint32_t scale = pow(2, modrm->sib.scale);
+    uint32_t index_val = get_register32(emu, modrm->sib.index);
+    uint32_t base_val = get_register32(emu, modrm->sib.base);
     return index_val * scale + base_val;
 }
 

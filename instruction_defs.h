@@ -117,6 +117,7 @@ void pop_rm32(Emulator *emu);
 void xchg_r32_r32(Emulator *emu);
 void cwde(Emulator *emu);
 void cdq(Emulator *emu);
+void ptr_call(Emulator *emu);
 void pushfd(Emulator *emu);
 void popfd(Emulator *emu);
 void sahf(Emulator *emu);
@@ -137,6 +138,7 @@ void ret(Emulator *emu);
 void mov_rm8_imm8(Emulator *emu);
 void mov_rm32_imm32(Emulator *emu);
 void leave(Emulator *emu);
+void ret_far(Emulator *emu);
 
 /* 0xD */
 void code_d0(Emulator *emu);
@@ -152,6 +154,7 @@ void loop(Emulator *emu);
 void jecxz(Emulator *emu);
 void call_rel32(Emulator *emu);
 void near_jump(Emulator *emu);
+void ptr_jump(Emulator *emu);
 void short_jump(Emulator *emu);
 void in_al_dx(Emulator *emu);
 void in_eax_dx(Emulator *emu);

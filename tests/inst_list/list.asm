@@ -426,7 +426,7 @@ label1:
     call [eax]; FF /2 call rm32 ; implemented but test with protect mode ;
     call [0x1000] ; FF /3 call m16:16/32 ;
     jmp [eax] ; FF /4 jmp rm32 ; implemented but test with protect mode ;
-    jmp [0x1000] ; FF /5 jmp m16:16/32 ;
+    jmp far [0x1000] ; FF /5 jmp m16:16/32 ;
     push dword [eax] ; FF /6 push rm32 ;
 
     hlt ; F4 hlt ;

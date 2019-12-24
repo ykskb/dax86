@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
         uint8_t op = get_code8(emu, 0);
         if (!quiet)
         {
-            printf("EIP: %X Op: %02X\n", emu->eip, op);
+            printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
         }
 
         if (instructions[op] == NULL)

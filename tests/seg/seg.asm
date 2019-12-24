@@ -3,10 +3,10 @@ BITS 32
     mov eax, 0x101001
     mov es, ax ; 8EC0 ; ModRM:1100 0000 -> reg_index:000
     
-    mov eax, 0x2
-    mov cs, ax ; 8EC8 ; ModRM:1100 1000 -> reg_index:001
+    ; mov eax, 0x1002
+    ; mov cs, ax ; 8EC8 ; ModRM:1100 1000 -> reg_index:001
     
-    mov eax, 0x1003
+    mov eax, 0x3
     mov ss, ax ; 8ED0 ; ModRM:1101 0000 -> reg_index:010
     
     mov eax, 0x1004
@@ -19,15 +19,15 @@ BITS 32
     mov gs, ax ; 8EE8 ; ModRM:1110 1000 -> reg_index:101
     
     push es
-    push cs
+    ; push cs
     push ss
     push ds
 
     pop es ; ES: 0x1004 from DS
-    ; no pop cs ; CS: 0x2
-    pop ds ; DS: 0x1003 from SS
-    pop ss ; SS: 0x2 from CS
+    ; no pop cs ; CS: 0x1002
+    pop ds ; DS: 0x3 from SS
+    pop ss ; SS: 0x1001 from ES
 
-    mov eax, ss ; EAX: 0x2 from SS
+    mov eax, ss ; EAX: 0x1001 from ES
     
     jmp 0

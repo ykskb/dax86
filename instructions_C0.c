@@ -296,3 +296,14 @@ void leave(Emulator *emu)
     set_register32(emu, EBP, pop32(emu));
     emu->eip += 1;
 }
+
+/*
+ * ret far: 1 byte
+ * Jumps to the address pushed by call (EIP & CS).
+ * 1 byte: op (CB)
+ */
+void ret_far(Emulator *emu)
+{
+    emu->eip = pop32(emu);
+    set_seg_register16(emu, CS, pop16(emu));
+}

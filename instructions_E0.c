@@ -140,6 +140,21 @@ void near_jump(Emulator *emu)
 }
 
 /*
+ * jmp ptr16:16/32: 7 bytes
+ * Jumps in ptr16:16/32.
+ * 1 byte: op (EA)
+ * 2 byte: cs value
+ * 4 byte: eip
+ */
+void ptr_jump(Emulator *emu)
+{
+    uint32_t eip_val = get_code32(emu, 1);
+    uint16_t cs_val = get_code16(emu, 5);
+    set_seg_register16(emu, CS, cs_val);
+    emu->eip = eip_val;
+}
+
+/*
  * jmp (short): 2 bytes
  * Jumps with 8-bit signed offset.
  * 1 byte: op (EB)

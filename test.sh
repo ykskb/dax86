@@ -30,7 +30,9 @@ for i in \
  "mov"\
  "pop"\
  "code_c0"\
- "loop"
+ "loop"\
+ "jmp_far"\
+ "call_far"
 do
 
 test_path="./tests/${i}/${i}.bin"
