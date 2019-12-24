@@ -1,6 +1,6 @@
 # dax86
 
-x86 simulator for study-purpose (without reading the source code of QEMU)
+x86 Simulator for Study-purpose | Implementation of x86 in C
 
 Referenced these publications with many thanks:
 
