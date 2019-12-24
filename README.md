@@ -10,16 +10,17 @@ Referenced these publications with many thanks:
 - https://c9x.me/x86/
 - https://book.mynavi.jp/support/bookmook/x86/
 
-Currently working on functionalities such as:
+In scope:
 
-- More instructions (in-progress)
-- Instruction prefixes (in-progress)
-- More registers (in-progress)
-- More eflags (in-progress)
-- Protection mode (starting-soon)
-- Paging (starting-soon)
-- SIB (done)
+- Real mode addressing
+- Protection mode
+- Paging
+- Instruction prefixes
 - more
+
+Out of scope:
+
+- Floating point related instructions
 
 with bunch of comments for note-taking purposes.
 
