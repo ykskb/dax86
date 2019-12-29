@@ -30,7 +30,7 @@ void set_memory8(Emulator *emu, uint32_t address, uint32_t value);
 void set_memory16(Emulator *emu, uint32_t address, uint16_t value);
 void set_memory32(Emulator *emu, uint32_t address, uint32_t value);
 
-uint32_t get_memory8(Emulator *emu, uint32_t address);
+uint8_t get_memory8(Emulator *emu, uint32_t address);
 uint16_t get_memory16(Emulator *emu, uint32_t address);
 uint32_t get_memory32(Emulator *emu, uint32_t address);
 

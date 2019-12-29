@@ -2,20 +2,20 @@
 
 #include "emulator_functions.h"
 
-/* Source Instruction Operations */
-
-static uint32_t get_code_address(Emulator *emu)
+static uint32_t get_physical_address(uint16_t seg_val, uint32_t offset)
 {
     /* Real mode */
-    uint32_t seg_addr = (uint32_t)get_seg_register16(emu, CS) << 4;
-    return seg_addr + emu->eip;
+    uint32_t p_base = ((uint32_t)seg_val) << 4;
+    return p_base + offset;
 }
+
+/* Source Instruction Operations */
 
 /* Retrieves code from memory by offset from EIP. */
 uint8_t get_code8(Emulator *emu, int index)
 {
-    uint32_t linear_addr = get_code_address(emu);
-    return emu->memory[linear_addr + index];
+    uint32_t p_addr = get_physical_address(get_seg_register16(emu, CS), emu->eip);
+    return emu->memory[p_addr + index];
 }
 
 int8_t get_sign_code8(Emulator *emu, int index)
@@ -57,61 +57,97 @@ int32_t get_sign_code32(Emulator *emu, int index)
     return (int32_t)get_code32(emu, index);
 }
 
-/* Memory Operations */
+/* Physical Memory Operations (static) */
 
-void set_memory8(Emulator *emu, uint32_t address, uint32_t value)
+static void _set_memory8(Emulator *emu, uint32_t p_address, uint8_t value)
 {
-    /* write last 8 bits */
-    emu->memory[address] = value & 0xFF;
+    emu->memory[p_address] = value & 0xFF;
 }
 
-void set_memory16(Emulator *emu, uint32_t address, uint16_t value)
+static void _set_memory16(Emulator *emu, uint32_t p_address, uint16_t value)
 {
     int i;
     for (i = 0; i < 2; i++)
     {
         /* passes right-most 8 bits first (little endian) */
-        set_memory8(emu, address + i, value >> (i * 8));
+        _set_memory8(emu, p_address + i, value >> (i * 8));
     }
 }
 
-void set_memory32(Emulator *emu, uint32_t address, uint32_t value)
+static void _set_memory32(Emulator *emu, uint32_t p_address, uint32_t value)
 {
     int i;
     for (i = 0; i < 4; i++)
     {
         /* passes right-most 8 bits first (little endian) */
-        set_memory8(emu, address + i, value >> (i * 8));
+        _set_memory8(emu, p_address + i, value >> (i * 8));
     }
 }
 
-uint32_t get_memory8(Emulator *emu, uint32_t address)
+static uint8_t _get_memory8(Emulator *emu, uint32_t p_address)
 {
-    return emu->memory[address];
+    return emu->memory[p_address];
 }
 
-uint16_t get_memory16(Emulator *emu, uint32_t address)
+static uint16_t _get_memory16(Emulator *emu, uint32_t p_address)
 {
     int i;
     uint16_t mem_read = 0;
     for (i = 0; i < 2; i++)
     {
         /* little endian: first to far right */
-        mem_read |= get_memory8(emu, address + i) << (8 * i);
+        mem_read |= _get_memory8(emu, p_address + i) << (8 * i);
     }
     return mem_read;
 }
 
-uint32_t get_memory32(Emulator *emu, uint32_t address)
+static uint32_t _get_memory32(Emulator *emu, uint32_t p_address)
 {
     int i;
     uint32_t mem_read = 0;
     for (i = 0; i < 4; i++)
     {
-        /* little endian: first to far right */
-        mem_read |= get_memory8(emu, address + i) << (8 * i);
+        mem_read |= _get_memory8(emu, p_address + i) << (8 * i);
     }
     return mem_read;
+}
+
+/* Memory Operations with Segment Registers (public) */
+
+void set_memory8(Emulator *emu, uint32_t address, uint32_t value)
+{
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    _set_memory8(emu, p_address, value);
+}
+
+void set_memory16(Emulator *emu, uint32_t address, uint16_t value)
+{
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    _set_memory16(emu, p_address, value);
+}
+
+void set_memory32(Emulator *emu, uint32_t address, uint32_t value)
+{
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    _set_memory32(emu, p_address, value);
+}
+
+uint8_t get_memory8(Emulator *emu, uint32_t address)
+{
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    return _get_memory8(emu, p_address);
+}
+
+uint16_t get_memory16(Emulator *emu, uint32_t address)
+{
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    return _get_memory16(emu, p_address);
+}
+
+uint32_t get_memory32(Emulator *emu, uint32_t address)
+{
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    return _get_memory32(emu, p_address);
 }
 
 /* Register Operations */
@@ -159,34 +195,38 @@ uint32_t get_register32(Emulator *emu, int reg_index)
 
 void push16(Emulator *emu, uint16_t value)
 {
-    /* New address would be ESP value - 2 bytes.  */
-    uint32_t address = get_register32(emu, ESP) - 2;
-    set_register32(emu, ESP, address);
-    set_memory16(emu, address, value);
+    /* New offset would be ESP value - 2 bytes.  */
+    uint32_t offset = get_register32(emu, ESP) - 2;
+    set_register32(emu, ESP, offset);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, SS), offset);
+    _set_memory16(emu, p_address, value);
 }
 
 void push32(Emulator *emu, uint32_t value)
 {
-    /* New address would be ESP value - 4 bytes.  */
-    uint32_t address = get_register32(emu, ESP) - 4;
+    /* New offset would be ESP value - 4 bytes.  */
+    uint32_t offset = get_register32(emu, ESP) - 4;
     /* Updates ESP with the new address. */
-    set_register32(emu, ESP, address);
-    set_memory32(emu, address, value);
+    set_register32(emu, ESP, offset);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, SS), offset);
+    _set_memory32(emu, p_address, value);
 }
 
 uint16_t pop16(Emulator *emu)
 {
-    uint32_t address = get_register32(emu, ESP);
-    uint16_t value = get_memory16(emu, address);
-    set_register32(emu, ESP, address + 2);
+    uint32_t offset = get_register32(emu, ESP);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, SS), offset);
+    uint16_t value = _get_memory16(emu, p_address);
+    set_register32(emu, ESP, offset + 2);
     return value;
 }
 
 uint32_t pop32(Emulator *emu)
 {
-    uint32_t address = get_register32(emu, ESP);
-    uint32_t value = get_memory32(emu, address);
-    set_register32(emu, ESP, address + 4);
+    uint32_t offset = get_register32(emu, ESP);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, SS), offset);
+    uint32_t value = _get_memory32(emu, p_address);
+    set_register32(emu, ESP, offset + 4);
     return value;
 }
 
