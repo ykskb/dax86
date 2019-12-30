@@ -178,6 +178,10 @@ void init_instructions(void)
     instructions[0x9E] = sahf;
     instructions[0x9F] = lahf;
 
+    instructions[0xA0] = mov_al_moffs8;
+    instructions[0xA1] = mov_eax_moffs32;
+    instructions[0xA2] = mov_moffs8_al;
+    instructions[0xA3] = mov_moffs32_eax;
     instructions[0xA8] = test_al_imm8;
     instructions[0xA9] = test_eax_imm32;
 

@@ -124,6 +124,10 @@ void sahf(Emulator *emu);
 void lahf(Emulator *emu);
 
 /* 0xA */
+void mov_al_moffs8(Emulator *emu);
+void mov_eax_moffs32(Emulator *emu);
+void mov_moffs8_al(Emulator *emu);
+void mov_moffs32_eax(Emulator *emu);
 void test_al_imm8(Emulator *emu);
 void test_eax_imm32(Emulator *emu);
 

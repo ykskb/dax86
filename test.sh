@@ -32,7 +32,8 @@ for i in \
  "code_c0"\
  "loop"\
  "jmp_far"\
- "call_far"
+ "call_far"\
+ "moffs"
 do
 
 test_path="./tests/${i}/${i}.bin"

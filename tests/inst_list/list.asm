@@ -190,19 +190,19 @@ label0:
 
     mov ds, eax ; 8E mov sreg rm32 ; implemented ;
 
-    pop dword [eax] ; 8F pop rm32
+    pop dword [eax] ; 8F pop rm32 ; implemented ;
 
-    xchg dword eax, ebp ; 90 + r ; xchg r32 eax
+    xchg dword eax, ebp ; 90 + r ; xchg r32 eax ; implemented ;
 
     ; F3 90 ; Pause ?
 
     cbw ; 66 98 cbw ax, al
-    cwde ; 98 cwde eax, ax
+    cwde ; 98 cwde eax, ax ; implemented ;
     cwd ; 66 99 cwd dx, ax
-    cdq ; 99 cdq edx, eax
+    cdq ; 99 cdq edx, eax ; implemented ;
 
     ; https://stackoverflow.com/questions/20264452/x86-function-call-types ;
-    call dword 0x10:0x1000 ; 9A call far ptr16:16/32 (cs: addr); absolute far jump ;
+    call dword 0x10:0x1000 ; 9A call far ptr16:16/32 (cs: addr); absolute far jump ; implemented ;
 
     ; https://www.felixcloutier.com/x86/wait:fwait ;
     fwait ; prefix 9B checks for and handle pending, unmasked, floating-point exceptions before proceeding. ;
@@ -213,14 +213,14 @@ label0:
     popf ; 9D popf ; pops stack to flags register ; implemented ;
     popfd ; 9D popfd ; pops stack to eflags register ; implemented ;
 
-    sahf ; 9E sahf ; stores ah into flags ;
-    lahf ; 9F lahf ; load flags to ah register ;
+    sahf ; 9E sahf ; stores ah into flags ; implemented ;
+    lahf ; 9F lahf ; load flags to ah register ; implemented ;
 
     ; offset to segment base ;
-    mov byte al, [0x10] ; A0 mov al moffs8 ;
-    mov dword eax, [0x10] ; A1 mov eax moffs32
-    mov byte [0x10], al ; A2 mov moffs8 al
-    mov dword [0x10], eax ; A3 mov moffs32 eax
+    mov byte al, [0x10] ; A0 mov al moffs8 ; implemented ;
+    mov dword eax, [0x10] ; A1 mov eax moffs32 ; implemented ;
+    mov byte [0x10], al ; A2 mov moffs8 al ; implemented ;
+    mov dword [0x10], eax ; A3 mov moffs32 eax ; implemented ;
 
     ; move data at address DS:(E)SI to address ES:(E)DI ;
     movsb ; A4 movsb ;
@@ -232,8 +232,8 @@ label0:
     cmpsw ; 66 A7 cmpsw ;
     cmpsd ; A7 cmpsd ;
 
-    test al, 0x1 ; A8 test al imm8
-    test eax, 0x1 ; A9 test eax imm32
+    test al, 0x1 ; A8 test al imm8 ; implemented ;
+    test eax, 0x1 ; A9 test eax imm32 ; implemented ;
 
     ; stores al/AX/EAX at address ES:(E)DI ;
     stosb ; AA stosb ;
@@ -368,7 +368,7 @@ label1:
 
     call label0 ; E8 call rel32 ; implemented ;
     jmp label0 ; E9 jmp rel32 ; implemented ;
-    jmp 0x10:0x1000 ; EA jmp ptr16:16/32 ;
+    jmp 0x10:0x1000 ; EA jmp ptr16:16/32 ; implemented ;
     jmp label1 ; EB jmp rel8 ; implemented
 
     in al, dx ; EC in al dx ; inputs byte from dx I/O port address into AL ; implemented ;
@@ -423,10 +423,10 @@ label1:
     
     ; FF 0 inc rm32 implemented ;
     dec dword [eax] ; FF /1 dec rm32 ; implemented ;
-    call [eax]; FF /2 call rm32 ; implemented but test with protect mode ;
-    call [0x1000] ; FF /3 call m16:16/32 ;
-    jmp [eax] ; FF /4 jmp rm32 ; implemented but test with protect mode ;
-    jmp far [0x1000] ; FF /5 jmp m16:16/32 ;
-    push dword [eax] ; FF /6 push rm32 ;
+    call [eax]; FF /2 call rm32 ; implemented ;
+    call [0x1000] ; FF /3 call m16:16/32 ; implemented ;
+    jmp [eax] ; FF /4 jmp rm32 ; implemented ;
+    jmp far [0x1000] ; FF /5 jmp m16:16/32 ; impemented ;
+    push dword [eax] ; FF /6 push rm32 ; implemented ;
 
     hlt ; F4 hlt ;
