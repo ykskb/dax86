@@ -331,8 +331,8 @@ static void jmp_rm32(Emulator *emu, ModRM *modrm)
 static void jmp_m_ptr(Emulator *emu, ModRM *modrm)
 {
     uint32_t address = calc_memory_address(emu, modrm);
-    uint16_t cs_val = get_memory16(emu, address);
-    uint32_t eip_val = get_memory32(emu, address + 2);
+    uint16_t cs_val = get_memory16(emu, DS, address);
+    uint32_t eip_val = get_memory32(emu, DS, address + 2);
 
     set_seg_register16(emu, CS, cs_val);
     emu->eip = eip_val;

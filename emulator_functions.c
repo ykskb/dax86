@@ -114,39 +114,39 @@ static uint32_t _get_memory32(Emulator *emu, uint32_t p_address)
 
 /* Memory Operations with Segment Registers (public) */
 
-void set_memory8(Emulator *emu, uint32_t address, uint32_t value)
+void set_memory8(Emulator *emu, int seg_index, uint32_t address, uint32_t value)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
     _set_memory8(emu, p_address, value);
 }
 
-void set_memory16(Emulator *emu, uint32_t address, uint16_t value)
+void set_memory16(Emulator *emu, int seg_index, uint32_t address, uint16_t value)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
     _set_memory16(emu, p_address, value);
 }
 
-void set_memory32(Emulator *emu, uint32_t address, uint32_t value)
+void set_memory32(Emulator *emu, int seg_index, uint32_t address, uint32_t value)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
     _set_memory32(emu, p_address, value);
 }
 
-uint8_t get_memory8(Emulator *emu, uint32_t address)
+uint8_t get_memory8(Emulator *emu, int seg_index, uint32_t address)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
     return _get_memory8(emu, p_address);
 }
 
-uint16_t get_memory16(Emulator *emu, uint32_t address)
+uint16_t get_memory16(Emulator *emu, int seg_index, uint32_t address)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
     return _get_memory16(emu, p_address);
 }
 
-uint32_t get_memory32(Emulator *emu, uint32_t address)
+uint32_t get_memory32(Emulator *emu, int seg_index, uint32_t address)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, DS), address);
+    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
     return _get_memory32(emu, p_address);
 }
 

@@ -223,32 +223,32 @@ label0:
     mov dword [0x10], eax ; A3 mov moffs32 eax ; implemented ;
 
     ; move data at address DS:(E)SI to address ES:(E)DI ;
-    movsb ; A4 movsb ;
+    movsb ; A4 movsb ; implemented ;
     movsw ; 66 A5 movsw ;
-    movsd ; A5 movsd ;
+    movsd ; A5 movsd ; implemented ;
 
     ; compares data at address DS:(E)SI with data at address ES:(E)DI and sets the status flags ;
-    cmpsb ; A6 cmpsb ;
+    cmpsb ; A6 cmpsb ; implemented ;
     cmpsw ; 66 A7 cmpsw ;
-    cmpsd ; A7 cmpsd ;
+    cmpsd ; A7 cmpsd ; implemented ;
 
     test al, 0x1 ; A8 test al imm8 ; implemented ;
     test eax, 0x1 ; A9 test eax imm32 ; implemented ;
 
     ; stores al/AX/EAX at address ES:(E)DI ;
-    stosb ; AA stosb ;
+    stosb ; AA stosb ; implemented ;
     stosw ; 66 AB stosw ;
-    stosd ; AB stosd ;
+    stosd ; AB stosd ; implemented ;
 
     ; loads data at address DS:(E)SI into AL/AX/EAX ;
-    lodsb ; AC lodsb ;
+    lodsb ; AC lodsb ; implemented ;
     lodsw ; 66 AD lodsw ;
-    lodsd ; AD lodsd ;
+    lodsd ; AD lodsd ; implemented ;
 
     ; compare AL/AX/EAX with byte at ES:(E)DI and set status flags ;
-    scasb ; AE scasb ;
+    scasb ; AE scasb ; implemented ;
     scasw ; 66 AF scasw ;
-    scasd ; AF scasd ;
+    scasd ; AF scasd ; implemented ;
 
     ; 0xB0 ~ 0xB7 mov r8 imm8 implemented ; op code includes 8 registers in 1 byte ;
     ; 0xB8 ~ 0xBF mov r32 imm32 implemented ; op code includes 8 registers in 1 byte ;
@@ -275,9 +275,11 @@ label0:
     ret 0x1000 ; C2 ret imm16 Near return to calling procedure and pop imm16 bytes from stack ; used?
     ; C3 ret implemented. ;
 
+    ; implemented ;
     les dword eax, [0x1000] ; C4 les r32 imm16/32 ; load ES:r32 with far pointer at memory ;
     les word ax, [0x1000] ; 66 C4 less r16 imm16 ; load ES:r16 with far pointer at memory ;
 
+    ; implemented ;
     lds dword eax, [0x1000] ; C5 les r32 imm16/32 ; load DS:r32 with far pointer at memory ;
     lds word ax, [0x1000] ; 66 C5 less r16 imm16 ; load DS:r16 with far pointer at memory ;
 
@@ -288,8 +290,8 @@ label0:
     ; C9 leave ; implemented ;
 
     ; far return: inter-segment return ;
-    retf 0x1000 ; CA retf imm16; far return from procedure
-    retf ; CB retf ; far return from procedure
+    retf 0x1000 ; CA retf imm16; far return from procedure ; used?
+    retf ; CB retf ; far return from procedure ; implemented ;
 
     int3 ; CC int3 ; for use by debuggers to temporarily replace an instruction in order to set a code breakpoint
     int 0x10 ; CD int ; calls interrupt or exception handler specified with the destination operand: interrupt vector 0~255

@@ -86,6 +86,7 @@ typedef struct
     uint32_t control_registers[CONTROL_REGISTER_COUNT];
     uint8_t *memory;
     uint32_t eip;
+    uint64_t gdtr;
 } Emulator;
 
 #endif

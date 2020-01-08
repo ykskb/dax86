@@ -196,7 +196,7 @@ void set_rm8(Emulator *emu, ModRM *modrm, uint8_t value)
          * 10: [eax] + disp32 etc, [ecx] + disp32...
          */
         uint32_t address = calc_memory_address(emu, modrm);
-        set_memory8(emu, address, value);
+        set_memory8(emu, DS, address, value);
     }
 }
 
@@ -209,7 +209,7 @@ uint8_t get_rm8(Emulator *emu, ModRM *modrm)
     else
     {
         uint32_t address = calc_memory_address(emu, modrm);
-        return get_memory8(emu, address);
+        return get_memory8(emu, DS, address);
     }
 }
 
@@ -229,7 +229,7 @@ void set_rm32(Emulator *emu, ModRM *modrm, uint32_t value)
          * 10: [eax] + disp32 etc, [ecx] + disp32...
          */
         uint32_t address = calc_memory_address(emu, modrm);
-        set_memory32(emu, address, value);
+        set_memory32(emu, DS, address, value);
     }
 }
 
@@ -242,7 +242,7 @@ uint32_t get_rm32(Emulator *emu, ModRM *modrm)
     else
     {
         uint32_t address = calc_memory_address(emu, modrm);
-        return get_memory32(emu, address);
+        return get_memory32(emu, DS, address);
     }
 }
 

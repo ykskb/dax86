@@ -10,24 +10,63 @@
 #include "modrm.h"
 #include "io.h"
 
-/*
- * rep: 1 byte prefix
- * Repeats string operation.
- * 1 byte: prefix (F2/F3)
+/* 
+ * REP/REPE/REPZ/REPNE/REPNZ
+ * 
+ * Repeats string operations.
+ *
+ * REP(F3): terminates if ECS=0
+ *     INS(6C/6D)
+ *     MOVS(A4/A5)
+ *     OUTS(6E/6F)
+ *     LODS(AC/AD)
+ *     STOS(AA/AB)
+ * REPE/REPZ(F3): terminates if ECX=0 or ZF=0:
+ *     CMPS(A6/A7)
+ *     SCAS(AE/AF)
+ * REPNE/REPNZ(F2): terminates if ECX=0 or ZF=1:
+ *     CMPS(A6/A7)
+ *     SCAS(AE/AF)
  */
+
 static void rep(Emulator *emu)
 {
     emu->eip += 1;
     uint32_t ecx_value = get_register32(emu, ECX);
     uint8_t op = get_code8(emu, 0);
-    /* TODO: Add check on supported types: INS, LODS, MOVS, OUTS and STOS */
     uint32_t op_eip = emu->eip;
     int i;
     for (i = 0; i < ecx_value; i++)
     {
         emu->eip = op_eip;
+        printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
         instructions[op](emu);
+        if ((op == 0xA6 || op == 0xA7 || op == 0xAE || op == 0xAF) && !is_zero(emu))
+        {
+            break;
+        }
     }
+    set_register32(emu, ECX, ecx_value - i);
+}
+
+static void repne(Emulator *emu)
+{
+    emu->eip += 1;
+    uint32_t ecx_value = get_register32(emu, ECX);
+    uint8_t op = get_code8(emu, 0);
+    uint32_t op_eip = emu->eip;
+    int i;
+    for (i = 0; i < ecx_value; i++)
+    {
+        emu->eip = op_eip;
+        printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
+        instructions[op](emu);
+        if ((op == 0xA6 || op == 0xA7 || op == 0xAE || op == 0xAF) && is_zero(emu))
+        {
+            break;
+        }
+    }
+    set_register32(emu, ECX, ecx_value - i);
 }
 
 instruction_func_t *instructions[256];
@@ -182,8 +221,18 @@ void init_instructions(void)
     instructions[0xA1] = mov_eax_moffs32;
     instructions[0xA2] = mov_moffs8_al;
     instructions[0xA3] = mov_moffs32_eax;
+    instructions[0xA4] = movsb;
+    instructions[0xA5] = movsd;
+    instructions[0xA6] = cmpsb;
+    instructions[0xA7] = cmpsd;
     instructions[0xA8] = test_al_imm8;
     instructions[0xA9] = test_eax_imm32;
+    instructions[0xAA] = stosb;
+    instructions[0xAB] = stosd;
+    instructions[0xAC] = lodsb;
+    instructions[0xAD] = lodsd;
+    instructions[0xAE] = scasb;
+    instructions[0xAF] = scasd;
 
     /* op code includes 8 registers in 1 byte: 0xB0 ~ 0xB7*/
     for (i = 0; i < 8; i++)
@@ -200,6 +249,8 @@ void init_instructions(void)
     instructions[0xC0] = code_c0;
     instructions[0xC1] = code_c01;
     instructions[0xC3] = ret;
+    instructions[0xC4] = les;
+    instructions[0xC5] = lds;
     instructions[0xC6] = mov_rm8_imm8;
     instructions[0xC7] = mov_rm32_imm32;
     instructions[0xC9] = leave;
@@ -218,6 +269,7 @@ void init_instructions(void)
     instructions[0xEE] = out_dx_al;
     instructions[0xEF] = out_dx_eax;
 
+    instructions[0xF2] = repne;
     instructions[0xF3] = rep;
     instructions[0xF5] = cmc;
     instructions[0xF6] = code_f6;

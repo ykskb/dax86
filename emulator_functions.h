@@ -26,13 +26,13 @@ int32_t get_sign_code32(Emulator *emu, int index);
 
 /* Memory Operations */
 
-void set_memory8(Emulator *emu, uint32_t address, uint32_t value);
-void set_memory16(Emulator *emu, uint32_t address, uint16_t value);
-void set_memory32(Emulator *emu, uint32_t address, uint32_t value);
+void set_memory8(Emulator *emu, int seg_index, uint32_t address, uint32_t value);
+void set_memory16(Emulator *emu, int seg_index, uint32_t address, uint16_t value);
+void set_memory32(Emulator *emu, int seg_index, uint32_t address, uint32_t value);
 
-uint8_t get_memory8(Emulator *emu, uint32_t address);
-uint16_t get_memory16(Emulator *emu, uint32_t address);
-uint32_t get_memory32(Emulator *emu, uint32_t address);
+uint8_t get_memory8(Emulator *emu, int seg_index, uint32_t address);
+uint16_t get_memory16(Emulator *emu, int seg_index, uint32_t address);
+uint32_t get_memory32(Emulator *emu, int seg_index, uint32_t address);
 
 /* Register Operations */
 

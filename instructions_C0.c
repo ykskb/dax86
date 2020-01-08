@@ -248,6 +248,43 @@ void ret(Emulator *emu)
     emu->eip = pop32(emu);
 }
 
+void load_seg_r32(Emulator *emu, int seg_index, ModRM *modrm)
+{
+    uint32_t address = calc_memory_address(emu, modrm);
+    uint16_t seg_val = get_memory16(emu, DS, address);
+    uint32_t offset = get_memory32(emu, DS, address + 2);
+    set_seg_register16(emu, seg_index, seg_val);
+    set_register32(emu, modrm->reg_index, offset);
+}
+
+/*
+ * les: 2|4 bytes
+ * Loads ES:r16/32 with far pointer from memory.
+ * 1 byte: op (C4)
+ * 1|5 bytes: ModRM
+ */
+void les(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm = create_modrm();
+    parse_modrm(emu, &modrm);
+    load_seg_r32(emu, ES, &modrm);
+}
+
+/*
+ * lds: 2|4 bytes
+ * Loads DS:r16/32 with far pointer from memory.
+ * 1 byte: op (C5)
+ * 1|5 bytes: ModRM
+ */
+void lds(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm = create_modrm();
+    parse_modrm(emu, &modrm);
+    load_seg_r32(emu, DS, &modrm);
+}
+
 /*
  * mov rm8 imm8: 3/4 bytes
  * Copies imm8 value to register or memory specified by ModR/M(rm8).

@@ -128,8 +128,18 @@ void mov_al_moffs8(Emulator *emu);
 void mov_eax_moffs32(Emulator *emu);
 void mov_moffs8_al(Emulator *emu);
 void mov_moffs32_eax(Emulator *emu);
+void movsb(Emulator *emu);
+void movsd(Emulator *emu);
+void cmpsb(Emulator *emu);
+void cmpsd(Emulator *emu);
 void test_al_imm8(Emulator *emu);
 void test_eax_imm32(Emulator *emu);
+void stosb(Emulator *emu);
+void stosd(Emulator *emu);
+void lodsb(Emulator *emu);
+void lodsd(Emulator *emu);
+void scasb(Emulator *emu);
+void scasd(Emulator *emu);
 
 /* 0xB */
 void mov_r8_imm8(Emulator *emu);
@@ -139,6 +149,8 @@ void mov_r32_imm32(Emulator *emu);
 void code_c0(Emulator *emu);
 void code_c01(Emulator *emu);
 void ret(Emulator *emu);
+void les(Emulator *emu);
+void lds(Emulator *emu);
 void mov_rm8_imm8(Emulator *emu);
 void mov_rm32_imm32(Emulator *emu);
 void leave(Emulator *emu);
