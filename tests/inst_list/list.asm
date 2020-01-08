@@ -101,8 +101,8 @@ label0:
 
     ; 58 + r pop r32 ; implemented ;
 
-    pusha ; 60 pusha ; push all general register to stack
-    pushad ; 61 pushad ;
+    pusha ; 60 pusha ; push all general register to stack ; implemented ;
+    pushad ; 61 pushad ; implemented ;
     popa ; 62 popa ;
     popad ; 63 popad ;
 
@@ -301,6 +301,7 @@ label0:
     iret ; CF iret ; interrupt return with operand size of 16bit
     iretd ; CF iretd ; interrupt return with operand size of 32bit
 
+    ; implemented ;
     rol byte [eax], 0x1 ; D0 /0 rotate rm8 left once ;
     ror byte [eax], 0x1 ; D0 /1 rotate rm8 right once ;
     rcl byte [eax], 0x1 ; D0 /2 rotate rm8 left once including CF ;
@@ -387,12 +388,12 @@ label1:
     ; rep string ops https://c9x.me/x86/html/file_module_x86_id_279.html ;
     
     ; terminates if ECX=0 or ZF=1 ;
-    repnz insb ; F3 repnz prefix ;
-    repne insb ; F2 repne ; identical to repnz ;
+    repnz insb ; F3 repnz prefix ; implemented (insb) ;
+    repne insb ; F2 repne ; identical to repnz ; implemented (insb) ;
     
     ; terminates if ECX=0 or ZF=0 ;
-    repz insb ; F3 repz prefix ;
-    repe insb ; F3 repe prefix ;
+    repz insb ; F3 repz prefix ; implemented (insb) ;
+    repe insb ; F3 repe prefix ; implemented (insb);
     
     ; terminates if ECX=0 ;
     rep insb ; F3 rep preifx implemented ; inputs (E)CX bytes from port DX into ES:[(E)DI] ;

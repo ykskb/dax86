@@ -1,30 +1,20 @@
 # dax86
 
-x86 Simulator for Study-purpose | Implementation of x86 in C
+x86 Simulator | Implementation of x86 in C for Study-purpose
 
-Referenced these publications with many thanks:
-
-- https://software.intel.com/en-us/articles/intel-sdm
-- http://ref.x86asm.net/
-- https://x86.puri.sm/
-- https://c9x.me/x86/
-- https://book.mynavi.jp/support/bookmook/x86/
+The goal of this project is to run xv6 on it so that one can understand how modern OS works at the level of CPU architecture.
 
 In scope:
 
+Instructions required to run xv6:
+
 - Real mode addressing
 - Protection mode
-- Paging
-- Instruction prefixes
-- more
+- Paging mode etc
 
 Out of scope:
 
-- Floating point related instructions
-
-with bunch of comments for note-taking purposes.
-
-Goal is to make xv86 work on this.
+- Floating point related instructions etc
 
 ##### Setup Environment using Docker
 
@@ -77,3 +67,11 @@ xxd [bin_file]
 # bin
 xxd -b [binary_file]
 ```
+
+Referenced these publications with many thanks:
+
+- https://software.intel.com/en-us/articles/intel-sdm
+- http://ref.x86asm.net/
+- https://x86.puri.sm/
+- https://c9x.me/x86/
+- https://book.mynavi.jp/support/bookmook/x86/
