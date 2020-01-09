@@ -2,6 +2,7 @@ BITS 32
 label0:
     org 0x7c00
     
+    ; implemented ;
     add byte [eax], ah; 00 add rm8 r8
     add dword [ebp+4], eax ; 01 add rm32 r32
     add byte ah, [ebp] ; 02 add r8 rm8
@@ -9,9 +10,10 @@ label0:
     add byte al, 3 ; 04 add al imm8
     add dword eax, 0x100000 ; 05 add eax imm32
     
-    push es ; 06
-    pop es ; 07
+    push es ; 06 ; implemented ;
+    pop es ; 07 ; implemented ;
 
+    ; implemented ;
     or byte [ebp], ah; 08 or rm8 r8
     or dword [ebp+4], eax ; 09 or rm32 r32
     or byte ah, [ebp] ; 0A or r8 rm8
@@ -23,6 +25,7 @@ label0:
 
     ; 0f: 2-byte instructions
 
+    ; implemented ;
     adc byte [ebp], ah; 10 adc rm8 r8
     adc dword [ebp], eax ; 11 adc rm32 r32
     adc byte ah, [ebp] ; 12 adc r8 rm8
@@ -30,8 +33,8 @@ label0:
     adc byte al, 3 ; 14 adc al imm8
     adc dword eax, 0x100000 ; 15 adc eax imm32
 
-    push ss ; 16
-    pop ss ; 17
+    push ss ; 16 ; implemented ;
+    pop ss ; 17 ; implemented ;
 
     ; <standard idiom in optimized code to check if a edx is zero>
     ; sbb edx, edx ; dst = dst - (src + CF) ; Compiler idiom to isolate CF for branchless code (some prefer setc)
@@ -39,6 +42,7 @@ label0:
     ; test edx, edx ; checks AND and updates flags without affecting any
     ; jz 0x810f31c ; jmp if zero 
 
+    ; implemented ;
     sbb byte [ebp], ah; 18 sbb rm8 r8
     sbb dword [ebp], eax ; 19 sbb rm32 r32
     sbb byte ah, [ebp] ; 1A sbb r8 rm8
@@ -46,9 +50,10 @@ label0:
     sbb byte al, 3 ; 1C sbb al imm8
     sbb dword eax, 0x100000 ; 1D sbb eax imm32
 
-    push ds ; 1E
-    pop ds ; 1F
+    push ds ; 1E ; implemented ;
+    pop ds ; 1F ; implemented ;
 
+    ; implemented ;
     and byte [ebp], ah; 20 and rm8 r8
     and dword [ebp], eax ; 21 and rm32 r32
     and byte ah, [ebp] ; 22 and r8 rm8
@@ -60,6 +65,7 @@ label0:
 
     ; 27 daa al ; ?
 
+    ; implemented ;
     sub byte [ebp], ah; 28 sub rm8 r8
     sub dword [ebp], eax ; 29 sub rm32 r32
     sub byte ah, [ebp] ; 2A sub r8 rm8
@@ -71,6 +77,7 @@ label0:
 
     ; 2F as al ; ?
 
+    ; implemented ;
     xor byte [ebp], ah; 30 xor rm8 r8
     xor dword [ebp], eax ; 31 xor rm32 r32
     xor byte ah, [ebp] ; 32 xor r8 rm8
@@ -82,6 +89,7 @@ label0:
 
     ; 37 aaa al ah ;  ?
 
+    ; implemented ;
     cmp byte [ebp], ah; 38 cmp rm8 r8
     cmp dword [ebp], eax ; 39 cmp rm32 r32
     cmp byte ah, [ebp] ; 3A cmp r8 rm8
@@ -253,6 +261,7 @@ label0:
     ; 0xB0 ~ 0xB7 mov r8 imm8 implemented ; op code includes 8 registers in 1 byte ;
     ; 0xB8 ~ 0xBF mov r32 imm32 implemented ; op code includes 8 registers in 1 byte ;
 
+    ; implemented ;
     ; https://stackoverflow.com/questions/10395071/what-is-the-difference-between-rcr-and-ror ;
     rol byte [eax], 0x10 ; C0 /0 rotate rm8 left imm8 times ;
     ror byte [eax], 0x10 ; C0 /1 rotate rm8 right imm8 times ;
@@ -263,6 +272,7 @@ label0:
     shr byte [eax], 0x10 ; C0 /5 logical shift rm8 right imm8 times ;
     sar byte [eax], 0x10 ; C0 /7 arithmetic shift rm8 left imm8 times ;
 
+    ; implemented ;
     rol dword [eax], 0x10 ; C1 /0 rotate rm32 left imm8 times ;
     ror dword [eax], 0x10 ; C1 /1 rotate rm32 right imm8 times ;
     rcl dword [eax], 0x10 ; C1 /2 rotate rm32 left imm8 times including CF ;
@@ -311,6 +321,7 @@ label0:
     shr byte [eax], 0x1 ; D0 /5 logical shift rm8 right once ;
     sar byte [eax], 0x1 ; D0 /7 arithmetic shift rm8 left once ;
 
+    ; implemented ;
     rol dword [eax], 0x1 ; D1 /0 rotate rm32 left once ;
     ror dword [eax], 0x1 ; D1 /1 rotate rm32 right once ;
     rcl dword [eax], 0x1 ; D1 /2 rotate rm32 left once including CF ;
@@ -320,6 +331,7 @@ label0:
     shr dword [eax], 0x1 ; D1 /5 logical shift rm32 right once ;
     sar dword [eax], 0x1 ; D1 /7 arithmetic shift rm32 left once ;
 
+    ; implemented ;
     rol byte [eax], cl ; D2 /0 rotate rm8 left cl times ;
     ror byte [eax], cl ; D2 /1 rotate rm8 right cl times ;
     rcl byte [eax], cl ; D2 /2 rotate rm8 left cl times including CF ;
@@ -329,6 +341,7 @@ label0:
     shr byte [eax], cl ; D2 /5 logical shift rm8 right cl times ;
     sar byte [eax], cl ; D2 /7 arithmetic shift rm8 left cl times ;
 
+    ; implemented ;
     rol dword [eax], cl ; D3 /0 rotate rm32 cl times ;
     ror dword [eax], cl ; D3 /1 rotate rm32 right cl times ;
     rcl dword [eax], cl ; D3 /2 rotate rm32 left cl times including CF ;

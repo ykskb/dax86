@@ -2,7 +2,7 @@
 
 x86 Simulator | Implementation of x86 in C for Study-purpose
 
-The goal of this project is to run xv6 on it so that one can understand how modern OS works at the level of CPU architecture.
+The goal of this project is to run xv6 on it so that one can have basic understanding of how OS works at the level of CPU architecture.
 
 In scope:
 

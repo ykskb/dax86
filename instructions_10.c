@@ -192,7 +192,7 @@ void sbb_r8_rm8(Emulator *emu)
 /*
  * sbb r32 rm32: 2|3 bytes
  * Subtracts values of ModR/M and carry flag from r32.
- * 1 byte: op (13)
+ * 1 byte: op (1B)
  * 1|2 byte: ModR/M
  */
 void sbb_r32_rm32(Emulator *emu)
@@ -210,7 +210,7 @@ void sbb_r32_rm32(Emulator *emu)
 /*
  * sbb al imm8: 2 bytes
  * Subtracts imm8 and carry flag from al.
- * 1 byte: op (14)
+ * 1 byte: op (1C)
  * 1 byte: imm8
  */
 void sbb_al_imm8(Emulator *emu)
@@ -226,7 +226,7 @@ void sbb_al_imm8(Emulator *emu)
 /*
  * sbb al imm32: 5 bytes
  * Subtracts imm32 and carry flag from eax.
- * 1 byte: op (15)
+ * 1 byte: op (1D)
  * 4 byte: imm32
  */
 void sbb_eax_imm32(Emulator *emu)
