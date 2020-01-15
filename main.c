@@ -51,6 +51,7 @@ static void dump_registers(Emulator *emu)
     {
         printf("%s: %08x\n", ctr_register_names[i], emu->control_registers[i]);
     }
+    printf("GDTR: %04x %08x\n", emu->gdtr.limit, emu->gdtr.base);
 }
 
 /* 

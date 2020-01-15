@@ -4,7 +4,7 @@
 #include "emulator.h"
 #include "modrm.h"
 
-/* 0x0 */
+/* 0x00 */
 void add_rm8_r8(Emulator *emu);
 void add_rm32_r32(Emulator *emu);
 void add_r8_rm8(Emulator *emu);
@@ -21,7 +21,7 @@ void or_al_imm8(Emulator *emu);
 void or_eax_imm32(Emulator *emu);
 void push_cs(Emulator *emu);
 
-/* 0x1 */
+/* 0x10 */
 void adc_rm8_r8(Emulator *emu);
 void adc_rm32_r32(Emulator *emu);
 void adc_r8_rm8(Emulator *emu);
@@ -39,7 +39,7 @@ void sbb_eax_imm32(Emulator *emu);
 void push_ds(Emulator *emu);
 void pop_ds(Emulator *emu);
 
-/* 0x2 */
+/* 0x20 */
 void and_rm8_r8(Emulator *emu);
 void and_rm32_r32(Emulator *emu);
 void and_r8_rm8(Emulator *emu);
@@ -56,7 +56,7 @@ void sub_al_imm8(Emulator *emu);
 void sub_eax_imm32(Emulator *emu);
 /* 2E CS override prefix */
 
-/* 0x3 */
+/* 0x30 */
 void xor_rm8_r8(Emulator *emu);
 void xor_rm32_r32(Emulator *emu);
 void xor_r8_rm8(Emulator *emu);
@@ -70,21 +70,21 @@ void cmp_r32_rm32(Emulator *emu);
 void cmp_al_imm8(Emulator *emu);
 void cmp_eax_imm32(Emulator *emu);
 
-/* 0x4 */
+/* 0x40 */
 void inc_r32(Emulator *emu);
 void dec_r32(Emulator *emu);
 
-/* 0x5 */
+/* 0x50 */
 void push_r32(Emulator *emu);
 void pop_r32(Emulator *emu);
 
-/* 0x6 */
+/* 0x60 */
 void pushad(Emulator *emu);
 void popad(Emulator *emu);
 void push_imm32(Emulator *emu);
 void push_imm8(Emulator *emu);
 
-/* 0x7 */
+/* 0x70 */
 void jo(Emulator *emu);
 void jno(Emulator *emu);
 void jc(Emulator *emu);
@@ -96,7 +96,7 @@ void jns(Emulator *emu);
 void jl(Emulator *emu);
 void jle(Emulator *emu);
 
-/* 0x8 */
+/* 0x80 */
 void code_80(Emulator *emu);
 void code_81(Emulator *emu);
 void code_83(Emulator *emu);
@@ -113,7 +113,7 @@ void lea_r32_m(Emulator *emu);
 void mov_seg_rm32(Emulator *emu);
 void pop_rm32(Emulator *emu);
 
-/* 0x9 */
+/* 0x90 */
 void xchg_r32_r32(Emulator *emu);
 void cwde(Emulator *emu);
 void cdq(Emulator *emu);
@@ -123,7 +123,7 @@ void popfd(Emulator *emu);
 void sahf(Emulator *emu);
 void lahf(Emulator *emu);
 
-/* 0xA */
+/* 0xA0 */
 void mov_al_moffs8(Emulator *emu);
 void mov_eax_moffs32(Emulator *emu);
 void mov_moffs8_al(Emulator *emu);
@@ -141,11 +141,11 @@ void lodsd(Emulator *emu);
 void scasb(Emulator *emu);
 void scasd(Emulator *emu);
 
-/* 0xB */
+/* 0xB0 */
 void mov_r8_imm8(Emulator *emu);
 void mov_r32_imm32(Emulator *emu);
 
-/* 0xC */
+/* 0xC0 */
 void code_c0(Emulator *emu);
 void code_c01(Emulator *emu);
 void ret(Emulator *emu);
@@ -156,14 +156,14 @@ void mov_rm32_imm32(Emulator *emu);
 void leave(Emulator *emu);
 void ret_far(Emulator *emu);
 
-/* 0xD */
+/* 0xD0 */
 void code_d0(Emulator *emu);
 void code_d1(Emulator *emu);
 void code_d2(Emulator *emu);
 void code_d3(Emulator *emu);
 void set_al_on_c(Emulator *emu);
 
-/* 0xE */
+/* 0xE0 */
 void loopnz(Emulator *emu);
 void loopz(Emulator *emu);
 void loop(Emulator *emu);
@@ -177,7 +177,7 @@ void in_eax_dx(Emulator *emu);
 void out_dx_al(Emulator *emu);
 void out_dx_eax(Emulator *emu);
 
-/* 0xF */
+/* 0xF0 */
 void cmc(Emulator *emu);
 void code_f6(Emulator *emu);
 void code_f7(Emulator *emu);
@@ -189,5 +189,8 @@ void cld(Emulator *emu);
 void std(Emulator *emu);
 void code_fe(Emulator *emu);
 void code_ff(Emulator *emu);
+
+/* 0x0F */
+void code_0f_01(Emulator *emu);
 
 #endif

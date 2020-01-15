@@ -83,4 +83,9 @@ void update_eflags_sub_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint1
 void update_eflags_logical_ops(Emulator *emu, uint32_t result);
 void update_eflags_logical_ops_8bit(Emulator *emu, uint8_t result);
 
+void update_eflags_mul(Emulator *emu, uint64_t upper_half_result);
+
+/* GDTR Operations */
+void set_gdtr(Emulator *emu, uint16_t limit, uint32_t base);
+
 #endif

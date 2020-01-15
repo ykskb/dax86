@@ -77,7 +77,18 @@ enum ControlRegister
  * 
  * RFLAGS:
  * Rsv...
+ * 
+ * GDTR:
+ * |0      15|16        47|
+ * |  LIMIT  |    BASE    |
+ * |_________|____________|
  */
+typedef struct
+{
+    uint16_t limit;
+    uint32_t base;
+} Gdtr;
+
 typedef struct
 {
     uint32_t eflags;
@@ -86,7 +97,7 @@ typedef struct
     uint32_t control_registers[CONTROL_REGISTER_COUNT];
     uint8_t *memory;
     uint32_t eip;
-    uint64_t gdtr;
+    Gdtr gdtr;
 } Emulator;
 
 #endif

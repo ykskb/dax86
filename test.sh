@@ -1,7 +1,11 @@
-# Files below do not run after 0x7c00 offset.
+# Execution Tests with Binary Files
+
+# Files below do not run after 0x7c00 offset:
+#
 # tests/mov_jmp/mov_jmp.bin
 
-# Files below require input
+# Files below require input:
+#
 # tests/io/in.bin
 # tests/io/in_display.bin
 # tests/rep/rep.bin
@@ -35,11 +39,13 @@ for i in \
  "call_far"\
  "moffs"\
  "str_8"\
- "str_32"
+ "str_32"\
+ "gdt"\
+ "mul"
 do
 
-test_path="./tests/${i}/${i}.bin"
-expected_path="./tests/${i}/expected.txt"
+test_path="./tests/exec/${i}/${i}.bin"
+expected_path="./tests/exec/${i}/expected.txt"
 
 echo "------------------------------------------------"
 echo "Running test with $i..."

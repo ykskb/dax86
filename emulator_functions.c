@@ -410,6 +410,23 @@ void update_eflags_sub(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t
     set_overflow_flag(emu, sign1 != sign2 && sign1 != signr);
 }
 
+/*
+ * imul & mul both updates OF and CF when a significant bit gets into upper half.
+ */
+void update_eflags_mul(Emulator *emu, uint64_t upper_half_result)
+{
+    if (upper_half_result == 0)
+    {
+        set_overflow_flag(emu, 0);
+        set_carry_flag(emu, 0);
+    }
+    else
+    {
+        set_overflow_flag(emu, 1);
+        set_carry_flag(emu, 1);
+    }
+}
+
 void update_eflags_sub_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint16_t result)
 {
     int sign1 = value1 >> 7;
@@ -438,4 +455,10 @@ void update_eflags_logical_ops_8bit(Emulator *emu, uint8_t result)
     set_zero_flag(emu, result == 0);
     set_sign_flag(emu, signr);
     set_overflow_flag(emu, 0);
+}
+
+void set_gdtr(Emulator *emu, uint16_t limit, uint32_t base)
+{
+    emu->gdtr.limit = limit;
+    emu->gdtr.base = base;
 }

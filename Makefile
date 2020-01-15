@@ -6,6 +6,7 @@ OBJS = \
 	modrm.o\
 	io.o\
 	shift.o\
+	gdt.o\
 	instructions_00.o\
 	instructions_10.o\
 	instructions_20.o\
@@ -21,7 +22,8 @@ OBJS = \
 	instructions_C0.o\
 	instructions_D0.o\
 	instructions_E0.o\
-	instructions_F0.o
+	instructions_F0.o\
+	instructions_0F00.o
 
 CC = /usr/bin/gcc
 CFLAGS += -Wall

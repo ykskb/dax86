@@ -10,6 +10,19 @@
 #include "modrm.h"
 #include "io.h"
 
+instruction_func_t *two_byte_instructions[256];
+instruction_func_t *instructions[256];
+
+/*
+ * Executes 2-byte instruction: 1 byte
+ * 1 byte: op (0F)
+ */
+static void two_byte_inst(Emulator *emu)
+{
+    uint8_t op = get_code8(emu, 1);
+    two_byte_instructions[op](emu);
+}
+
 /* 
  * REP/REPE/REPZ/REPNE/REPNZ
  * 
@@ -28,7 +41,6 @@
  *     CMPS(A6/A7)
  *     SCAS(AE/AF)
  */
-
 static void rep(Emulator *emu)
 {
     emu->eip += 1;
@@ -69,7 +81,11 @@ static void repne(Emulator *emu)
     set_register32(emu, ECX, ecx_value - i);
 }
 
-instruction_func_t *instructions[256];
+static void init_two_byte_instructions(void)
+{
+    memset(two_byte_instructions, 0, sizeof(two_byte_instructions));
+    two_byte_instructions[0x01] = code_0f_01;
+}
 
 void init_instructions(void)
 {
@@ -94,6 +110,8 @@ void init_instructions(void)
     instructions[0x0D] = or_eax_imm32;
 
     instructions[0x0E] = push_cs;
+
+    instructions[0x0F] = two_byte_inst;
 
     instructions[0x10] = adc_rm8_r8;
     instructions[0x11] = adc_rm32_r32;
@@ -282,4 +300,6 @@ void init_instructions(void)
     instructions[0xFD] = std;
     instructions[0xFE] = code_fe;
     instructions[0xFF] = code_ff;
+
+    init_two_byte_instructions();
 }
