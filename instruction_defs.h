@@ -83,6 +83,8 @@ void pushad(Emulator *emu);
 void popad(Emulator *emu);
 void push_imm32(Emulator *emu);
 void push_imm8(Emulator *emu);
+void imul_r32_rm32_imm8(Emulator *emu);
+void imul_r32_rm32_imm32(Emulator *emu);
 
 /* 0x70 */
 void jo(Emulator *emu);

@@ -123,12 +123,12 @@ label0:
     ; 68 push imm32 ; implemented ;
 
     ; imul https://c9x.me/x86/html/file_module_x86_id_138.html ;
-    imul byte [ebp] ; F6/5 imul rm8 ; AX = al * r/m byte.
+    imul byte [ebp] ; F6/5 imul rm8 ; AX = al * r/m byte. ; implemented ;
     imul word [ebp] ; 66 F7/5 imul rm16 ; DX:AX = AX * r/m word.
-    imul dword [ebp] ; 66 F7/5 imul rm32 ; EDX:EAX = EAX * r/m doubleword.
+    imul dword [ebp] ; 66 F7/5 imul rm32 ; EDX:EAX = EAX * r/m doubleword. ; implemented ;
     imul dword eax, [ebp] ; 0F doubleword register = doubleword register * r/m doubleword.
-    imul eax, [ebp], 0x10000 ; 69 imul r16 rm16 imm32
-    imul eax, [ebp], 3 ; 6B r16 rm16 imm8
+    imul eax, [ebp], 0x10000 ; 69 imul r16 rm16 imm32 ; implemented ;
+    imul eax, [ebp], 3 ; 6B r16 rm16 imm8 ; implemented ;
 
     ; 6A push imm8 ; implemented ;
 
@@ -416,15 +416,15 @@ label1:
     test byte [eax], 0x10 ; F6 0|1 test rm8 imm8 ; implemented ;
     not byte [eax], 0x10 ; F6 2 not rm8 imm8 ; implemented ;
     neg byte [eax], 0x10 ; F6 3 neg rm8 imm8 ; implemented ;
-    mul byte [eax] ; F6 4 mul ax al rm8 ; 
-    imul byte [eax] ; F6 5 imul ax al rm8 ; 
+    mul byte [eax] ; F6 4 mul ax al rm8 ; implemented ;
+    imul byte [eax] ; F6 5 imul ax al rm8 ; implemented ;
     div byte [eax] ; F6 6 div al ah ax rm8 ; 
     idiv byte [eax] ; F6 7 idiv al ah ax rm8 ; 
 
     test dword [eax], 0x1000 ; F7 0|1 test rm32 imm32 ; implemented ;
     not dword [eax] ; F7 not rm32 ; implemented ;
     neg dword [eax] ; F7 neg rm32 ; implemented ;
-    mul dword [eax] ; F7 mul edx dax rm32 ; 
+    mul dword [eax] ; F7 mul edx dax rm32 ; implemented ;
     imul dword [eax] ; F7 imul edx dax rm32 ; 
     div dword [eax] ; F7 div edx dax rm32 ; 
     idiv dword [eax] ; F7 idiv edx dax rm32 ; 

@@ -192,7 +192,9 @@ void init_instructions(void)
     instructions[0x60] = pushad;
     instructions[0x61] = popad;
     instructions[0x68] = push_imm32;
+    instructions[0x69] = imul_r32_rm32_imm32;
     instructions[0x6A] = push_imm8;
+    instructions[0x6B] = imul_r32_rm32_imm8;
 
     instructions[0x70] = jo;
     instructions[0x71] = jno;

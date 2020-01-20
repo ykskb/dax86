@@ -70,7 +70,25 @@ static void mul_rm8(Emulator *emu, ModRM *modrm)
 {
     uint8_t rm8_val = get_rm8(emu, modrm);
     uint8_t al_val = get_register8(emu, AL);
-    uint16_t result = al_val * rm8_val;
+    uint16_t result = (uint16_t)al_val * (uint16_t)rm8_val;
+    uint8_t res_upper_half = result >> 8;
+    uint8_t res_lower_half = (uint8_t)result;
+    set_register8(emu, AH, res_upper_half);
+    set_register8(emu, AL, res_lower_half);
+    update_eflags_mul(emu, res_upper_half);
+}
+
+/*
+ * imul rm8: 2|3 
+ * Performs signed multiplication (AX = AL * r/m8).
+ * 1 byte: op (F6: 5)
+ * 1|2 bytes: ModRM
+ */
+static void imul_rm8(Emulator *emu, ModRM *modrm)
+{
+    int8_t rm8_val = get_rm8(emu, modrm);
+    int8_t al_val = get_register8(emu, AL);
+    int16_t result = (int16_t)al_val * (int16_t)rm8_val;
     uint8_t res_upper_half = result >> 8;
     uint8_t res_lower_half = (uint8_t)result;
     set_register8(emu, AH, res_upper_half);
@@ -100,6 +118,9 @@ void code_f6(Emulator *emu)
         break;
     case 4:
         mul_rm8(emu, &modrm);
+        break;
+    case 5:
+        imul_rm8(emu, &modrm);
         break;
     default:
         printf("Not implemented: Op: F6 with ModR/M Op: %d\n", modrm.opcode);
@@ -165,6 +186,24 @@ static void mul_rm32(Emulator *emu, ModRM *modrm)
     update_eflags_mul(emu, res_upper_half);
 }
 
+/*
+ * imul rm32: 2|3 
+ * Performs signed multiplication (EDX:EAX = EAX * r/m32).
+ * 1 byte: op (F7: 5)
+ * 1|2 bytes: ModRM
+ */
+static void imul_rm32(Emulator *emu, ModRM *modrm)
+{
+    int32_t rm32_val = get_rm32(emu, modrm);
+    int32_t eax_val = get_register32(emu, EAX);
+    int64_t result = (int64_t)eax_val * (int64_t)rm32_val;
+    uint32_t res_upper_half = result >> 32;
+    uint32_t res_lower_half = (uint32_t)result;
+    set_register32(emu, EDX, res_upper_half);
+    set_register32(emu, EAX, res_lower_half);
+    update_eflags_mul(emu, res_upper_half);
+}
+
 void code_f7(Emulator *emu)
 {
     emu->eip += 1;
@@ -187,6 +226,9 @@ void code_f7(Emulator *emu)
         break;
     case 4:
         mul_rm32(emu, &modrm);
+        break;
+    case 5:
+        imul_rm32(emu, &modrm);
         break;
     default:
         printf("Not implemented: Op: F7 with ModR/M Op: %d\n", modrm.opcode);
