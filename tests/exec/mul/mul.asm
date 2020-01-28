@@ -57,13 +57,15 @@ BITS 32
     imul dword [ebp]
     push edx ; 7BAC: 0xF8000000
     push eax ; 7BA8: 0x80000000 (-576460750155939840)
-    pushf ; 7BA4: 0x0
+    pushf ; 7BA4: 0x0801
 
     mov dword [ebp], 0xFFFFFFFF ; -1
     imul eax, [ebp], byte 3
     push eax ; 7BA0: 0xFFFFFFFD (-3)
+    pushf ; 7B9C: 0x0801
 
     imul eax, byte 3 ; 6B C0 03; C0: 11 000 000: eax
-    push eax ; 7B9c: 0xFFFFFFF7 (-9)
+    push eax ; 7B98: 0xFFFFFFF7 (-9)
+    pushf ; 7B94: 0x0801
 
     jmp 0

@@ -59,6 +59,41 @@ enum ControlRegister
     CONTROL_REGISTER_COUNT
 };
 
+/* GDTR:
+ * |0      15|16        47|
+ * |  LIMIT  |    BASE    |
+ * |_________|____________|
+ */
+typedef struct
+{
+    uint16_t limit;
+    uint32_t base;
+} Gdtr;
+
+enum Exception
+{
+    NO_ERR,
+    E_DE,
+    E_DB,
+    E_BP,
+    E_OF,
+    E_BR,
+    E_UD,
+    E_NM,
+    E_DF,
+    E_TS,
+    E_NP,
+    E_SS,
+    E_GP,
+    E_PF,
+    E_MF,
+    E_AC,
+    E_MC,
+    E_XF,
+    E_VE,
+    E_SX
+};
+
 /*
  * FLAGS:
  * | n-th bit                                      |
@@ -77,18 +112,7 @@ enum ControlRegister
  * 
  * RFLAGS:
  * Rsv...
- * 
- * GDTR:
- * |0      15|16        47|
- * |  LIMIT  |    BASE    |
- * |_________|____________|
  */
-typedef struct
-{
-    uint16_t limit;
-    uint32_t base;
-} Gdtr;
-
 typedef struct
 {
     uint32_t eflags;
@@ -98,6 +122,7 @@ typedef struct
     uint8_t *memory;
     uint32_t eip;
     Gdtr gdtr;
+    uint8_t exception;
 } Emulator;
 
 #endif

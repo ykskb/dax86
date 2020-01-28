@@ -25,6 +25,7 @@ static Emulator *create_emu(size_t mem_size, uint32_t eip, uint32_t esp)
     memset(emu->control_registers, 0, sizeof(emu->control_registers));
     emu->eip = eip;
     emu->registers[ESP] = esp;
+    emu->exception = NO_ERR;
 
     return emu;
 }

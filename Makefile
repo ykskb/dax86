@@ -7,6 +7,7 @@ OBJS = \
 	io.o\
 	shift.o\
 	gdt.o\
+	twos_complement.o\
 	instructions_00.o\
 	instructions_10.o\
 	instructions_20.o\

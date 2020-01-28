@@ -41,7 +41,8 @@ for i in \
  "str_8"\
  "str_32"\
  "gdt"\
- "mul"
+ "mul"\
+ "div"
 do
 
 test_path="./tests/exec/${i}/${i}.bin"

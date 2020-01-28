@@ -8,6 +8,7 @@
 #include "emulator_functions.h"
 #include "modrm.h"
 #include "io.h"
+#include "twos_complement.h"
 
 /*
  * cmc: 1 byte
@@ -79,21 +80,64 @@ static void mul_rm8(Emulator *emu, ModRM *modrm)
 }
 
 /*
- * imul rm8: 2|3 
+ * imul rm8: 2|3 bytes
  * Performs signed multiplication (AX = AL * r/m8).
  * 1 byte: op (F6: 5)
  * 1|2 bytes: ModRM
  */
 static void imul_rm8(Emulator *emu, ModRM *modrm)
 {
-    int8_t rm8_val = get_rm8(emu, modrm);
-    int8_t al_val = get_register8(emu, AL);
+    int8_t rm8_val = to_int8(get_rm8(emu, modrm));
+    int8_t al_val = to_int8(get_register8(emu, AL));
     int16_t result = (int16_t)al_val * (int16_t)rm8_val;
     uint8_t res_upper_half = result >> 8;
     uint8_t res_lower_half = (uint8_t)result;
     set_register8(emu, AH, res_upper_half);
     set_register8(emu, AL, res_lower_half);
     update_eflags_mul(emu, res_upper_half);
+}
+
+/*
+ * div rm8: 2|3 bytes
+ * AL (Quotient) = AX / rm8 & Remainder to AH
+ * 1 byte: op (F6:6)
+ * 1|2 bytes: ModRM
+ */
+static void div_rm8(Emulator *emu, ModRM *modrm)
+{
+    uint16_t rm8_val = get_rm8(emu, modrm);
+    uint16_t ax_val = get_register32(emu, EAX);
+    uint16_t quot = ax_val / rm8_val;
+    if (rm8_val == 0 || quot > 0xFF)
+    {
+        emu->exception = E_DE;
+        return;
+    }
+    uint16_t rem = ax_val % rm8_val;
+    set_register8(emu, AL, quot);
+    set_register8(emu, AH, rem);
+}
+
+/*
+ * idiv rm8: 2|3 bytes
+ * AL (Quotient) = AX / rm8 & Remainder to AH
+ * 1 byte: op (F6:7)
+ * 1|2 bytes: ModRM
+ */
+static void idiv_rm8(Emulator *emu, ModRM *modrm)
+{
+    int16_t rm8_val = to_int8(get_rm8(emu, modrm));
+    uint16_t ax_val_raw = get_register32(emu, EAX);
+    int16_t ax_val = to_int16(ax_val_raw);
+    int16_t quot = ax_val / rm8_val;
+    if (rm8_val == 0 || quot > 127 || quot < -128)
+    {
+        emu->exception = E_DE;
+        return;
+    }
+    int16_t rem = ax_val % rm8_val;
+    set_register8(emu, AL, quot);
+    set_register8(emu, AH, rem);
 }
 
 void code_f6(Emulator *emu)
@@ -121,6 +165,12 @@ void code_f6(Emulator *emu)
         break;
     case 5:
         imul_rm8(emu, &modrm);
+        break;
+    case 6:
+        div_rm8(emu, &modrm);
+        break;
+    case 7:
+        idiv_rm8(emu, &modrm);
         break;
     default:
         printf("Not implemented: Op: F6 with ModR/M Op: %d\n", modrm.opcode);
@@ -187,21 +237,67 @@ static void mul_rm32(Emulator *emu, ModRM *modrm)
 }
 
 /*
- * imul rm32: 2|3 
+ * imul rm32: 2|3 bytes
  * Performs signed multiplication (EDX:EAX = EAX * r/m32).
  * 1 byte: op (F7: 5)
  * 1|2 bytes: ModRM
  */
 static void imul_rm32(Emulator *emu, ModRM *modrm)
 {
-    int32_t rm32_val = get_rm32(emu, modrm);
-    int32_t eax_val = get_register32(emu, EAX);
+    int32_t rm32_val = to_int32(get_rm32(emu, modrm));
+    int32_t eax_val = to_int32(get_register32(emu, EAX));
     int64_t result = (int64_t)eax_val * (int64_t)rm32_val;
     uint32_t res_upper_half = result >> 32;
     uint32_t res_lower_half = (uint32_t)result;
     set_register32(emu, EDX, res_upper_half);
     set_register32(emu, EAX, res_lower_half);
     update_eflags_mul(emu, res_upper_half);
+}
+
+/*
+ * div rm32: 2|3 bytes
+ * EAX (Quotient)= EDX:EAX / rm32 & Remainder to EDX
+ * 1 byte: op (F7:6)
+ * 1|2 bytes: ModRM
+ */
+static void div_rm32(Emulator *emu, ModRM *modrm)
+{
+    uint64_t rm32_val = get_rm32(emu, modrm);
+    uint64_t eax_val = get_register32(emu, EAX);
+    uint64_t edx_val = get_register32(emu, EDX);
+    uint64_t dividend = (edx_val << 32) | eax_val;
+    uint64_t quot = dividend / rm32_val;
+    if (rm32_val == 0 || quot > 0xFFFFFFFF)
+    {
+        emu->exception = E_DE;
+        return;
+    }
+    uint64_t rem = dividend % rm32_val;
+    set_register32(emu, EAX, quot);
+    set_register32(emu, EDX, rem);
+}
+
+/*
+ * idiv rm32: 2|3 bytes
+ * EAX (Quotient)= EDX:EAX / rm32 & Remainder to EDX
+ * 1 byte: op (F7:7)
+ * 1|2 bytes: ModRM
+ */
+static void idiv_rm32(Emulator *emu, ModRM *modrm)
+{
+    int64_t rm32_val = to_int32(get_rm32(emu, modrm));
+    uint64_t eax_val = get_register32(emu, EAX);
+    uint64_t edx_val = get_register32(emu, EDX);
+    int64_t dividend = to_int64((edx_val << 32) | eax_val);
+    int64_t quot = dividend / rm32_val;
+    if (rm32_val == 0 || quot > 2147483647 || quot < -2147483648)
+    {
+        emu->exception = E_DE;
+        return;
+    }
+    int64_t rem = dividend % rm32_val;
+    set_register32(emu, EAX, quot);
+    set_register32(emu, EDX, rem);
 }
 
 void code_f7(Emulator *emu)
@@ -229,6 +325,12 @@ void code_f7(Emulator *emu)
         break;
     case 5:
         imul_rm32(emu, &modrm);
+        break;
+    case 6:
+        div_rm32(emu, &modrm);
+        break;
+    case 7:
+        idiv_rm32(emu, &modrm);
         break;
     default:
         printf("Not implemented: Op: F7 with ModR/M Op: %d\n", modrm.opcode);
