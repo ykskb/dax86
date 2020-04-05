@@ -24,6 +24,12 @@ int16_t get_sign_code16(Emulator *emu, int index);
 uint32_t get_code32(Emulator *emu, int index);
 int32_t get_sign_code32(Emulator *emu, int index);
 
+/* Physical Memory Operations */
+
+void _set_memory8(Emulator *emu, uint32_t p_address, uint8_t value);
+void _set_memory16(Emulator *emu, uint32_t p_address, uint16_t value);
+void _set_memory32(Emulator *emu, uint32_t p_address, uint32_t value);
+
 /* Memory Operations */
 
 void set_memory8(Emulator *emu, int seg_index, uint32_t address, uint32_t value);
@@ -57,6 +63,10 @@ uint16_t get_seg_register16(Emulator *emu, int reg_index);
 
 void push_segment_register(Emulator *emu, int reg_index);
 void pop_segment_register(Emulator *emu, int reg_index);
+
+/* Control Register Operations */
+void set_ctrl_register32(Emulator *emu, int reg_index, uint32_t value);
+uint32_t get_ctrl_register32(Emulator *emu, int reg_index);
 
 /* Eflag Operations */
 

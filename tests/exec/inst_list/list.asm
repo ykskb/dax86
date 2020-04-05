@@ -418,16 +418,16 @@ label1:
     neg byte [eax], 0x10 ; F6 3 neg rm8 imm8 ; implemented ;
     mul byte [eax] ; F6 4 mul ax al rm8 ; implemented ;
     imul byte [eax] ; F6 5 imul ax al rm8 ; implemented ;
-    div byte [eax] ; F6 6 div al ah ax rm8 ; 
-    idiv byte [eax] ; F6 7 idiv al ah ax rm8 ; 
+    div byte [eax] ; F6 6 div al ah ax rm8 ; implemented ;
+    idiv byte [eax] ; F6 7 idiv al ah ax rm8 ; implemented ;
 
     test dword [eax], 0x1000 ; F7 0|1 test rm32 imm32 ; implemented ;
     not dword [eax] ; F7 not rm32 ; implemented ;
     neg dword [eax] ; F7 neg rm32 ; implemented ;
     mul dword [eax] ; F7 mul edx dax rm32 ; implemented ;
-    imul dword [eax] ; F7 imul edx dax rm32 ; 
-    div dword [eax] ; F7 div edx dax rm32 ; 
-    idiv dword [eax] ; F7 idiv edx dax rm32 ; 
+    imul dword [eax] ; F7 imul edx dax rm32 ; implemented ;
+    div dword [eax] ; F7 div edx dax rm32 ; implemented ;
+    idiv dword [eax] ; F7 idiv edx dax rm32 ; implemented ;
 
     clc ; F8 clc ; clears carry flag ; implemented ;
     stc ; F9 stc ; sets carry flag ; implemented ;

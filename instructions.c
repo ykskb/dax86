@@ -85,6 +85,8 @@ static void init_two_byte_instructions(void)
 {
     memset(two_byte_instructions, 0, sizeof(two_byte_instructions));
     two_byte_instructions[0x01] = code_0f_01;
+    two_byte_instructions[0x20] = mov_r32_cr;
+    two_byte_instructions[0x22] = mov_cr_r32;
 }
 
 void init_instructions(void)

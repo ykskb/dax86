@@ -2,11 +2,66 @@
 
 #include "emulator_functions.h"
 
+/* Physical Memory Operations */
+
 static uint32_t get_physical_address(uint16_t seg_val, uint32_t offset)
 {
     /* Real mode */
     uint32_t p_base = ((uint32_t)seg_val) << 4;
     return p_base + offset;
+}
+
+void _set_memory8(Emulator *emu, uint32_t p_address, uint8_t value)
+{
+    emu->memory[p_address] = value & 0xFF;
+}
+
+void _set_memory16(Emulator *emu, uint32_t p_address, uint16_t value)
+{
+    int i;
+    for (i = 0; i < 2; i++)
+    {
+        /* passes right-most 8 bits first (little endian) */
+        _set_memory8(emu, p_address + i, value >> (i * 8));
+    }
+}
+
+void _set_memory32(Emulator *emu, uint32_t p_address, uint32_t value)
+{
+    int i;
+    for (i = 0; i < 4; i++)
+    {
+        /* passes right-most 8 bits first (little endian) */
+        _set_memory8(emu, p_address + i, value >> (i * 8));
+    }
+}
+
+static uint8_t _get_memory8(Emulator *emu, uint32_t p_address)
+{
+    return emu->memory[p_address];
+}
+
+static uint16_t _get_memory16(Emulator *emu, uint32_t p_address)
+{
+    int i;
+    uint16_t mem_read = 0;
+    for (i = 0; i < 2; i++)
+    {
+        /* little endian: first to far right */
+        mem_read |= _get_memory8(emu, p_address + i) << (8 * i);
+    }
+    return mem_read;
+}
+
+static uint32_t _get_memory32(Emulator *emu, uint32_t p_address)
+{
+    int i;
+    uint32_t mem_read = 0;
+    for (i = 0; i < 4; i++)
+    {
+        mem_read |= _get_memory8(emu, p_address + i) << (8 * i);
+    }
+    return mem_read;
 }
 
 /* Source Instruction Operations */
@@ -57,62 +112,7 @@ int32_t get_sign_code32(Emulator *emu, int index)
     return (int32_t)get_code32(emu, index);
 }
 
-/* Physical Memory Operations (static) */
-
-static void _set_memory8(Emulator *emu, uint32_t p_address, uint8_t value)
-{
-    emu->memory[p_address] = value & 0xFF;
-}
-
-static void _set_memory16(Emulator *emu, uint32_t p_address, uint16_t value)
-{
-    int i;
-    for (i = 0; i < 2; i++)
-    {
-        /* passes right-most 8 bits first (little endian) */
-        _set_memory8(emu, p_address + i, value >> (i * 8));
-    }
-}
-
-static void _set_memory32(Emulator *emu, uint32_t p_address, uint32_t value)
-{
-    int i;
-    for (i = 0; i < 4; i++)
-    {
-        /* passes right-most 8 bits first (little endian) */
-        _set_memory8(emu, p_address + i, value >> (i * 8));
-    }
-}
-
-static uint8_t _get_memory8(Emulator *emu, uint32_t p_address)
-{
-    return emu->memory[p_address];
-}
-
-static uint16_t _get_memory16(Emulator *emu, uint32_t p_address)
-{
-    int i;
-    uint16_t mem_read = 0;
-    for (i = 0; i < 2; i++)
-    {
-        /* little endian: first to far right */
-        mem_read |= _get_memory8(emu, p_address + i) << (8 * i);
-    }
-    return mem_read;
-}
-
-static uint32_t _get_memory32(Emulator *emu, uint32_t p_address)
-{
-    int i;
-    uint32_t mem_read = 0;
-    for (i = 0; i < 4; i++)
-    {
-        mem_read |= _get_memory8(emu, p_address + i) << (8 * i);
-    }
-    return mem_read;
-}
-
-/* Memory Operations with Segment Registers (public) */
+/* Memory Operations with Segment Registers */
 
 void set_memory8(Emulator *emu, int seg_index, uint32_t address, uint32_t value)
 {
@@ -252,6 +252,18 @@ void pop_segment_register(Emulator *emu, int reg_index)
 {
     uint16_t value = pop16(emu);
     set_seg_register16(emu, reg_index, value);
+}
+
+/* Control Register Operations */
+
+void set_ctrl_register32(Emulator *emu, int reg_index, uint32_t value)
+{
+    emu->control_registers[reg_index] = value;
+}
+
+uint32_t get_ctrl_register32(Emulator *emu, int reg_index)
+{
+    return emu->control_registers[reg_index];
 }
 
 /* Eflag Operations */

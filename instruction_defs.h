@@ -192,7 +192,11 @@ void std(Emulator *emu);
 void code_fe(Emulator *emu);
 void code_ff(Emulator *emu);
 
-/* 0x0F */
+/* 0x0F00 */
 void code_0f_01(Emulator *emu);
+
+/* 0x0F20 */
+void mov_r32_cr(Emulator *emu);
+void mov_cr_r32(Emulator *emu);
 
 #endif

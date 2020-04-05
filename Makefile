@@ -24,7 +24,8 @@ OBJS = \
 	instructions_D0.o\
 	instructions_E0.o\
 	instructions_F0.o\
-	instructions_0F00.o
+	instructions_0F00.o\
+	instructions_0F20.o
 
 CC = /usr/bin/gcc
 CFLAGS += -Wall
@@ -45,7 +46,7 @@ $(TARGET) : $(OBJS) Makefile
 create-docker:
 	docker build -t dax86 .
 	docker run -dit -v $$(pwd):/dax86 --name dax86-c $$(docker images -q dax86)
-	docker exec -it $$(docker ps -aqf "name=dax86-c") sh
+	docker exec -it $$(docker ps -aqf "name=dax86-c") bash
 
 clean-docker:
 	docker stop $$(docker ps -aqf "name=dax86-c")

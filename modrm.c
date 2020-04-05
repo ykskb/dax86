@@ -23,6 +23,7 @@
  * ________________________________________________________________________
  *                        |  REG  |EAX |ECX |EDX |EBX |ESP |EBP |ESI |EDI |
  *                        | SREG  | ES | CS | SS | DS | FS | GS |rsvd|rsvd|
+ *                        |  CR   |CR0 |CR1 |CR2 |CR3 |CR4 |CR5 |CR6 |CR7 |
  *                        | (r32) |000 |001 |010 |011 |100 |101 |110 |111 |
  * | Mod | R/M |    Addressing    |          Mod R/M Value in Hex         |
  * | 00  | 000 | [eax]            | 00 | 08 | 10 | 18 | 20 | 28 | 30 | 38 |
