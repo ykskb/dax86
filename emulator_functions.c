@@ -4,8 +4,9 @@
 
 /* Physical Memory Operations */
 
-static uint32_t get_physical_address(uint16_t seg_val, uint32_t offset)
+static uint32_t get_physical_address(Emulator *emu, int seg_index, uint32_t offset)
 {
+    uint16_t seg_val = get_seg_register16(emu, seg_index);
     /* Real mode */
     uint32_t p_base = ((uint32_t)seg_val) << 4;
     return p_base + offset;
@@ -69,7 +70,7 @@ static uint32_t _get_memory32(Emulator *emu, uint32_t p_address)
 /* Retrieves code from memory by offset from EIP. */
 uint8_t get_code8(Emulator *emu, int index)
 {
-    uint32_t p_addr = get_physical_address(get_seg_register16(emu, CS), emu->eip);
+    uint32_t p_addr = get_physical_address(emu, CS, emu->eip);
     return emu->memory[p_addr + index];
 }
 
@@ -116,37 +117,37 @@ int32_t get_sign_code32(Emulator *emu, int index)
 
 void set_memory8(Emulator *emu, int seg_index, uint32_t address, uint32_t value)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
+    uint32_t p_address = get_physical_address(emu, seg_index, address);
     _set_memory8(emu, p_address, value);
 }
 
 void set_memory16(Emulator *emu, int seg_index, uint32_t address, uint16_t value)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
+    uint32_t p_address = get_physical_address(emu, seg_index, address);
     _set_memory16(emu, p_address, value);
 }
 
 void set_memory32(Emulator *emu, int seg_index, uint32_t address, uint32_t value)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
+    uint32_t p_address = get_physical_address(emu, seg_index, address);
     _set_memory32(emu, p_address, value);
 }
 
 uint8_t get_memory8(Emulator *emu, int seg_index, uint32_t address)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
+    uint32_t p_address = get_physical_address(emu, seg_index, address);
     return _get_memory8(emu, p_address);
 }
 
 uint16_t get_memory16(Emulator *emu, int seg_index, uint32_t address)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
+    uint32_t p_address = get_physical_address(emu, seg_index, address);
     return _get_memory16(emu, p_address);
 }
 
 uint32_t get_memory32(Emulator *emu, int seg_index, uint32_t address)
 {
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, seg_index), address);
+    uint32_t p_address = get_physical_address(emu, seg_index, address);
     return _get_memory32(emu, p_address);
 }
 
@@ -198,7 +199,7 @@ void push16(Emulator *emu, uint16_t value)
     /* New offset would be ESP value - 2 bytes.  */
     uint32_t offset = get_register32(emu, ESP) - 2;
     set_register32(emu, ESP, offset);
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, SS), offset);
+    uint32_t p_address = get_physical_address(emu, SS, offset);
     _set_memory16(emu, p_address, value);
 }
 
@@ -208,14 +209,14 @@ void push32(Emulator *emu, uint32_t value)
     uint32_t offset = get_register32(emu, ESP) - 4;
     /* Updates ESP with the new address. */
     set_register32(emu, ESP, offset);
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, SS), offset);
+    uint32_t p_address = get_physical_address(emu, SS, offset);
     _set_memory32(emu, p_address, value);
 }
 
 uint16_t pop16(Emulator *emu)
 {
     uint32_t offset = get_register32(emu, ESP);
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, SS), offset);
+    uint32_t p_address = get_physical_address(emu, SS, offset);
     uint16_t value = _get_memory16(emu, p_address);
     set_register32(emu, ESP, offset + 2);
     return value;
@@ -224,7 +225,7 @@ uint16_t pop16(Emulator *emu)
 uint32_t pop32(Emulator *emu)
 {
     uint32_t offset = get_register32(emu, ESP);
-    uint32_t p_address = get_physical_address(get_seg_register16(emu, SS), offset);
+    uint32_t p_address = get_physical_address(emu, SS, offset);
     uint32_t value = _get_memory32(emu, p_address);
     set_register32(emu, ESP, offset + 4);
     return value;
