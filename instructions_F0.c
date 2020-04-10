@@ -520,6 +520,7 @@ static void jmp_m_ptr(Emulator *emu, ModRM *modrm)
 
     set_seg_register16(emu, CS, cs_val);
     emu->eip = eip_val;
+    check_protected_mode_entry(emu);
 }
 
 /*

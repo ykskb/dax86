@@ -5,6 +5,10 @@
 
 #include "emulator.h"
 
+/* CR0 */
+#define CR0_PE (1)
+#define CR0_PG (1 << 31)
+
 /* Eflags */
 #define CARRY_FLAG (1)
 #define ZERO_FLAG (1 << 6)
@@ -12,6 +16,29 @@
 #define INT_ENABLE_FLAG (1 << 9)
 #define DIRECTION_FLAG (1 << 10)
 #define OVERFLOW_FLAG (1 << 11)
+
+/* Register Operations */
+
+void set_register8(Emulator *emu, int index, uint8_t value);
+uint8_t get_register8(Emulator *emu, int index);
+
+void set_register32(Emulator *emu, int reg_index, uint32_t value);
+uint32_t get_register32(Emulator *emu, int reg_index);
+
+/* Segment Register Operations */
+
+void set_seg_register16(Emulator *emu, int reg_index, uint16_t value);
+uint16_t get_seg_register16(Emulator *emu, int reg_index);
+
+void push_segment_register(Emulator *emu, int reg_index);
+void pop_segment_register(Emulator *emu, int reg_index);
+
+/* Control Register Operations */
+
+void check_protected_mode_entry(Emulator *emu);
+
+void set_ctrl_register32(Emulator *emu, int reg_index, uint32_t value);
+uint32_t get_ctrl_register32(Emulator *emu, int reg_index);
 
 /* Source Instruction Operations */
 
@@ -30,7 +57,9 @@ void _set_memory8(Emulator *emu, uint32_t p_address, uint8_t value);
 void _set_memory16(Emulator *emu, uint32_t p_address, uint16_t value);
 void _set_memory32(Emulator *emu, uint32_t p_address, uint32_t value);
 
-/* Memory Operations */
+uint32_t _get_memory32(Emulator *emu, uint32_t p_address);
+
+/* Memory Operations with Segment Registers */
 
 void set_memory8(Emulator *emu, int seg_index, uint32_t address, uint32_t value);
 void set_memory16(Emulator *emu, int seg_index, uint32_t address, uint16_t value);
@@ -40,14 +69,6 @@ uint8_t get_memory8(Emulator *emu, int seg_index, uint32_t address);
 uint16_t get_memory16(Emulator *emu, int seg_index, uint32_t address);
 uint32_t get_memory32(Emulator *emu, int seg_index, uint32_t address);
 
-/* Register Operations */
-
-void set_register8(Emulator *emu, int index, uint8_t value);
-uint8_t get_register8(Emulator *emu, int index);
-
-void set_register32(Emulator *emu, int reg_index, uint32_t value);
-uint32_t get_register32(Emulator *emu, int reg_index);
-
 /* Stack Operations */
 
 void push16(Emulator *emu, uint16_t value);
@@ -55,18 +76,6 @@ uint16_t pop16(Emulator *emu);
 
 void push32(Emulator *emu, uint32_t value);
 uint32_t pop32(Emulator *emu);
-
-/* Segment Register Operations */
-
-void set_seg_register16(Emulator *emu, int reg_index, uint16_t value);
-uint16_t get_seg_register16(Emulator *emu, int reg_index);
-
-void push_segment_register(Emulator *emu, int reg_index);
-void pop_segment_register(Emulator *emu, int reg_index);
-
-/* Control Register Operations */
-void set_ctrl_register32(Emulator *emu, int reg_index, uint32_t value);
-uint32_t get_ctrl_register32(Emulator *emu, int reg_index);
 
 /* Eflag Operations */
 

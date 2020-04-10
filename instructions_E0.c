@@ -152,6 +152,7 @@ void ptr_jump(Emulator *emu)
     uint16_t cs_val = get_code16(emu, 5);
     set_seg_register16(emu, CS, cs_val);
     emu->eip = eip_val;
+    check_protected_mode_entry(emu);
 }
 
 /*

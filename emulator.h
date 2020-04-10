@@ -124,6 +124,9 @@ typedef struct
     uint8_t *memory;
     uint32_t eip;
     Gdtr gdtr;
+    /* Utility */
+    uint8_t is_pe;
+    uint8_t is_pg;
     uint8_t exception;
 } Emulator;
 

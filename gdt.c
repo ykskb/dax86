@@ -10,9 +10,9 @@
 #include "io.h"
 
 /*
- * GDTR: 
+ * GDTR:
  * 48 bits long register to hold size and the starting address of GDT.
- * | 31                      16 | 15                       0 | 
+ * | 31                      16 | 15                       0 |
  * |          Base 0:15         |        Limit 0:15          |
  * |____________________________|____________________________|
  * | 63      56 | 55 52 | 51 48 | 47        40 | 39       32 |
@@ -27,7 +27,7 @@
  * Exec: 1: executable | 0: system descriptor
  * DC (CS): 1: lower level can execute | 0: only executable with privilege
  * DC (DS): 1: segments grow downward | 0: segments grow upward
- * RW (CS): 1: readable | 0: not readable 
+ * RW (CS): 1: readable | 0: not readable
  * RW (DS): 1: writable | 0: not writable
  * AC: 1: accessed | 0: not accessed
  * 
@@ -83,4 +83,99 @@ void lgdt(Emulator *emu, ModRM *modrm)
     uint16_t limit = get_memory16(emu, DS, address);
     uint32_t base = get_memory32(emu, DS, address + 2);
     set_gdtr(emu, limit, base);
+}
+
+static void gdt_access_error(char *msg)
+{
+    printf("GDT access error: %s\n", msg);
+    exit(1);
+}
+
+static void check_entry_access(uint8_t access_byte, uint8_t cpl, uint8_t write, uint8_t exec)
+{
+    if (write)
+    {
+        uint8_t rw = access_byte & 2;
+        if (!rw)
+        {
+            gdt_access_error("not writable");
+        }
+    }
+    if (exec)
+    {
+        uint8_t d_exec = access_byte & 8;
+        if (!d_exec)
+        {
+            gdt_access_error("not executable");
+        }
+    }
+    uint8_t dpl = (access_byte >> 5) & 3;
+    if (dpl < cpl)
+    {
+        gdt_access_error("entry privilege not met");
+    }
+}
+
+static uint32_t read_entry_base(uint32_t entry1, uint32_t entry2)
+{
+    uint32_t base_low = (entry1 >> 16);
+    uint32_t base_mid = (entry2 & 0xFF);
+    uint32_t base_high = (entry1 >> 24);
+    return base_low | (base_mid << 16) | (base_high << 24);
+}
+
+static void check_entry_limit(uint32_t entry1, uint32_t entry2, uint32_t offset)
+{
+    uint32_t limit_low = entry1 & 0xFFFF;
+    uint32_t limit_high = (entry2 >> 16) & 0xF;
+    uint32_t limit = limit_low | (limit_high << 16);
+
+    uint8_t flags = (entry2 >> 20) & 0xF;
+    uint8_t g = flags & 8;
+    if (g)
+    {
+        uint64_t limit_val = limit * (2 ^ 12);
+        if ((uint64_t)offset > limit_val)
+        {
+            gdt_access_error("beyond entry limit");
+        }
+    }
+    else
+    {
+        if (offset > limit)
+        {
+            gdt_access_error("beyond entry limit");
+        }
+    }
+}
+
+uint32_t get_linear_addr(Emulator *emu, uint16_t seg_val, uint32_t offset, uint8_t write, uint8_t exec)
+{
+    int entry_index = seg_val >> 3;
+    uint8_t ti = seg_val & (1 << 2);
+    uint8_t cpl = seg_val & 3;
+    if (ti)
+    {
+        /* LGT */
+        return 0;
+    }
+    else
+    {
+        /* GDT */
+        uint32_t entry_addr = emu->gdtr.base + (entry_index * 8);
+        if (entry_addr > (emu->gdtr.base + emu->gdtr.limit))
+        {
+            gdt_access_error("beyond table limit");
+        }
+        uint32_t entry1 = _get_memory32(emu, entry_addr);
+        uint32_t entry2 = _get_memory32(emu, entry_addr + 4);
+
+        uint8_t access_byte = (entry2 >> 8) & 0xFF;
+        check_entry_access(access_byte, cpl, write, exec);
+
+        uint32_t base = read_entry_base(entry1, entry2);
+        check_entry_limit(entry1, entry2, offset);
+
+        return base + offset;
+    }
 }
