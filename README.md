@@ -1,20 +1,21 @@
 # dax86
 
-x86 Simulator | Implementation of x86 in C for Study-purpose
+x86 (i386) Emulator in C
 
-The goal of this project is to run xv6 on it so that one can have basic understanding of how OS works at the level of CPU architecture.
+Primary purpose is to run xv6 so that one can trace how an OS runs at CPU level.
 
 In scope:
 
-Instructions required to run xv6:
-
-- Real mode addressing
-- Protection mode
-- Paging mode etc
+- Instructions required for running xv6
+- Real mode
+- Protected mode
+- Paging
+- Device emulation (Keyboard, APIC, Display etc)
 
 Out of scope:
 
-- Floating point related instructions etc
+- FPU-related instructions
+- Virtual 8086 mode
 
 ##### Setup Environment using Docker
 
