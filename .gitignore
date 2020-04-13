@@ -54,3 +54,5 @@ dkms.conf
 
 .DS_Store
 .vscode
+
+tests/exec/**/*.bin
