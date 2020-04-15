@@ -8,6 +8,7 @@
 #include "emulator_functions.h"
 #include "modrm.h"
 #include "io.h"
+#include "gdt.h"
 
 /*
  * loopnz rel8: 2 bytes

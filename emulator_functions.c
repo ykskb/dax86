@@ -2,6 +2,8 @@
 
 #include "emulator_functions.h"
 #include "gdt.h"
+#include "paging.h"
+#include "io.h"
 
 /* Register Operations */
 
@@ -56,38 +58,7 @@ uint16_t get_seg_register16(Emulator *emu, int reg_index)
     return emu->segment_registers[reg_index];
 }
 
-void push_segment_register(Emulator *emu, int reg_index)
-{
-    uint16_t value = get_seg_register16(emu, reg_index);
-    push16(emu, value);
-}
-
-void pop_segment_register(Emulator *emu, int reg_index)
-{
-    uint16_t value = pop16(emu);
-    set_seg_register16(emu, reg_index, value);
-}
-
 /* Control Register Operations */
-
-void check_protected_mode_entry(Emulator *emu)
-{
-    if (emu->is_pe)
-        return;
-    uint8_t cr0_pe = (emu->control_registers[CR0] & CR0_PE);
-    uint16_t gdt_index = emu->segment_registers[CS] >> 3;
-    uint16_t gdt_entry_count = (emu->gdtr.limit + 1) / 8;
-    if (cr0_pe && gdt_index != 0 && gdt_entry_count > gdt_index)
-        emu->is_pe = 1;
-}
-
-static void check_paging(Emulator *emu)
-{
-    if (emu->is_pg)
-        return;
-    if ((emu->control_registers[CR0] & CR0_PG) != 0)
-        emu->is_pg = 1;
-}
 
 void set_ctrl_register32(Emulator *emu, int reg_index, uint32_t value)
 {
@@ -105,23 +76,20 @@ static uint32_t get_physical_address(Emulator *emu, int seg_index, uint32_t offs
 {
     uint8_t exec = 0;
     if (seg_index == CS)
-    {
         exec = 1;
-    }
 
     uint16_t seg_val = get_seg_register16(emu, seg_index);
 
+    /* Protected mode enabled. */
     if (emu->is_pe)
     {
         uint32_t linear = get_linear_addr(emu, seg_val, offset, write, exec);
         check_paging(emu);
+        /* Paging enabled. */
         if (emu->is_pg)
-        {
-        }
+            return get_phys_addr(emu, linear, write, exec);
         else
-        {
             return linear;
-        }
     }
     /* Real mode */
     uint32_t p_base = ((uint32_t)seg_val) << 4;
@@ -304,6 +272,20 @@ uint32_t pop32(Emulator *emu)
     uint32_t value = _get_memory32(emu, p_address);
     set_register32(emu, ESP, offset + 4);
     return value;
+}
+
+/* Segment Register to Memory */
+
+void push_segment_register(Emulator *emu, int reg_index)
+{
+    uint16_t value = get_seg_register16(emu, reg_index);
+    push16(emu, value);
+}
+
+void pop_segment_register(Emulator *emu, int reg_index)
+{
+    uint16_t value = pop16(emu);
+    set_seg_register16(emu, reg_index, value);
 }
 
 /* Eflag Operations */

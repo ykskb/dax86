@@ -4,10 +4,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#include "instruction_defs.h"
+#include "gdt.h"
 #include "emulator_functions.h"
-#include "modrm.h"
-#include "io.h"
 
 /*
  * GDTR:
@@ -83,6 +81,17 @@ void lgdt(Emulator *emu, ModRM *modrm)
     uint16_t limit = get_memory16(emu, DS, address);
     uint32_t base = get_memory32(emu, DS, address + 2);
     set_gdtr(emu, limit, base);
+}
+
+void check_protected_mode_entry(Emulator *emu)
+{
+    if (emu->is_pe)
+        return;
+    uint8_t cr0_pe = (emu->control_registers[CR0] & CR0_PE);
+    uint16_t gdt_index = emu->segment_registers[CS] >> 3;
+    uint16_t gdt_entry_count = (emu->gdtr.limit + 1) / 8;
+    if (cr0_pe && gdt_index != 0 && gdt_entry_count > gdt_index)
+        emu->is_pe = 1;
 }
 
 static void gdt_access_error(char *msg)

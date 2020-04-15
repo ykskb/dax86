@@ -88,7 +88,8 @@ function test_all() {
   "str_32"\
   "gdt"\
   "mul"\
-  "div"
+  "div"\
+  "paging"
   do
     run_test $i
   done

@@ -9,6 +9,7 @@
 #include "modrm.h"
 #include "io.h"
 #include "twos_complement.h"
+#include "gdt.h"
 
 /*
  * cmc: 1 byte

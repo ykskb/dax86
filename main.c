@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 
     init_instructions();
 
-    while (emu->eip < MEMORY_SIZE)
+    while ((emu->eip < MEMORY_SIZE) || (emu->is_pg))
     {
         uint8_t op = get_code8(emu, 0);
         if (!quiet)

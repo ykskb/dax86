@@ -5,10 +5,6 @@
 
 #include "emulator.h"
 
-/* CR0 */
-#define CR0_PE (1)
-#define CR0_PG (1 << 31)
-
 /* Eflags */
 #define CARRY_FLAG (1)
 #define ZERO_FLAG (1 << 6)
@@ -30,12 +26,7 @@ uint32_t get_register32(Emulator *emu, int reg_index);
 void set_seg_register16(Emulator *emu, int reg_index, uint16_t value);
 uint16_t get_seg_register16(Emulator *emu, int reg_index);
 
-void push_segment_register(Emulator *emu, int reg_index);
-void pop_segment_register(Emulator *emu, int reg_index);
-
 /* Control Register Operations */
-
-void check_protected_mode_entry(Emulator *emu);
 
 void set_ctrl_register32(Emulator *emu, int reg_index, uint32_t value);
 uint32_t get_ctrl_register32(Emulator *emu, int reg_index);
@@ -76,6 +67,11 @@ uint16_t pop16(Emulator *emu);
 
 void push32(Emulator *emu, uint32_t value);
 uint32_t pop32(Emulator *emu);
+
+/* Segment Register to Memory */
+
+void push_segment_register(Emulator *emu, int reg_index);
+void pop_segment_register(Emulator *emu, int reg_index);
 
 /* Eflag Operations */
 
