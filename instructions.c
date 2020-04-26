@@ -20,7 +20,44 @@ instruction_func_t *instructions[256];
 static void two_byte_inst(Emulator *emu)
 {
     uint8_t op = get_code8(emu, 1);
+    if (two_byte_instructions[op] == NULL)
+    {
+        printf("Op: 0f %x not implemented.\n", op);
+        exit(1);
+    }
     two_byte_instructions[op](emu);
+}
+
+static void operand_override(Emulator *emu)
+{
+    emu->eip += 1;
+    uint8_t op = get_code8(emu, 0);
+    if (emu->is_pe)
+    {
+        switch (op)
+        {
+        case 0x89:
+            mov_rm16_r16(emu);
+            break;
+        default:
+            printf("Op: 66 %x not implemented.\n", op);
+            exit(1);
+            break;
+        }
+    }
+    else
+    {
+        switch (op)
+        {
+        case 0x89:
+            mov_rm32_r32(emu);
+            break;
+        default:
+            printf("Op: 66 %x not implemented.\n", op);
+            exit(1);
+            break;
+        }
+    }
 }
 
 /* 
@@ -47,6 +84,11 @@ static void rep(Emulator *emu)
     uint32_t ecx_value = get_register32(emu, ECX);
     uint8_t op = get_code8(emu, 0);
     uint32_t op_eip = emu->eip;
+    if (instructions[op] == NULL)
+    {
+        printf("Op: f3 %x not implemented.\n", op);
+        exit(1);
+    }
     int i;
     for (i = 0; i < ecx_value; i++)
     {
@@ -67,6 +109,11 @@ static void repne(Emulator *emu)
     uint32_t ecx_value = get_register32(emu, ECX);
     uint8_t op = get_code8(emu, 0);
     uint32_t op_eip = emu->eip;
+    if (instructions[op] == NULL)
+    {
+        printf("Op: f2 %x not implemented.\n", op);
+        exit(1);
+    }
     int i;
     for (i = 0; i < ecx_value; i++)
     {
@@ -87,6 +134,8 @@ static void init_two_byte_instructions(void)
     two_byte_instructions[0x01] = code_0f_01;
     two_byte_instructions[0x20] = mov_r32_cr;
     two_byte_instructions[0x22] = mov_cr_r32;
+    two_byte_instructions[0xB6] = movzx_r32_rm8;
+    two_byte_instructions[0xB7] = movzx_r32_rm16;
 }
 
 void init_instructions(void)
@@ -193,10 +242,12 @@ void init_instructions(void)
 
     instructions[0x60] = pushad;
     instructions[0x61] = popad;
+    instructions[0x66] = operand_override;
     instructions[0x68] = push_imm32;
     instructions[0x69] = imul_r32_rm32_imm32;
     instructions[0x6A] = push_imm8;
     instructions[0x6B] = imul_r32_rm32_imm8;
+    instructions[0x6D] = ins_m32_dx;
 
     instructions[0x70] = jo;
     instructions[0x71] = jno;

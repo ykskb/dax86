@@ -46,10 +46,10 @@ void set_rm8(Emulator *emu, ModRM *modrm, uint8_t value);
 /* Gets 8-bit value from register or memory depending on Mod of ModR/M byte. */
 uint8_t get_rm8(Emulator *emu, ModRM *modrm);
 
-/* Sets 32-bit value to register or memory depending on Mod of ModR/M byte. */
-void set_rm32(Emulator *emu, ModRM *modrm, uint32_t value);
+void set_rm16(Emulator *emu, ModRM *modrm, uint8_t value);
+uint16_t get_rm16(Emulator *emu, ModRM *modrm);
 
-/* Gets 32-bit value from register or memory depending on Mod of ModR/M byte. */
+void set_rm32(Emulator *emu, ModRM *modrm, uint32_t value);
 uint32_t get_rm32(Emulator *emu, ModRM *modrm);
 
 /* Sets 8-bit value on the register specified by REG of ModR/M. */
@@ -58,10 +58,10 @@ void set_r8(Emulator *emu, ModRM *modrm, uint8_t value);
 /* Get 8-bit value from the register specified by REG of ModR/M. */
 uint8_t get_r8(Emulator *emu, ModRM *modrm);
 
-/* Sets 32-bit value on the register specified by REG of ModR/M. */
-void set_r32(Emulator *emu, ModRM *modrm, uint32_t value);
+void set_r16(Emulator *emu, ModRM *modrm, uint8_t value);
+uint8_t get_r16(Emulator *emu, ModRM *modrm);
 
-/* Get 32-bit value from the register specified by REG of ModR/M. */
+void set_r32(Emulator *emu, ModRM *modrm, uint32_t value);
 uint32_t get_r32(Emulator *emu, ModRM *modrm);
 
 /* Sets 16-bit value on the segment register specified by REG of ModR/M. */

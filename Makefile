@@ -1,6 +1,7 @@
 TARGET = dax86
 OBJS = \
 	main.o\
+	emulator.o\
 	emulator_functions.o\
 	instructions.o\
 	modrm.o\
@@ -9,6 +10,9 @@ OBJS = \
 	gdt.o\
 	paging.o\
 	twos_complement.o\
+	interrupt.o\
+	kbd.o\
+	disk.o\
 	instructions_00.o\
 	instructions_10.o\
 	instructions_20.o\
@@ -26,7 +30,8 @@ OBJS = \
 	instructions_E0.o\
 	instructions_F0.o\
 	instructions_0F00.o\
-	instructions_0F20.o
+	instructions_0F20.o\
+	instructions_0FB0.o
 
 CC = /usr/bin/gcc
 CFLAGS += -Wall
@@ -39,10 +44,10 @@ all :
 # gcc -c: only compile & assembly to .o
 # $<: first prerequisite
 %.o : %.c Makefile
-	$(CC) $(CFLAGS) -c $< 
+	$(CC) $(CFLAGS) -c $<
 
 $(TARGET) : $(OBJS) Makefile
-	$(CC) -o $@ $(OBJS) -lm
+	$(CC) -o $@ $(OBJS) -lm -lpthread
 
 create-docker:
 	docker build -t dax86 .

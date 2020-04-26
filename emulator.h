@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+#include "disk.h"
+
+/* Memory size: 1MB */
+#define MEMORY_SIZE (1024 * 1024)
+
 /*
  * In order of REG of ModR/M
  * EAX: 000, ECX: 001 ... EDI: 111
@@ -117,17 +122,34 @@ enum Exception
  */
 typedef struct
 {
+    /* Registers */
     uint32_t eflags;
     uint32_t registers[REGISTERS_COUNT];
     uint16_t segment_registers[SEGMENT_REGISTERS_COUNT];
     uint32_t control_registers[CONTROL_REGISTER_COUNT];
-    uint8_t *memory;
     uint32_t eip;
     Gdtr gdtr;
+    /* Devices */
+    uint8_t *memory;
+    Disk *disk;
+    uint8_t int_pin;
     /* Utility */
     uint8_t is_pe;
     uint8_t is_pg;
+    uint8_t int_enabled;
     uint8_t exception;
 } Emulator;
+
+Emulator *create_emu(uint32_t eip, uint32_t esp);
+void destroy_emu(Emulator *emu);
+
+void load_boot_sector(Emulator *emu, FILE *f);
+
+void dump_registers(Emulator *emu);
+void dump_memory(Emulator *emu);
+void dump_eflags(Emulator *emu);
+/*
+void dump_input(Emulator *emu);
+*/
 
 #endif

@@ -89,7 +89,9 @@ function test_all() {
   "gdt"\
   "mul"\
   "div"\
-  "paging"
+  "paging"\
+  "disk"\
+  "movzx"
   do
     run_test $i
   done

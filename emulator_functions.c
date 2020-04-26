@@ -36,6 +36,18 @@ uint8_t get_register8(Emulator *emu, int index)
     }
 }
 
+void set_register16(Emulator *emu, int reg_index, uint16_t value)
+{
+    /* Resets lowest byte keeping the rest same. */
+    uint32_t r = emu->registers[reg_index] & 0xffff0000;
+    emu->registers[reg_index] = r | (uint32_t)value;
+}
+
+uint16_t get_register16(Emulator *emu, int reg_index)
+{
+    return emu->registers[reg_index] & 0xffff;
+}
+
 void set_register32(Emulator *emu, int reg_index, uint32_t value)
 {
     emu->registers[reg_index] = value;

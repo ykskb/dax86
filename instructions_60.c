@@ -129,3 +129,25 @@ void imul_r32_rm32_imm8(Emulator *emu)
     emu->eip += 1;
     imul_r32_rm32_imm(emu, &modrm, imm8_val);
 }
+
+/*
+ * ins m32 dx
+ * Inputs dword from DX port into ES:EDI
+ * 1 byte: op (6D)
+ */
+void ins_m32_dx(Emulator *emu)
+{
+    uint16_t dx_val = get_register16(emu, EDX);
+    uint32_t in_val = io_in32(emu, dx_val);
+    uint32_t edi_val = get_register32(emu, EDI);
+    set_memory32(emu, ES, edi_val, in_val);
+    if (is_direction_down(emu))
+    {
+        set_register32(emu, EDI, edi_val - 4);
+    }
+    else
+    {
+        set_register32(emu, EDI, edi_val + 4);
+    }
+    emu->eip += 1;
+}

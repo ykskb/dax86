@@ -113,6 +113,36 @@ void jecxz(Emulator *emu)
 }
 
 /*
+ * in al imm8: 2 bytes
+ * Inputs a byte from port imm8 to AL.
+ * 1 byte: op (E4)
+ * 1 byte: imm8
+ */
+void in_al_imm8(Emulator *emu)
+{
+    /* IO Port Address from imm8 */
+    uint16_t address = get_code8(emu, 1);
+    uint8_t value = io_in8(emu, address);
+    set_register8(emu, AL, value);
+    emu->eip += 2;
+}
+
+/*
+ * in eax imm8: 2 bytes
+ * Inputs a byte from port imm8 to EAX.
+ * 1 byte: op (E5)
+ * 1 byte: imm8
+ */
+void in_eax_imm8(Emulator *emu)
+{
+    /* IO Port Address from imm8 */
+    uint16_t address = get_code8(emu, 1);
+    uint32_t value = io_in32(emu, address);
+    set_register32(emu, EAX, value);
+    emu->eip += 2;
+}
+
+/*
  * call rel32: 5 bytes
  * Jumps by 32-bit number relatively from next address.
  * 1 byte: op (E8)
@@ -177,7 +207,7 @@ void in_al_dx(Emulator *emu)
 {
     /* IO Port Address from DX */
     uint16_t address = get_register32(emu, EDX) & 0xffff;
-    uint8_t value = io_in8(address);
+    uint8_t value = io_in8(emu, address);
     set_register8(emu, AL, value);
     emu->eip += 1;
 }
@@ -191,7 +221,7 @@ void in_eax_dx(Emulator *emu)
 {
     /* IO Port Address from DX */
     uint16_t address = get_register32(emu, EDX) & 0xffff;
-    uint32_t value = io_in32(address);
+    uint32_t value = io_in32(emu, address);
     set_register32(emu, EAX, value);
     emu->eip += 1;
 }
@@ -206,7 +236,7 @@ void out_dx_al(Emulator *emu)
     /* IO Port Address from DX */
     uint16_t address = get_register32(emu, EDX) & 0xffff;
     uint8_t value = get_register8(emu, AL);
-    io_out8(address, value);
+    io_out8(emu, address, value);
     emu->eip += 1;
 }
 
@@ -220,6 +250,6 @@ void out_dx_eax(Emulator *emu)
     /* IO Port Address from DX */
     uint16_t address = get_register32(emu, EDX) & 0xffff;
     uint32_t value = get_register8(emu, EAX);
-    io_out32(address, value);
+    io_out32(emu, address, value);
     emu->eip += 1;
 }

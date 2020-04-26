@@ -1,4 +1,5 @@
-TARGET = in.bin in_display.bin
+TARGET = disk.bin
+OBJS = crt0.o main_func.o
 
 CC = gcc
 LD = ld
@@ -17,8 +18,5 @@ all :
 %.o : %.asm Makefile
 	$(AS) -f elf $<
 
-%.bin : %.o Makefile
-	$(LD) $(LDFLAGS) -o $@ $<
-
-%.bin : %.asm Makefile
-	$(AS) -f bin -o $@ $<
+$(TARGET) : $(OBJS) Makefile
+	$(LD) $(LDFLAGS) -o $@ $(OBJS)

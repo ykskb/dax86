@@ -667,6 +667,21 @@ void mov_rm32_r32(Emulator *emu)
 }
 
 /*
+ * mov rm16 r16: 2 bytes
+ * Copies value of register specified by REG to ModR/M.
+ * 1 byte: op (89)
+ * 1 byte: ModR/M
+ */
+void mov_rm16_r16(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm = create_modrm();
+    parse_modrm(emu, &modrm);
+    uint16_t r16 = get_r16(emu, &modrm);
+    set_rm16(emu, &modrm, r16);
+}
+
+/*
  * mov r8 rm8: 2 bytes
  * Copies 8-bit value from register or memory specified by ModR/M to the register
  * specified by ModR/M.

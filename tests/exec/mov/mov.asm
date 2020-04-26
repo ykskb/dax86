@@ -1,6 +1,7 @@
 BITS 32
     org 0x7c00
     ; mov eax, ds ; Tested in seg ;
+    ; mov ebp, esp ; required for 66 tests below
     mov dword eax, esp
     mov dword edx, 0xF
     ; 7C00 + 0xF * 4 = 7C3C
@@ -19,4 +20,7 @@ BITS 32
     mov cr2, eax
     mov eax, cr0
     ; mov es, edx ; Tested in seg ;
+    
+    ; 66: operand prefix (needs to be tested in protected mode)
+    ; mov [ebp - 10], dx ; 66 89 5424FC
     jmp 0

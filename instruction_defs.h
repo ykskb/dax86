@@ -85,6 +85,7 @@ void push_imm32(Emulator *emu);
 void push_imm8(Emulator *emu);
 void imul_r32_rm32_imm8(Emulator *emu);
 void imul_r32_rm32_imm32(Emulator *emu);
+void ins_m32_dx(Emulator *emu);
 
 /* 0x70 */
 void jo(Emulator *emu);
@@ -108,6 +109,7 @@ void xchg_rm8_r8(Emulator *emu);
 void xchg_rm32_r32(Emulator *emu);
 void mov_rm8_r8(Emulator *emu);
 void mov_rm32_r32(Emulator *emu);
+void mov_rm16_r16(Emulator *emu);
 void mov_r8_rm8(Emulator *emu);
 void mov_r32_rm32(Emulator *emu);
 void mov_rm32_seg(Emulator *emu);
@@ -198,5 +200,9 @@ void code_0f_01(Emulator *emu);
 /* 0x0F20 */
 void mov_r32_cr(Emulator *emu);
 void mov_cr_r32(Emulator *emu);
+
+/* 0x0FB0 */
+void movzx_r32_rm8(Emulator *emu);
+void movzx_r32_rm16(Emulator *emu);
 
 #endif

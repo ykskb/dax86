@@ -18,6 +18,9 @@
 void set_register8(Emulator *emu, int index, uint8_t value);
 uint8_t get_register8(Emulator *emu, int index);
 
+void set_register16(Emulator *emu, int reg_index, uint16_t value);
+uint16_t get_register16(Emulator *emu, int reg_index);
+
 void set_register32(Emulator *emu, int reg_index, uint32_t value);
 uint32_t get_register32(Emulator *emu, int reg_index);
 
