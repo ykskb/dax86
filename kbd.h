@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "ioapic.h"
+
 #define KBD_BUF_SIZE 255
 #define KBD_STATUS_IN 2
 /*
@@ -23,12 +25,14 @@
 typedef struct
 {
     uint8_t status;
+    IOAPIC *ioapic;
     unsigned int buf[256];
     uint8_t buf_index;
     uint8_t buf_out_index;
     uint8_t buf_index_reset;
 } KBD;
 
+void init_kbd(IOAPIC *ioapic);
 uint8_t get_kbd_status();
 void write_ps2_output_port(uint8_t value);
 void write_ps2_config_byte(uint8_t value);

@@ -58,7 +58,7 @@ void set_drive_head(Disk *disk, uint8_t val)
     disk->drive_head = val;
 }
 
-static set_head_index(Disk *disk)
+static void set_head_index(Disk *disk)
 {
     uint32_t head_index = 0 | disk->lba_low | (disk->lba_mid << 8) | (disk->lba_high << 16) |
                           ((disk->drive_head & 0x0F) << 24);

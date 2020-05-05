@@ -6,7 +6,9 @@
 #include "emulator.h"
 #include "instructions.h"
 #include "emulator_functions.h"
+#include "ioapic.h"
 #include "disk.h"
+#include "kbd.h"
 
 int remove_arg_at(int argc, char *argv[], int index)
 {
@@ -58,6 +60,7 @@ int main(int argc, char *argv[])
      */
     emu = create_emu(0x7c00, 0x7c00);
 
+    /* Binary file loading */
     binary = fopen(argv[1], "rb"); // rb: read-binary (r: translated mode for "\n")
     if (binary == NULL)
     {
@@ -65,10 +68,17 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    load_data_to_disk(emu->disk, binary);
-    load_boot_sector(emu, binary);
-
+    Disk *disk = create_disk_device();
+    load_data_to_disk(disk, binary);
     fclose(binary);
+
+    attach_disk(emu, disk);
+    IOAPIC *ioapic = create_ioapic();
+    add_lapic(ioapic, 0, emu->lapic);
+
+    load_boot_sector(emu);
+
+    /* init_kbd(ioapic); */
 
     /* dump_input(emu); */
 

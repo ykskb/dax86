@@ -42,56 +42,30 @@ void write_ps2_config_byte(uint8_t value)
     }
 }
 
-static void kbd_write_interrupt(Emulator *emu)
+static void *kbd_loop()
 {
-    if (kbd->buf_index_reset)
-    {
-        while (kbd->buf_out_index < KBD_BUF_SIZE)
-        {
-            if (write_interrupt(emu, T_IRQ0 + IRQ_KBD))
-            {
-                kbd->buf_out_index += 1;
-            }
-        }
-        kbd->buf_index_reset = 0;
-        kbd->buf_out_index = 0;
-    }
-    for (kbd->buf_out_index; kbd->buf_out_index < kbd->buf_index; kbd->buf_out_index++)
-    {
-        if (write_interrupt(emu, T_IRQ0 + IRQ_KBD))
-        {
-            printf("wrote interrupt");
-            kbd->buf_out_index += 1;
-        }
-    }
-    kbd->status &= ~KBD_STATUS_IN;
-}
-
-static void *kbd_loop(void *ptr)
-{
-    Emulator *emu = (Emulator *)ptr;
     while (1)
     {
-        if (kbd->buf_index > KBD_BUF_SIZE)
-        {
-            kbd->buf_index = 0;
-            kbd->buf_index_reset = 1;
-        }
         uint8_t value = getchar();
         kbd->buf[kbd->buf_index] = value;
-        kbd->status |= KBD_STATUS_IN;
-        kbd->buf_index += 1;
-        kbd_write_interrupt(emu);
+        if (kbd->buf_index > 254)
+        {
+            kbd->buf_index = 0;
+        }
+        else
+        {
+            kbd->buf_index += 1;
+        }
+        ioapic_int_to_lapic(kbd->ioapic, T_IRQ0 + IRQ_KBD);
     }
+    return NULL;
 }
 
-void init_kbd(Emulator *emu)
+void init_kbd(IOAPIC *ioapic)
 {
     kbd = malloc(sizeof(KBD));
-    kbd->buf_index = 0;
-    kbd->buf_out_index = 0;
-    kbd->buf_index_reset = 0;
     kbd->status = 0;
+    kbd->ioapic = ioapic;
     pthread_t kbd_thread_id;
-    pthread_create(&kbd_thread_id, NULL, kbd_loop, (void *)emu);
+    pthread_create(&kbd_thread_id, NULL, kbd_loop, NULL);
 }

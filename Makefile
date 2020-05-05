@@ -10,6 +10,8 @@ OBJS = \
 	gdt.o\
 	paging.o\
 	twos_complement.o\
+	lapic.o\
+	ioapic.o\
 	interrupt.o\
 	kbd.o\
 	disk.o\

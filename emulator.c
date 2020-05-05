@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "emulator.h"
+#include "lapic.h"
 
 /* Util for Print Binary */
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
@@ -27,11 +28,11 @@ Emulator *create_emu(uint32_t eip, uint32_t esp)
     memset(emu->control_registers, 0, sizeof(emu->control_registers));
     emu->eip = eip;
     emu->registers[ESP] = esp;
-    emu->int_pin = 0;
+    emu->int_r = 0;
 
     /* Devices */
+    emu->lapic = create_lapic(emu);
     emu->memory = malloc(MEMORY_SIZE);
-    emu->disk = create_disk_device();
 
     /* Utility */
     emu->is_pe = 0;
@@ -48,6 +49,11 @@ void destroy_emu(Emulator *emu)
     free(emu);
 }
 
+void attach_disk(Emulator *emu, Disk *disk)
+{
+    emu->disk = disk;
+}
+
 /*
  * Loads first sector of binary file into emulator.
  * Each index stores 1 byte of binary.
@@ -56,7 +62,7 @@ void destroy_emu(Emulator *emu)
  * 0x200 (512) * 1 byte = 512 bytes
  * fread(*ptr, byte, num(of byte to read), *stream)
  */
-void load_boot_sector(Emulator *emu, FILE *f)
+void load_boot_sector(Emulator *emu)
 {
     memcpy(emu->memory + 0x7c00, emu->disk->storage, 512);
 }

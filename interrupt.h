@@ -12,6 +12,6 @@
 #define IRQ_ERROR 19
 #define IRQ_SPURIOUS 31
 
-uint8_t write_interrupt(Emulator *emu, uint8_t irq);
+void handle_interrupt(Emulator *emu);
 
 #endif

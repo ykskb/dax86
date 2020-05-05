@@ -2,6 +2,7 @@
 #define EMULATOR_H_
 
 #include <stdint.h>
+#include <pthread.h>
 
 #include "disk.h"
 
@@ -99,6 +100,9 @@ enum Exception
     E_SX
 };
 
+typedef struct LAPIC LAPIC;
+typedef struct Emulator Emulator;
+
 /*
  * FLAGS:
  * | n-th bit                                      |
@@ -120,7 +124,7 @@ enum Exception
  * RFLAGS:
  * Rsv...
  */
-typedef struct
+struct Emulator
 {
     /* Registers */
     uint32_t eflags;
@@ -129,21 +133,36 @@ typedef struct
     uint32_t control_registers[CONTROL_REGISTER_COUNT];
     uint32_t eip;
     Gdtr gdtr;
+    uint8_t int_r;
     /* Devices */
+    struct LAPIC *lapic;
     uint8_t *memory;
     Disk *disk;
-    uint8_t int_pin;
     /* Utility */
     uint8_t is_pe;
     uint8_t is_pg;
     uint8_t int_enabled;
     uint8_t exception;
-} Emulator;
+};
+
+#define APIC_REGISTERS_SIZE 128
+struct LAPIC
+{
+    uint32_t reg_base_address;
+    uint8_t registers[APIC_REGISTERS_SIZE];
+    uint8_t irr[256];
+    uint8_t isr[256];
+    uint32_t eoi;
+    pthread_mutex_t lock;
+    Emulator *emu;
+    uint8_t isr_index;
+};
 
 Emulator *create_emu(uint32_t eip, uint32_t esp);
 void destroy_emu(Emulator *emu);
 
-void load_boot_sector(Emulator *emu, FILE *f);
+void attach_disk(Emulator *emu, Disk *disk);
+void load_boot_sector(Emulator *emu);
 
 void dump_registers(Emulator *emu);
 void dump_memory(Emulator *emu);
