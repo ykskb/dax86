@@ -1,13 +1,6 @@
 #ifndef LAPIC_H_
 #define LAPIC_H_
 
-#include <stdint.h>
-#include <pthread.h>
-
-#include "emulator.h"
-
-#define APIC_REGISTERS_SIZE 128
-
 /*
  * <Local APIC Registers (0x0 to 0x3F0)>
  * The default base address 0xFEE00000.
@@ -64,9 +57,28 @@
  * (20: 31: Reserved)
  */
 
+#include <stdint.h>
+#include <pthread.h>
+
+#include "emulator.h"
+
+#define LAPIC_DEFAULT_BASE 0xFEE00000
+
+#define TPR 0x0080        // Task Priority
+#define EOI 0x00B0        // EOI
+#define SVR 0x00F0        // Spurious Interrupt Vector
+#define TICR 0x0380       // Timer Initial Count
+#define LINT0 0x0350      // Local Vector Table 1 (LINT0)
+#define LINT1 0x0360      // Local Vector Table 2 (LINT1)
+#define ERROR 0x0370      // Local Vector Table 3 (ERROR)
+#define MASKED 0x00010000 // Interrupt masked
+
 LAPIC *create_lapic(Emulator *emu);
+
 void lapic_send_intr(LAPIC *lapic);
-void lapic_eoi(LAPIC *lapic);
 void lapic_write_to_irr(LAPIC *lapic, uint8_t irq);
+
+void lapic_write_reg(LAPIC *lapic, uint32_t addr, uint32_t val);
+uint32_t lapic_read_reg(LAPIC *lapic, uint32_t addr);
 
 #endif

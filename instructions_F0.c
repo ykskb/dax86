@@ -10,6 +10,7 @@
 #include "io.h"
 #include "twos_complement.h"
 #include "gdt.h"
+#include "lapic.h"
 
 /*
  * cmc: 1 byte
@@ -369,6 +370,7 @@ void stc(Emulator *emu)
 void cli(Emulator *emu)
 {
     set_int_flag(emu, 0);
+    emu->int_enabled = 0;
     emu->eip += 1;
 }
 
@@ -380,6 +382,8 @@ void cli(Emulator *emu)
 void sti(Emulator *emu)
 {
     set_int_flag(emu, 1);
+    emu->int_enabled = 1;
+    lapic_send_intr(emu->lapic);
     emu->eip += 1;
 }
 

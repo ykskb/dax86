@@ -9,6 +9,8 @@
 /* Memory size: 1MB */
 #define MEMORY_SIZE (1024 * 1024)
 
+#define APIC_REGISTERS_SIZE 64
+
 /*
  * In order of REG of ModR/M
  * EAX: 000, ECX: 001 ... EDI: 111
@@ -145,17 +147,19 @@ struct Emulator
     uint8_t exception;
 };
 
-#define APIC_REGISTERS_SIZE 128
 struct LAPIC
 {
-    uint32_t reg_base_address;
-    uint8_t registers[APIC_REGISTERS_SIZE];
+    Emulator *emu;
+    uint32_t registers[APIC_REGISTERS_SIZE];
+
+    /* convenience properties */
+    uint8_t unit_enabled;
+    uint8_t int_enabled;
     uint8_t irr[256];
     uint8_t isr[256];
-    uint32_t eoi;
-    pthread_mutex_t lock;
-    Emulator *emu;
     uint8_t isr_index;
+    pthread_mutex_t lock;
+    pthread_t *timer_thread;
 };
 
 Emulator *create_emu(uint32_t eip, uint32_t esp);

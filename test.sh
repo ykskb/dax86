@@ -91,7 +91,8 @@ function test_all() {
   "div"\
   "paging"\
   "disk"\
-  "movzx"
+  "movzx"\
+  "lapic"
   do
     run_test $i
   done

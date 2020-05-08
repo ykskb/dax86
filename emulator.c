@@ -33,6 +33,7 @@ Emulator *create_emu(uint32_t eip, uint32_t esp)
     /* Devices */
     emu->lapic = create_lapic(emu);
     emu->memory = malloc(MEMORY_SIZE);
+    emu->disk = NULL;
 
     /* Utility */
     emu->is_pe = 0;
