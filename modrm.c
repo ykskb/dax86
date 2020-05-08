@@ -15,11 +15,17 @@
  * SIB: 1 byte after ModRM byte
  * |  1 0  |   1 1 0   |  1 0 1   |
  * | Scale | Index REG | Base REG |
- * | 00: 1 |
- * | 01: 2 |
- * | 10: 4 |
- * | 11: 8 |
- * Base + (Index * Scale)
+ * | 00: 1 |           | 000: eax | 001 | 010 | 011 | 100 |    101     |   110   |   111   | 
+ * | 01: 2 | 000: eax  |                                  |            |                   |
+ * | 10: 4 | 001: ecx  |    [Base + (Index * Scale)]      | [(I * S)   | [Base + (I * S)]  |
+ * | 11: 8 | 010: edx  |                                  |  + disp32] |                   |
+ * |_______| 011: ebx  |__________________________________|____________|___________________|                
+ *         | 100: esp  |_____________[base]_______________|__[disp32]__|_____[base]________|
+ *         | 101: ebp  |                                  |            |                   |
+ *         | 110: esi  |    [Base + (Index + Scale)]      | [(I * S)   | [Base + (I * S)]  |
+ *         | 111: edi  |                                  |  + disp32] |                   |
+ *         |___________|__________________________________|____________|___________________|
+ * 
  * ________________________________________________________________________
  *                        |  REG  |EAX |ECX |EDX |EBX |ESP |EBP |ESI |EDI |
  *                        | SREG  | ES | CS | SS | DS | FS | GS |rsvd|rsvd|
@@ -103,7 +109,7 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
      * 00/101: disp32
      * 10/[000 - 111]: [reg] + disp32
      */
-    if ((modrm->mod == 0 && modrm->rm == 5) || modrm->mod == 2)
+    if ((modrm->mod == 0 && modrm->rm == 5) || modrm->mod == 2 || modrm->sib.base == 5)
     {
         modrm->disp32 = get_sign_code32(emu, 0);
         emu->eip += 4;
@@ -122,9 +128,21 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
 
 uint32_t calc_cib_address(Emulator *emu, ModRM *modrm)
 {
+    if (modrm->sib.index == 4 && modrm->sib.base == 5)
+    {
+        return modrm->disp32;
+    }
+    uint32_t base_val = get_register32(emu, modrm->sib.base);
+    if (modrm->sib.index == 4)
+    {
+        return base_val;
+    }
     uint32_t scale = pow(2, modrm->sib.scale);
     uint32_t index_val = get_register32(emu, modrm->sib.index);
-    uint32_t base_val = get_register32(emu, modrm->sib.base);
+    if (modrm->sib.base == 5)
+    {
+        return (index_val * scale) + modrm->disp32;
+    }
     return index_val * scale + base_val;
 }
 
