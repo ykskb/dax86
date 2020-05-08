@@ -172,6 +172,8 @@ void loopnz(Emulator *emu);
 void loopz(Emulator *emu);
 void loop(Emulator *emu);
 void jecxz(Emulator *emu);
+void in_al_imm8(Emulator *emu);
+void in_eax_imm8(Emulator *emu);
 void call_rel32(Emulator *emu);
 void near_jump(Emulator *emu);
 void ptr_jump(Emulator *emu);

@@ -143,6 +143,34 @@ void in_eax_imm8(Emulator *emu)
 }
 
 /*
+ * out imm8 al: 2 bytes
+ * Outputs a byte on al to imm8 port.
+ * 1 byte: op (E6)
+ * 1 byte: imm8
+ */
+void out_imm8_al(Emulator *emu)
+{
+    uint16_t address = get_code8(emu, 1);
+    uint8_t al_val = get_register8(emu, AL);
+    io_out8(emu, address, al_val);
+    emu->eip += 2;
+}
+
+/*
+ * out imm8 eax: 2 bytes
+ * Outputs dword on eax to imm8 port.
+ * 1 byte: op (E7)
+ * 1 byte: imm8
+ */
+void out_imm8_eax(Emulator *emu)
+{
+    uint16_t address = get_code8(emu, 1);
+    uint32_t eax_val = get_register32(emu, EAX);
+    io_out32(emu, address, eax_val);
+    emu->eip += 2;
+}
+
+/*
  * call rel32: 5 bytes
  * Jumps by 32-bit number relatively from next address.
  * 1 byte: op (E8)

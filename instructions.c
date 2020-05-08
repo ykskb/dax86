@@ -333,6 +333,8 @@ void init_instructions(void)
     instructions[0xE1] = loopz;
     instructions[0xE2] = loop;
     instructions[0xE3] = jecxz;
+    instructions[0xE4] = in_al_imm8;
+    instructions[0xE5] = in_eax_imm8;
     instructions[0xE8] = call_rel32;
     instructions[0xE9] = near_jump;
     instructions[0xEA] = ptr_jump;
