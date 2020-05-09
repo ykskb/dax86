@@ -5,39 +5,43 @@
 
 #include "lapic.h"
 
+#define IOAPIC_DEFAULT_BASE 0xFEC00000
+#define IOAPIC_ID = 0x0;
+
 /*
  * <Memory-mapped Registers>
  * 
  * - IOREGSEL
- *   I/O REGISTER SELECT REGISTER
+ *   I/O REGISTER SELECT REGISTER: RW
  *   0xFEC0 xy00 (xy=See APICBASE Register in the PIIX3)
  *   |31_____________8|7____________________0|
  *   |____Reserved____|_APIC_Register_Offset_|
  * 
  * - IOWIN
- *   I/O WINDOW REGISTER
+ *   I/O WINDOW REGISTER: RW
  *   0xFEC0 xy10 (xy=See APICBASE Register in PIIX3)
  *   |31__________________________________0|
  *   |_________APIC_Register_Data__________|
  * 
  * <Registers>
  * 
- * - IOAPICID
+ * - IOAPICID: RW
  *   Offset: 0x0
  *   |31________28|27___24|23_____________0|
  *   |__Reserved__|APIC_ID|____Reserved____|
  * 
- * - IOAPICVER
+ * - IOAPICVER: RO
  *   Offset: 0x1
  *   |31_24|23___________________16|15_8|7_______0|
  *   |Rsvd_|_Max_Redirection_Entry_|Rsvd|_Version_|
  * 
- * - IOAPICARB: arbitration priority of for bus ownershipt (rotating priority scheme: 15 wins)
+ * - IOAPICARB: RO
+ *   Arbitration priority of for bus ownershipt (rotating priority scheme: 15 wins)
  *   Offset: 0x2
  *   |31________28|27__________24|23_____________0|
  *   |__Reserved__|Arbitration_ID|____Reserved____|
  * 
- * - IOREDTBL[23:0] 64-bit entries (2 x 32-bit registers)
+ * - IOREDTBL[23:0] 64-bit entries (2 x 32-bit registers): RW
  *   Offset:
  *   0x10-0x11 (IOREDTBL0)
  *   0x12-0x13 (IOREDTBL1)
@@ -76,6 +80,8 @@
 
 typedef struct
 {
+    uint32_t select_register;
+    uint32_t window_register;
     uint32_t id_register;
     uint32_t ver_register;
     uint32_t arb_register;
@@ -83,9 +89,15 @@ typedef struct
     LAPIC *lapic[8];
 } IOAPIC;
 
-IOAPIC *create_ioapic();
+extern IOAPIC *ioapic;
 
-void add_lapic(IOAPIC *ioapic, uint8_t index, LAPIC *lapic);
-void ioapic_int_to_lapic(IOAPIC *ioapic, uint8_t irq);
+void init_ioapic();
 
+void add_lapic(uint8_t index, LAPIC *lapic);
+void ioapic_int_to_lapic(uint8_t irq);
+
+void ioapic_write_reg(uint32_t addr, uint32_t val);
+uint32_t ioapic_read_reg(uint32_t addr);
+
+void dump_ioapic();
 #endif

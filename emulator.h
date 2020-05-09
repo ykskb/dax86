@@ -149,8 +149,8 @@ struct Emulator
 
 struct LAPIC
 {
-    Emulator *emu;
     uint32_t registers[APIC_REGISTERS_SIZE];
+    Emulator *emu;
 
     /* convenience properties */
     uint8_t unit_enabled;

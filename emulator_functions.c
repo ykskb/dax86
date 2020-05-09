@@ -229,13 +229,14 @@ void set_memory32(Emulator *emu, int seg_index, uint32_t address, uint32_t value
 {
     uint32_t p_address = get_physical_address(emu, seg_index, address, 1);
     /* mmio */
-    if (p_address > LAPIC_DEFAULT_BASE)
+    if (p_address >= LAPIC_DEFAULT_BASE)
     {
         lapic_write_reg(emu->lapic, p_address, value);
         return;
     }
-    if (p_address > IOAPIC_DEFAULT_BASE)
+    if (p_address >= IOAPIC_DEFAULT_BASE)
     {
+        ioapic_write_reg(p_address, value);
         return;
     }
     _set_memory32(emu, p_address, value);
@@ -257,13 +258,13 @@ uint32_t get_memory32(Emulator *emu, int seg_index, uint32_t address)
 {
     uint32_t p_address = get_physical_address(emu, seg_index, address, 0);
     /* mmio */
-    if (p_address > LAPIC_DEFAULT_BASE)
+    if (p_address >= LAPIC_DEFAULT_BASE)
     {
         return lapic_read_reg(emu->lapic, p_address);
     }
-    if (p_address > IOAPIC_DEFAULT_BASE)
+    if (p_address >= IOAPIC_DEFAULT_BASE)
     {
-        return 0;
+        return ioapic_read_reg(p_address);
     }
     return _get_memory32(emu, p_address);
 }

@@ -20,24 +20,25 @@ LAPIC *create_lapic(Emulator *emu)
 
 void lapic_send_intr(LAPIC *lapic)
 {
-    if (lapic->emu->int_enabled && lapic->registers[EOI] == 0)
+    if (!lapic->int_enabled || !lapic->unit_enabled || !lapic->emu->int_enabled || lapic->registers[EOI] != 0)
     {
-        pthread_mutex_lock(&lapic->lock);
-        uint8_t i;
-        for (i = 0; i < 255; i++)
-        {
-            if (lapic->irr[i] > 0)
-            {
-                lapic->isr[i] = lapic->irr[i];
-                lapic->isr_index = i;
-                lapic->emu->int_r = lapic->irr[i];
-                lapic->registers[EOI] = 1;
-                lapic->irr[i] = 0;
-                break;
-            }
-        }
-        pthread_mutex_unlock(&lapic->lock);
+        return;
     }
+    pthread_mutex_lock(&lapic->lock);
+    uint8_t i;
+    for (i = 0; i < 255; i++)
+    {
+        if (lapic->irr[i] > 0)
+        {
+            lapic->isr[i] = lapic->irr[i];
+            lapic->isr_index = i;
+            lapic->emu->int_r = lapic->irr[i];
+            lapic->registers[EOI] = 1;
+            lapic->irr[i] = 0;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&lapic->lock);
 }
 
 static void lapic_eoi(LAPIC *lapic)
@@ -112,21 +113,18 @@ void lapic_write_reg(LAPIC *lapic, uint32_t addr, uint32_t val)
         }
         return;
     }
-    if (offset == TICR)
+    else if (offset == TICR)
     {
         pthread_create(lapic->timer_thread, NULL, timer_loop, (void *)lapic);
-        return;
     }
-    if (offset == TPR)
+    else if (offset == TPR)
     {
         check_int_enabled(lapic);
-        return;
     }
-    if (offset == EOI && val == 0)
+    else if (offset == EOI && val == 0)
     {
         check_int_enabled(lapic);
         lapic_eoi(lapic);
-        return;
     }
 }
 
@@ -134,4 +132,12 @@ uint32_t lapic_read_reg(LAPIC *lapic, uint32_t addr)
 {
     uint8_t index = (addr - LAPIC_DEFAULT_BASE) >> 4;
     return lapic->registers[index];
+}
+
+void dump_lapic(LAPIC *lapic)
+{
+    printf("<LAPIC at %p>\n", (void *)lapic);
+    printf("TPR: %08x EOI: %08x SVR: %08x\n", lapic->registers[TPR >> 4], lapic->registers[EOI >> 4], lapic->registers[SVR >> 4]);
+    printf("TIMER: %08x TICR: %08x\n", lapic->registers[TIMER >> 4], lapic->registers[TICR >> 4]);
+    printf("LINT0: %08x LINT1: %08x\n", lapic->registers[LINT0 >> 4], lapic->registers[LINT1 >> 4]);
 }

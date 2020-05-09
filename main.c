@@ -28,6 +28,8 @@ int remove_arg_at(int argc, char *argv[], int index)
     }
 }
 
+IOAPIC *ioapic;
+
 int main(int argc, char *argv[])
 {
     FILE *binary; // FILE: pointer to stream
@@ -73,8 +75,9 @@ int main(int argc, char *argv[])
     fclose(binary);
 
     attach_disk(emu, disk);
-    IOAPIC *ioapic = create_ioapic();
-    add_lapic(ioapic, 0, emu->lapic);
+
+    init_ioapic();
+    add_lapic(0, emu->lapic);
 
     load_boot_sector(emu);
 
@@ -117,6 +120,8 @@ int main(int argc, char *argv[])
         dump_registers(emu);
         dump_eflags(emu);
         dump_memory(emu);
+        dump_lapic(emu->lapic);
+        dump_ioapic();
     }
     destroy_emu(emu);
     return 0;

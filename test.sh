@@ -1,30 +1,50 @@
 # Execution Tests with Binary Files
 
+function echo_ndisasm() {
+  echo "ndisasm -b 32 $1"
+  echo
+  ndisasm -b 32 $1
+  echo
+}
+
+function echo_output() {
+  echo "./dax86 $1"
+  echo
+  echo "$2"
+  echo
+}
+
 function run_test() {
   test_dir="./tests/exec/$1"
   test_path="$test_dir/$1.bin"
   expected_path="$test_dir/expected.txt"
-  
+  verbose=false
+
+  if [ "$2" == "-v" ]; then
+    verbose=true
+  fi
+  # start of test
   echo "------------------------------------------------"
   echo "Building test binary $1..."
-  echo
-  make -C $test_dir
-  echo
+  if [ "$verbose" = true ]; then
+    echo
+    make -C $test_dir
+    echo
+  fi
   echo "Running test with $1..."
-  echo
-  echo "ndisasm -b 32 $test_path"
-  echo
-  ndisasm -b 32 $test_path
-  echo
-  echo "./dax86 $test_path"
-  echo
   output=$(./dax86 $test_path)
-  echo "$output"
-  echo
   if [[ $output == *"End of program :)"* ]]; then
     echo "[Run: SUCCESS]"
+    if [ "$verbose" = true ]; then
+      echo
+      echo_ndisasm "$test_path"
+      echo_output "$test_path" "$output"
+    fi
   else
     echo "[Run: FAILURE]"
+    echo
+    echo_ndisasm "$test_path"
+    echo_output "$test_path" "$output"
     exit 1
   fi
   if [ -f "${expected_path}" ]
@@ -33,13 +53,19 @@ function run_test() {
     line_num=0
     while IFS= read -r line; do
       if [[ $output == *"$line"* ]]; then
-        echo "Line ${line_num}: Pass"
+        if [ "$verbose" = true ]; then
+          echo "Line ${line_num}: Pass"
+        fi
       else
         echo "Line ${line_num}: Fail"
+        echo
+        echo_ndisasm "$test_path"
+        echo_output "$test_path" "$output"
         exit 1
       fi
       line_num=$((line_num+1))
     done < "${expected_path}"
+    echo "All check passed."
   else
     echo "expected.txt Not Found"
   fi
@@ -92,7 +118,8 @@ function test_all() {
   "paging"\
   "disk"\
   "movzx"\
-  "lapic"
+  "lapic"\
+  "ioapic"
   do
     run_test $i
   done
@@ -102,7 +129,7 @@ function main() {
   if [ -z "$1" ]; then
     test_all
   else
-    run_test $1
+    run_test $1 "-v"
   fi
 }
 
