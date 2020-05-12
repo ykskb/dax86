@@ -39,6 +39,18 @@ DEFINE_JX(o, is_overflow)
 #undef DEFINE_JX
 
 /*
+ * ja (77)
+ * Jumps if above (CF=0 and ZF=0)
+ * 1 byte: op code
+ * 1 byte: offset to jump
+ */
+void ja(Emulator *emu)
+{
+    int diff = (!is_zero(emu) && !is_carry(emu)) ? get_sign_code8(emu, 1) : 0;
+    emu->eip += (diff + 2);
+}
+
+/*
  * jl (7C) and jle (7E)
  * Assuming there's no overflow, which means overflow_flag == 0,
  * if sign_flag is 0, left is bigger. Ex:

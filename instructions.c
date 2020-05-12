@@ -136,6 +136,10 @@ static void init_two_byte_instructions(void)
     two_byte_instructions[0x22] = mov_cr_r32;
     two_byte_instructions[0xB6] = movzx_r32_rm8;
     two_byte_instructions[0xB7] = movzx_r32_rm16;
+    two_byte_instructions[0x82] = jc32;
+    two_byte_instructions[0x83] = jnc32;
+    two_byte_instructions[0x84] = jz32;
+    two_byte_instructions[0x85] = jnz32;
 }
 
 void init_instructions(void)
@@ -255,6 +259,7 @@ void init_instructions(void)
     instructions[0x73] = jnc;
     instructions[0x74] = jz;
     instructions[0x75] = jnz;
+    instructions[0x77] = ja;
     instructions[0x78] = js;
     instructions[0x79] = jns;
     instructions[0x7C] = jl;

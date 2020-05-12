@@ -94,6 +94,7 @@ void jc(Emulator *emu);
 void jnc(Emulator *emu);
 void jz(Emulator *emu);
 void jnz(Emulator *emu);
+void ja(Emulator *emu);
 void js(Emulator *emu);
 void jns(Emulator *emu);
 void jl(Emulator *emu);
@@ -203,8 +204,13 @@ void code_0f_01(Emulator *emu);
 void mov_r32_cr(Emulator *emu);
 void mov_cr_r32(Emulator *emu);
 
+/* 0x0F80 */
+void jc32(Emulator *emu);
+void jnc32(Emulator *emu);
+void jz32(Emulator *emu);
+void jnz32(Emulator *emu);
+
 /* 0x0FB0 */
 void movzx_r32_rm8(Emulator *emu);
 void movzx_r32_rm16(Emulator *emu);
-
 #endif
