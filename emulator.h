@@ -162,7 +162,7 @@ struct LAPIC
     pthread_t *timer_thread;
 };
 
-Emulator *create_emu(uint32_t eip, uint32_t esp);
+Emulator *create_emu(uint8_t *memory, uint32_t eip, uint32_t esp);
 void destroy_emu(Emulator *emu);
 
 void attach_disk(Emulator *emu, Disk *disk);

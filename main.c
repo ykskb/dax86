@@ -9,6 +9,7 @@
 #include "ioapic.h"
 #include "disk.h"
 #include "kbd.h"
+#include "mp.h"
 
 int remove_arg_at(int argc, char *argv[], int index)
 {
@@ -56,11 +57,17 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    /* Main memory */
+    uint8_t *memory = malloc(MEMORY_SIZE);
+
     /*
      * Initial setup: EIP: 0x7c00, ESP: 0x7c00
      * BIOS places instructions at 0x7c00.
      */
-    emu = create_emu(0x7c00, 0x7c00);
+    emu = create_emu(memory, 0x7c00, 0x7c00);
+
+    /* BIOS configures MP settings */
+    set_mp_config(emu);
 
     /* Binary file loading */
     binary = fopen(argv[1], "rb"); // rb: read-binary (r: translated mode for "\n")

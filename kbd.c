@@ -56,7 +56,7 @@ static void *kbd_loop()
         {
             kbd->buf_index += 1;
         }
-        ioapic_int_to_lapic(kbd->ioapic, T_IRQ0 + IRQ_KBD);
+        ioapic_int_to_lapic(T_IRQ0 + IRQ_KBD);
     }
     return NULL;
 }

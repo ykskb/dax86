@@ -77,10 +77,12 @@ function run_test() {
 # tests/mov_jmp/mov_jmp.bin
 #
 # Files below require input:
-#
-# tests/io/in.bin
-# tests/io/in_display.bin
-# tests/rep/rep.bin
+#   tests/io/in.bin
+#   tests/io/in_display.bin
+#   tests/rep/rep.bin
+# Binary is more than 512 bytes (1 sector):
+#   tests/mp/mp.bin
+
 function test_all() {
   for i in \
   "modrm"\

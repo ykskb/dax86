@@ -5,32 +5,48 @@
 #include "kbd.h"
 
 /* 
- * 0x60
  * PS/2 (keyboard) Controller
- * in/out: Data Register
- * 
- * 0x64
- * PS/2 (keyboard) Controller
- * in: Status Register
- * out: Command Register
- * 
- * 0x3f8
- * Serial COM1 port: Convenience Implementation
- * Actual IO checks 0x03fd (status port) and read 
- * from 0x3f8 (data port) if data is there.
- * Also while loop below clears buffer if needed.
- * while ((ch = getchar()) != '\n' && ch != EOF) continue;
+ * 0x60: in|out: Data Register
+ * 0x64: in: Status Register | out: Command Register
  */
+#define PS2DATA 0x60
+#define PS2STACMD 0x64
+
+/* 
+ * Serial (COM1)
+ * 0x3f8: in|out: Data port
+ * 0x3fd: in: Status port
+ */
+#define SERIALSTA 0x3fd
+#define SERIALDATA 0x3f8
+
+/*
+ * Disk
+ * 0x1F0: Data Register
+ * 0x1F2: in|out: Sector Count Register
+ * 0x1F3: in|out: LBA Low
+ * 0x1F4: in|out: LBA Mid
+ * 0x1F5: in|out: LBA High
+ * 0x1F6: in|out: Drive/Head Register
+ * 0x1F7: in: Status Register | out: Command Register
+ */
+#define DISKDATA 0x1f0
+#define DISKSECCOUNT 0x1f2
+#define DISKLBALOW 0x1f3
+#define DISKLBAMID 0x1f4
+#define DISKLBAHIGH 0x1f5
+#define DISKDRVHEAD 0x1f6
+#define DISKSTACMD 0x1f7
 
 uint8_t io_in8(Emulator *emu, uint16_t address)
 {
     switch (address)
     {
-    case 0x64:
+    case PS2STACMD:
         return get_kbd_status();
-    case 0x1f7:
+    case DISKSTACMD:
         return get_disk_status(emu->disk);
-    case 0x3f8:
+    case SERIALDATA:
         return getchar();
     default:
         printf("IN8 on port %x not implemented.\n", address);
@@ -44,7 +60,7 @@ uint32_t io_in32(Emulator *emu, uint16_t address)
     {
     case 0x1F0:
         return read_disk_data32(emu->disk);
-    case 0x3f8:
+    case SERIALDATA:
         return getchar();
     default:
         printf("IN32 on port %x not implemented.\n", address);
@@ -56,31 +72,31 @@ void io_out8(Emulator *emu, uint16_t address, uint8_t value)
 {
     switch (address)
     {
-    case 0x60:
+    case PS2DATA:
         write_ps2_config_byte(value);
         break;
-    case 0x64:
+    case PS2STACMD:
         write_ps2_output_port(value);
         break;
-    case 0x1f2:
+    case DISKSECCOUNT:
         set_sec_count(emu->disk, value);
         break;
-    case 0x1f3:
+    case DISKLBALOW:
         set_lba_low(emu->disk, value);
         break;
-    case 0x1f4:
+    case DISKLBAMID:
         set_lba_mid(emu->disk, value);
         break;
-    case 0x1f5:
+    case DISKLBAHIGH:
         set_lba_high(emu->disk, value);
         break;
-    case 0x1f6:
+    case DISKDRVHEAD:
         set_drive_head(emu->disk, value);
         break;
-    case 0x1f7:
+    case DISKSTACMD:
         set_disk_command(emu->disk, value);
         break;
-    case 0x3f8:
+    case SERIALDATA:
         putchar(value);
         break;
     default:
@@ -93,7 +109,7 @@ void io_out32(Emulator *emu, uint16_t address, uint32_t value)
 {
     switch (address)
     {
-    case 0x3f8:
+    case SERIALDATA:
         putchar(value);
         break;
     default:

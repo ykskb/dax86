@@ -15,6 +15,7 @@ OBJS = \
 	interrupt.o\
 	kbd.o\
 	disk.o\
+	mp.o\
 	instructions_00.o\
 	instructions_10.o\
 	instructions_20.o\
@@ -33,6 +34,7 @@ OBJS = \
 	instructions_F0.o\
 	instructions_0F00.o\
 	instructions_0F20.o\
+	instructions_0F80.o\
 	instructions_0FB0.o
 
 CC = /usr/bin/gcc

@@ -18,7 +18,7 @@
         (byte & 0x02 ? '1' : '0'), \
         (byte & 0x01 ? '1' : '0')
 
-Emulator *create_emu(uint32_t eip, uint32_t esp)
+Emulator *create_emu(uint8_t *memory, uint32_t eip, uint32_t esp)
 {
     Emulator *emu = malloc(sizeof(Emulator));
 
@@ -32,7 +32,7 @@ Emulator *create_emu(uint32_t eip, uint32_t esp)
 
     /* Devices */
     emu->lapic = create_lapic(emu);
-    emu->memory = malloc(MEMORY_SIZE);
+    emu->memory = memory;
     emu->disk = NULL;
 
     /* Utility */
@@ -91,20 +91,18 @@ void dump_registers(Emulator *emu)
     printf("GDTR: %04x %08x\n", emu->gdtr.limit, emu->gdtr.base);
 }
 
-/*
-void dump_input(Emulator *emu)
-{
-    printf("Input:\n");
-    int i;
-    for (i = 0; i < MEMORY_SIZE; i++)
-    {
-        if (emu->memory[i])
-        {
-            printf("%08x\n", emu->memory[i]);
-        }
-    }
-}
-*/
+// void dump_input(Emulator *emu)
+// {
+//     printf("Input:\n");
+//     int i;
+//     for (i = 0; i < MEMORY_SIZE; i++)
+//     {
+//         if (emu->memory[i])
+//         {
+//             printf("%08x\n", emu->memory[i]);
+//         }
+//     }
+// }
 
 void dump_memory(Emulator *emu)
 {
