@@ -39,6 +39,9 @@ static void operand_override(Emulator *emu)
         case 0x89:
             mov_rm16_r16(emu);
             break;
+        case 0xB8:
+            mov_r16_imm16(emu);
+            break;
         default:
             printf("Op: 66 %x not implemented.\n", op);
             exit(1);
@@ -49,6 +52,9 @@ static void operand_override(Emulator *emu)
     {
         switch (op)
         {
+        case 0x83:
+            code_83(emu);
+            break;
         case 0x89:
             mov_rm32_r32(emu);
             break;
@@ -259,6 +265,7 @@ void init_instructions(void)
     instructions[0x73] = jnc;
     instructions[0x74] = jz;
     instructions[0x75] = jnz;
+    instructions[0x76] = jna;
     instructions[0x77] = ja;
     instructions[0x78] = js;
     instructions[0x79] = jns;
@@ -340,6 +347,8 @@ void init_instructions(void)
     instructions[0xE3] = jecxz;
     instructions[0xE4] = in_al_imm8;
     instructions[0xE5] = in_eax_imm8;
+    instructions[0xE6] = out_imm8_al;
+    instructions[0xE7] = out_imm8_eax;
     instructions[0xE8] = call_rel32;
     instructions[0xE9] = near_jump;
     instructions[0xEA] = ptr_jump;

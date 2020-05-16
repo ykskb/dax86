@@ -94,6 +94,7 @@ void jc(Emulator *emu);
 void jnc(Emulator *emu);
 void jz(Emulator *emu);
 void jnz(Emulator *emu);
+void jna(Emulator *emu);
 void ja(Emulator *emu);
 void js(Emulator *emu);
 void jns(Emulator *emu);
@@ -149,6 +150,7 @@ void scasd(Emulator *emu);
 /* 0xB0 */
 void mov_r8_imm8(Emulator *emu);
 void mov_r32_imm32(Emulator *emu);
+void mov_r16_imm16(Emulator *emu);
 
 /* 0xC0 */
 void code_c0(Emulator *emu);
@@ -175,6 +177,8 @@ void loop(Emulator *emu);
 void jecxz(Emulator *emu);
 void in_al_imm8(Emulator *emu);
 void in_eax_imm8(Emulator *emu);
+void out_imm8_al(Emulator *emu);
+void out_imm8_eax(Emulator *emu);
 void call_rel32(Emulator *emu);
 void near_jump(Emulator *emu);
 void ptr_jump(Emulator *emu);

@@ -39,6 +39,18 @@ DEFINE_JX(o, is_overflow)
 #undef DEFINE_JX
 
 /*
+ * jna (76)
+ * Jumps if above (CF=1 or ZF=1)
+ * 1 byte: op code
+ * 1 byte: offset to jump
+ */
+void jna(Emulator *emu)
+{
+    int diff = (is_zero(emu) || is_carry(emu)) ? get_sign_code8(emu, 1) : 0;
+    emu->eip += (diff + 2);
+}
+
+/*
  * ja (77)
  * Jumps if above (CF=0 and ZF=0)
  * 1 byte: op code

@@ -35,3 +35,17 @@ void mov_r32_imm32(Emulator *emu)
     set_register32(emu, reg, value);
     emu->eip += 5;
 }
+
+/*
+ * mov r16 imm16: 3 bytes
+ * Copies imm value to register specified in op code (r32: 32 bit register).
+ * 1 byte: op (B8) + reg index (3bits)
+ * 2 bytes: value (16 bit unsigned)
+ */
+void mov_r16_imm16(Emulator *emu)
+{
+    uint8_t reg = get_code8(emu, 0) - 0xB8;
+    uint32_t value = get_code32(emu, 1);
+    set_register16(emu, reg, value);
+    emu->eip += 3;
+}
