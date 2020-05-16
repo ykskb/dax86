@@ -6,8 +6,8 @@
 
 #include "disk.h"
 
-/* Memory size: 1MB */
-#define MEMORY_SIZE (1024 * 1024)
+/* Memory size: 10MB */
+#define MEMORY_SIZE (1024 * 1024 * 10)
 
 #define APIC_REGISTERS_SIZE 64
 
@@ -169,7 +169,7 @@ void attach_disk(Emulator *emu, Disk *disk);
 void load_boot_sector(Emulator *emu);
 
 void dump_registers(Emulator *emu);
-void dump_memory(Emulator *emu);
+void dump_memory(Emulator *emu, int from, int len);
 void dump_eflags(Emulator *emu);
 /*
 void dump_input(Emulator *emu);

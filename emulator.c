@@ -104,12 +104,11 @@ void dump_registers(Emulator *emu)
 //     }
 // }
 
-void dump_memory(Emulator *emu)
+void dump_memory(Emulator *emu, int from, int len)
 {
-    int i = 0x7b00;
     int i_per_line = 32;
-    int display_length = 1024;
-    int end_i = i + display_length;
+    int i = from;
+    int end_i = i + len;
     int j;
     printf("memory %X to %X:\n", i, end_i);
     printf("          ");

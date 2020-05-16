@@ -10,6 +10,7 @@
 #include "disk.h"
 #include "kbd.h"
 #include "mp.h"
+#include "kbd.h"
 
 int remove_arg_at(int argc, char *argv[], int index)
 {
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
 
     load_boot_sector(emu);
 
-    /* init_kbd(ioapic); */
+    init_kbd(ioapic);
 
     /* dump_input(emu); */
 
@@ -126,7 +127,7 @@ int main(int argc, char *argv[])
     {
         dump_registers(emu);
         dump_eflags(emu);
-        dump_memory(emu);
+        dump_memory(emu, 0x7b00, 1024);
         dump_lapic(emu->lapic);
         dump_ioapic();
     }
