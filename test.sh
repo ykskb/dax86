@@ -26,9 +26,10 @@ function run_test() {
   # start of test
   echo "------------------------------------------------"
   echo "Building test binary $1..."
+  build_output=$(make -C $test_dir)
   if [ "$verbose" = true ]; then
     echo
-    make -C $test_dir
+    echo "$build_output"
     echo
   fi
   echo "Running test with $1..."
@@ -110,7 +111,9 @@ function test_all() {
   "code_c0"\
   "loop"\
   "jmp_far"\
+  "jmp_far16"\
   "call_far"\
+  "call_far16"\
   "moffs"\
   "str_8"\
   "str_32"\

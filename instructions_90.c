@@ -55,13 +55,9 @@ void cdq(Emulator *emu)
     uint32_t eax = get_register32(emu, EAX);
     uint8_t sign = eax >> 31 & 1;
     if (sign == 1)
-    {
         set_register32(emu, EDX, 0xFFFFFFFF);
-    }
     else
-    {
         set_register32(emu, EDX, 0);
-    }
     emu->eip += 1;
 }
 
@@ -70,12 +66,15 @@ void cdq(Emulator *emu)
  * Pushes CS and EIP in order and jumps to ptr16:32.
  * 1 byte: op (9A)
  * 2 byte: cs value
- * 4 byte: eip
+ * 2|4 byte: eip (ptr16|32)
  */
 void ptr_call(Emulator *emu)
 {
     push_segment_register(emu, CS);
-    push32(emu, emu->eip + 7);
+    if (emu->is_pe)
+        push32(emu, emu->eip + 7);
+    else
+        push32(emu, emu->eip + 5);
     ptr_jump(emu);
 }
 

@@ -207,8 +207,18 @@ void near_jump(Emulator *emu)
  */
 void ptr_jump(Emulator *emu)
 {
-    uint32_t eip_val = get_code32(emu, 1);
-    uint16_t cs_val = get_code16(emu, 5);
+    uint32_t eip_val;
+    uint16_t cs_val;
+    if (emu->is_pe)
+    {
+        eip_val = get_code32(emu, 1);
+        cs_val = get_code16(emu, 5);
+    }
+    else
+    {
+        eip_val = (uint32_t)get_code16(emu, 1);
+        cs_val = get_code16(emu, 3);
+    }
     set_seg_register16(emu, CS, cs_val);
     emu->eip = eip_val;
     check_protected_mode_entry(emu);

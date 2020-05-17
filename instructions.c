@@ -50,8 +50,16 @@ static void operand_override(Emulator *emu)
     }
     else
     {
+        if (op >= 0xB8 && op <= 0xBF)
+        {
+            mov_r32_imm32(emu);
+            return;
+        }
         switch (op)
         {
+        case 0x01:
+            add_rm32_r32(emu);
+            break;
         case 0x83:
             code_83(emu);
             break;

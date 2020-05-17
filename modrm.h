@@ -25,6 +25,7 @@ typedef struct
     SIB sib;    // 1 byte
     union {
         int8_t disp8;
+        int16_t disp16;
         uint32_t disp32;
     };
 } ModRM;

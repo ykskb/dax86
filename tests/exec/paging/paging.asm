@@ -1,4 +1,4 @@
-BITS 32
+BITS 16
     org 0x7c00
 
 load_gdt:
@@ -11,6 +11,7 @@ load_gdt:
 
     jmp 8:pe_enter ; GDT index: 1 << 3 = 1000b
 
+BITS 32
 pe_enter:
     ; Turn on page size extension for 4Mbyte pages
     mov    eax, cr4
@@ -78,15 +79,16 @@ PDE1:
 
 PDE2:
     ; Pointing to PGT
-    dw 0x300F
+    ; 0x07C7 300F
+    dw 0x000F
     dw 0x7C7
 
 ; 0x7C73
 PGT:
-    ; 31_____________________________12_11_____9_______________________________________0
-    ; | Page table 4kb-aligned address | Avail. | G* | 0 | D* | A | C* | W | U | R | P |
-    ; |________________________________________________________________________________|
-    dw 0x800F
-    dw 0x7C3 ; 7C38 + 2 = pg_enter (0x7c3A)
+    ; 31_____________________________12_11_____9____________________________________0
+    ; | Page table 4kb-aligned address | Avail. | G | 0 | D | A | C | W | U | R | P |
+    ; |_____________________________________________________________________________|
+    dw 0x500F
+    dw 0x7C3 ; 7C35 + 2 = pg_enter (0x7c37)
     ; on memory: 0f80 c307
     ; get_memory32 at 0x7c73: 07C3 800F

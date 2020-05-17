@@ -85,6 +85,17 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
 
     emu->eip += 1;
 
+    /* Real mode workaround for [disp16] */
+    if (!emu->is_pe)
+    {
+        if (modrm->mod == 0 && modrm->rm == 6)
+        {
+            modrm->disp16 = get_sign_code16(emu, 0);
+            emu->eip += 2;
+            return;
+        }
+    }
+
     /*
      * SIB after ModR/M Byte
      * mod/RM:
@@ -148,6 +159,14 @@ uint32_t calc_cib_address(Emulator *emu, ModRM *modrm)
 
 uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
 {
+    /* Real mode workaround for [disp16] */
+    if (!emu->is_pe)
+    {
+        if (modrm->mod == 0 && modrm->rm == 6)
+        {
+            return modrm->disp16;
+        }
+    }
     /* Mod:0 [reg] */
     if (modrm->mod == 0)
     {

@@ -6,6 +6,7 @@
 
 #include "gdt.h"
 #include "emulator_functions.h"
+#include "emulator.h"
 
 /*
  * GDTR:
@@ -88,7 +89,7 @@ void check_protected_mode_entry(Emulator *emu)
     if (emu->is_pe)
         return;
     uint8_t cr0_pe = (emu->control_registers[CR0] & CR0_PE);
-    uint16_t gdt_index = emu->segment_registers[CS] >> 3;
+    uint16_t gdt_index = get_seg_register16(emu, CS) >> 3;
     uint16_t gdt_entry_count = (emu->gdtr.limit + 1) / 8;
     if (cr0_pe && gdt_index != 0 && gdt_entry_count > gdt_index)
         emu->is_pe = 1;
@@ -119,7 +120,7 @@ static void check_entry_access(uint8_t access_byte, uint8_t cpl, uint8_t write, 
         }
     }
     uint8_t dpl = (access_byte >> 5) & 3;
-    if (dpl < cpl)
+    if (dpl > cpl)
     {
         gdt_access_error("entry privilege not met");
     }
@@ -133,8 +134,13 @@ static uint32_t read_entry_base(uint32_t entry1, uint32_t entry2)
     return base_low | (base_mid << 16) | (base_high << 24);
 }
 
-static void check_entry_limit(uint32_t entry1, uint32_t entry2, uint32_t offset)
+static void check_entry_limit(Emulator *emu, uint32_t entry1, uint32_t entry2, uint32_t offset)
 {
+    /* If paging is on, limit is most likely set to max. */
+    if (emu->is_pg)
+    {
+        return;
+    }
     uint32_t limit_low = entry1 & 0xFFFF;
     uint32_t limit_high = (entry2 >> 16) & 0xF;
     uint32_t limit = limit_low | (limit_high << 16);
@@ -183,7 +189,7 @@ uint32_t get_linear_addr(Emulator *emu, uint16_t seg_val, uint32_t offset, uint8
         check_entry_access(access_byte, cpl, write, exec);
 
         uint32_t base = read_entry_base(entry1, entry2);
-        check_entry_limit(entry1, entry2, offset);
+        check_entry_limit(emu, entry1, entry2, offset);
 
         return base + offset;
     }

@@ -1,4 +1,4 @@
-BITS 32
+BITS 16
     org 0x7c00
 
 load_gdt:
@@ -15,6 +15,7 @@ load_gdt:
 
     jmp 8:pe_enter ; 1000b
 
+BITS 32
 pe_enter:
     mov dword eax, 0x10 ; 10000b
     mov ss, ax
