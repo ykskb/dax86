@@ -6,8 +6,8 @@
 
 #include "disk.h"
 
-/* Memory size: 10MB */
-#define MEMORY_SIZE (1024 * 1024 * 10)
+/* Memory size: 512MB */
+#define MEMORY_SIZE (1024 * 1024 * 512)
 
 #define APIC_REGISTERS_SIZE 64
 
