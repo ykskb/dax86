@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "emulator.h"
 #include "kbd.h"
+#include "instructions.h"
 
 /* 
  * PS/2 (keyboard) Controller
@@ -19,6 +20,7 @@
  */
 #define SERIALSTA 0x3fd
 #define SERIALDATA 0x3f8
+#define SERIALLINESTA 0x3fd
 
 /*
  * Disk
@@ -47,9 +49,13 @@ uint8_t io_in8(Emulator *emu, uint16_t address)
     case DISKSTACMD:
         return get_disk_status(emu->disk);
     case SERIALDATA:
-        return getchar();
+        return 0;
+        // return getchar();
+    case SERIALLINESTA:
+        return 0x20;
     default:
-        printf("IN8 on port %x not implemented.\n", address);
+        if (!quiet)
+            printf("IN8 on port %x not implemented.\n", address);
         return 0;
     }
 }
@@ -61,9 +67,11 @@ uint32_t io_in32(Emulator *emu, uint16_t address)
     case 0x1F0:
         return read_disk_data32(emu->disk);
     case SERIALDATA:
-        return getchar();
+        return 0;
+        // return getchar();
     default:
-        printf("IN32 on port %x not implemented.\n", address);
+        if (!quiet)
+            printf("IN32 on port %x not implemented.\n", address);
         return 0;
     }
 }
@@ -100,7 +108,8 @@ void io_out8(Emulator *emu, uint16_t address, uint8_t value)
         putchar(value);
         break;
     default:
-        printf("OUT8 on port %x not implemented.\n", address);
+        if (!quiet)
+            printf("OUT8 on port %x not implemented.\n", address);
         break;
     }
 }
@@ -113,7 +122,8 @@ void io_out32(Emulator *emu, uint16_t address, uint32_t value)
         putchar(value);
         break;
     default:
-        printf("OUT32 on port %x not implemented.\n", address);
+        if (!quiet)
+            printf("OUT32 on port %x not implemented.\n", address);
         break;
     }
 }
