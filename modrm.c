@@ -11,21 +11,6 @@
  * Mod R/M: 1 byte
  * | 0 1 | 0 0 0 | 1 0 1 |
  * | Mod |  REG  |  R/M  |
- * 
- * SIB: 1 byte after ModRM byte
- * |  1 0  |   1 1 0   |  1 0 1   |
- * | Scale | Index REG | Base REG |
- * | 00: 1 |           | 000: eax | 001 | 010 | 011 | 100 |    101     |   110   |   111   | 
- * | 01: 2 | 000: eax  |                                  |            |                   |
- * | 10: 4 | 001: ecx  |    [Base + (Index * Scale)]      | [(I * S)   | [Base + (I * S)]  |
- * | 11: 8 | 010: edx  |                                  |  + disp32] |                   |
- * |_______| 011: ebx  |__________________________________|____________|___________________|                
- *         | 100: esp  |_____________[base]_______________|__[disp32]__|_____[base]________|
- *         | 101: ebp  |                                  |            |                   |
- *         | 110: esi  |    [Base + (Index + Scale)]      | [(I * S)   | [Base + (I * S)]  |
- *         | 111: edi  |                                  |  + disp32] |                   |
- *         |___________|__________________________________|____________|___________________|
- * 
  * ________________________________________________________________________
  *                        |  REG  |EAX |ECX |EDX |EBX |ESP |EBP |ESI |EDI |
  *                        | SREG  | ES | CS | SS | DS | FS | GS |rsvd|rsvd|
@@ -42,10 +27,10 @@
  * |     | 111 | [edi]            | 07 | 0F | 17 | 1F | 27 | 2F | 37 | 3F |
  * | 01  | 000 | [eax] + disp8    | 40 | 48 | 50 | 58 | 60 | 68 | 70 | 78 |
  * |     | 001 | [ecx] + disp8    | 41 | 49 | 51 | 59 | 61 | 69 | 71 | 79 |
- * |     | 002 | [edx] + disp8    | 42 | 4A | 52 | 5A | 62 | 6A | 72 | 7A |
- * |     | 003 | [ebx] + disp8    | 43 | 4B | 53 | 5B | 63 | 6B | 73 | 7B |
- * |     | 004 | [-][-] + disp8   | 44 | 4B | 54 | 5C | 64 | 6C | 74 | 7C |
- * |     | 005 | [ebp] + disp8    | 45 | 4D | 55 | 5D | 65 | 6D | 75 | 7D | 
+ * |     | 010 | [edx] + disp8    | 42 | 4A | 52 | 5A | 62 | 6A | 72 | 7A |
+ * |     | 011 | [ebx] + disp8    | 43 | 4B | 53 | 5B | 63 | 6B | 73 | 7B |
+ * |     | 100 | [-][-] + disp8   | 44 | 4B | 54 | 5C | 64 | 6C | 74 | 7C |
+ * |     | 101 | [ebp] + disp8    | 45 | 4D | 55 | 5D | 65 | 6D | 75 | 7D | 
  * |                               ...                                    |
  * |     | 111 | [edi] + disp8    | 47 | 4F | 57 | 5F | 67 | 6F | 79 | 7F |
  * | 10  | 000 | [eax] + disp32   | 80 | 88 | 90 | 98 | A0 | A8 | B0 | B8 |
@@ -56,6 +41,8 @@
  * |     | 111 | edi              | C7 | CF | D7 | DF | E7 | EF | F7 | FF |
  * |______________________________________________________________________|
  * 
+ * SIB: 1 byte after ModRM byte: 2 bits: scale | 3 bits: index | 3 bits: base
+ *   
  * Examples:
  * op eax, [ebx]: 03 (EAX|[EBX])
  * op eax, [0x7c00]: 05 007C 0000 (EAX|disp32)
@@ -120,7 +107,7 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
      * 00/101: disp32
      * 10/[000 - 111]: [reg] + disp32
      */
-    if ((modrm->mod == 0 && modrm->rm == 5) || modrm->mod == 2 || modrm->sib.base == 5)
+    if ((modrm->mod == 0 && modrm->rm == 5) || (modrm->mod == 0 && modrm->sib.base == 5) || modrm->mod == 2)
     {
         modrm->disp32 = get_sign_code32(emu, 0);
         emu->eip += 4;
@@ -137,6 +124,44 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
     }
 }
 
+/*
+ * _Mod:00________________________________________________________________________________
+ * | Scale | Index REG | Base REG |                                                        |
+ * | 00: 1 |           | 000: eax | 001 | 010 | 011 | 100 |    101     |   110   |   111   | 
+ * | 01: 2 | 000: eax  |                                  |            |                   |
+ * | 10: 4 | 001: ecx  |    [Base + (Index * Scale)]      | [(I * S)   | [Base + (I * S)]  |
+ * | 11: 8 | 010: edx  |                                  |  + disp32] |                   |
+ * |_______| 011: ebx  |__________________________________|____________|___________________|                
+ *         | 100: esp  |_____________[base]_______________|__[disp32]__|_____[base]________|
+ *         | 101: ebp  |                                  |            |                   |
+ *         | 110: esi  |    [Base + (Index + Scale)]      | [(I * S)   | [Base + (I * S)]  |
+ *         | 111: edi  |                                  |  + disp32] |                   |
+ *         |___________|__________________________________|____________|___________________|
+ *  _Mod:01________________________________________________________________________________
+ * | Scale | Index REG | Base REG |                                                        |
+ * | 00: 1 |           | 000: eax | 001 | 010 | 011 | 100 |    101     |   110   |   111   | 
+ * | 01: 2 | 000: eax  |                                                                   |
+ * | 10: 4 | 001: ecx  |                [Base + (Index * Scale) + disp8]                   |
+ * | 11: 8 | 010: edx  |                                                                   |
+ * |_______| 011: ebx  |___________________________________________________________________|                
+ *         | 100: esp  |________________________[base + disp8]_____________________________|
+ *         | 101: ebp  |                                                                   | 
+ *         | 110: esi  |                [Base + (Index * Scale) + disp8]                   | 
+ *         | 111: edi  |                                                                   |
+ *         |___________|___________________________________________________________________|
+ *  _Mod:10________________________________________________________________________________
+ * | Scale | Index REG | Base REG |                                                        |
+ * | 00: 1 |           | 000: eax | 001 | 010 | 011 | 100 |    101     |   110   |   111   | 
+ * | 01: 2 | 000: eax  |                                                                   |
+ * | 10: 4 | 001: ecx  |                [Base + (Index * Scale) + disp32]                  |
+ * | 11: 8 | 010: edx  |                                                                   |
+ * |_______| 011: ebx  |___________________________________________________________________|                
+ *         | 100: esp  |________________________[base + disp32]____________________________|
+ *         | 101: ebp  |                                                                   | 
+ *         | 110: esi  |                [Base + (Index * Scale) + disp32]                  | 
+ *         | 111: edi  |                                                                   |
+ *         |___________|___________________________________________________________________|  
+ */
 uint32_t calc_cib_address(Emulator *emu, ModRM *modrm)
 {
     if (modrm->sib.index == 4 && modrm->sib.base == 5)
@@ -254,7 +279,7 @@ uint8_t get_rm8(Emulator *emu, ModRM *modrm)
     }
 }
 
-void set_rm16(Emulator *emu, ModRM *modrm, uint8_t value)
+void set_rm16(Emulator *emu, ModRM *modrm, uint16_t value)
 {
     /* Mod:11 is for registers directly. */
     if (modrm->mod == 3)
@@ -330,12 +355,12 @@ uint8_t get_r8(Emulator *emu, ModRM *modrm)
     return get_register8(emu, modrm->reg_index);
 }
 
-void set_r16(Emulator *emu, ModRM *modrm, uint8_t value)
+void set_r16(Emulator *emu, ModRM *modrm, uint16_t value)
 {
     set_register16(emu, modrm->reg_index, value);
 }
 
-uint8_t get_r16(Emulator *emu, ModRM *modrm)
+uint16_t get_r16(Emulator *emu, ModRM *modrm)
 {
     return get_register16(emu, modrm->reg_index);
 }
