@@ -525,6 +525,15 @@ void update_eflags_logical_ops_8bit(Emulator *emu, uint8_t result)
     set_overflow_flag(emu, 0);
 }
 
+void update_eflags_logical_ops_16bit(Emulator *emu, uint8_t result)
+{
+    int signr = (result >> 15) & 1;
+    set_carry_flag(emu, 0);
+    set_zero_flag(emu, result == 0);
+    set_sign_flag(emu, signr);
+    set_overflow_flag(emu, 0);
+}
+
 void set_gdtr(Emulator *emu, uint16_t limit, uint32_t base)
 {
     emu->gdtr.limit = limit;

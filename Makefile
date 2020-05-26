@@ -35,6 +35,7 @@ OBJS = \
 	instructions_0F00.o\
 	instructions_0F20.o\
 	instructions_0F80.o\
+	instructions_0F90.o\
 	instructions_0FB0.o
 
 CC = /usr/bin/gcc

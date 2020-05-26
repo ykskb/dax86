@@ -287,7 +287,7 @@ void out_dx_eax(Emulator *emu)
 {
     /* IO Port Address from DX */
     uint16_t address = get_register32(emu, EDX) & 0xffff;
-    uint32_t value = get_register8(emu, EAX);
+    uint32_t value = get_register32(emu, EAX);
     io_out32(emu, address, value);
     emu->eip += 1;
 }

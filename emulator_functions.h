@@ -100,6 +100,7 @@ void update_eflags_sub_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint1
 
 void update_eflags_logical_ops(Emulator *emu, uint32_t result);
 void update_eflags_logical_ops_8bit(Emulator *emu, uint8_t result);
+void update_eflags_logical_ops_16bit(Emulator *emu, uint8_t result);
 
 void update_eflags_mul(Emulator *emu, uint64_t upper_half_result);
 

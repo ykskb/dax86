@@ -578,6 +578,24 @@ void test_rm8_r8(Emulator *emu)
 }
 
 /*
+ * test rm16 r16: 2|3 bytes
+ * Performs logical AND of operands and updates flags. No result store.
+ * 1 byte: op (85)
+ * 1|2 byte: ModR/M
+ */
+void test_rm16_r16(Emulator *emu)
+{
+    emu->eip += 1;
+    ModRM modrm = create_modrm();
+    parse_modrm(emu, &modrm);
+    uint16_t rm16 = get_rm16(emu, &modrm);
+    uint16_t r16 = get_r16(emu, &modrm);
+
+    uint32_t result = rm16 & r16;
+    update_eflags_logical_ops_16bit(emu, result);
+}
+
+/*
  * test rm32 r32: 2|3 bytes
  * Performs logical AND of operands and updates flags. No result store.
  * 1 byte: op (85)

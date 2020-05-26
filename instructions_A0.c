@@ -52,6 +52,20 @@ void mov_moffs8_al(Emulator *emu)
 }
 
 /*
+ * mov moffs16 ax: 5 bytes
+ * Copies AX value to moffs. (16 bit)
+ * 1 byte: op (A3)
+ * 4 byte: moffs
+ */
+void mov_moffs16_ax(Emulator *emu)
+{
+    uint32_t offset = get_code32(emu, 1);
+    uint16_t ax_val = get_register32(emu, EAX);
+    set_memory16(emu, DS, offset, ax_val);
+    emu->eip += 5;
+}
+
+/*
  * mov moffs16/32 eax: 5 bytes
  * Copies AX/EAX value to moffs. (16/32 bit)
  * 1 byte: op (A3)

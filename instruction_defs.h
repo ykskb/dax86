@@ -100,12 +100,14 @@ void js(Emulator *emu);
 void jns(Emulator *emu);
 void jl(Emulator *emu);
 void jle(Emulator *emu);
+void jg(Emulator *emu);
 
 /* 0x80 */
 void code_80(Emulator *emu);
 void code_81(Emulator *emu);
 void code_83(Emulator *emu);
 void test_rm8_r8(Emulator *emu);
+void test_rm16_r16(Emulator *emu);
 void test_rm32_r32(Emulator *emu);
 void xchg_rm8_r8(Emulator *emu);
 void xchg_rm32_r32(Emulator *emu);
@@ -133,6 +135,7 @@ void lahf(Emulator *emu);
 void mov_al_moffs8(Emulator *emu);
 void mov_eax_moffs32(Emulator *emu);
 void mov_moffs8_al(Emulator *emu);
+void mov_moffs16_ax(Emulator *emu);
 void mov_moffs32_eax(Emulator *emu);
 void movsb(Emulator *emu);
 void movsd(Emulator *emu);
@@ -159,6 +162,7 @@ void ret(Emulator *emu);
 void les(Emulator *emu);
 void lds(Emulator *emu);
 void mov_rm8_imm8(Emulator *emu);
+void mov_rm16_imm16(Emulator *emu);
 void mov_rm32_imm32(Emulator *emu);
 void leave(Emulator *emu);
 void ret_far(Emulator *emu);
@@ -213,8 +217,16 @@ void jc32(Emulator *emu);
 void jnc32(Emulator *emu);
 void jz32(Emulator *emu);
 void jnz32(Emulator *emu);
+void jna32(Emulator *emu);
+void ja32(Emulator *emu);
+void jg32(Emulator *emu);
+
+/* 0x0F90 */
+void sete(Emulator *emu);
 
 /* 0x0FB0 */
 void movzx_r32_rm8(Emulator *emu);
 void movzx_r32_rm16(Emulator *emu);
+void movsx_r32_rm8(Emulator *emu);
+
 #endif

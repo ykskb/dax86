@@ -12,6 +12,7 @@
 
 instruction_func_t *two_byte_instructions[256];
 instruction_func_t *instructions[256];
+uint8_t quiet;
 
 /*
  * Executes 2-byte instruction: 1 byte
@@ -22,10 +23,19 @@ static void two_byte_inst(Emulator *emu)
     uint8_t op = get_code8(emu, 1);
     if (two_byte_instructions[op] == NULL)
     {
-        printf("Op: 0f %x not implemented.\n", op);
+        printf("EIP: %08x Op: 0f %x not implemented.\n", emu->eip, op);
         exit(1);
     }
     two_byte_instructions[op](emu);
+}
+
+static void lock_prefix(Emulator *emu)
+{
+    emu->eip += 1;
+    uint8_t op = get_code8(emu, 0);
+    if (!quiet)
+        printf("Ignoring lock prefix.\n");
+    instructions[op](emu);
 }
 
 static void operand_override(Emulator *emu)
@@ -36,14 +46,23 @@ static void operand_override(Emulator *emu)
     {
         switch (op)
         {
+        case 0x85:
+            test_rm16_r16(emu);
+            break;
         case 0x89:
             mov_rm16_r16(emu);
+            break;
+        case 0xA3:
+            mov_moffs16_ax(emu);
             break;
         case 0xB8:
             mov_r16_imm16(emu);
             break;
+        case 0xC7:
+            mov_rm16_imm16(emu);
+            break;
         default:
-            printf("Op: 66 %x not implemented.\n", op);
+            printf("EIP: %08x Op: 66 %x not implemented.\n", emu->eip, op);
             exit(1);
             break;
         }
@@ -57,6 +76,9 @@ static void operand_override(Emulator *emu)
         }
         switch (op)
         {
+        case 0x85:
+            test_rm32_r32(emu);
+            break;
         case 0x01:
             add_rm32_r32(emu);
             break;
@@ -67,7 +89,7 @@ static void operand_override(Emulator *emu)
             mov_rm32_r32(emu);
             break;
         default:
-            printf("Op: 66 %x not implemented.\n", op);
+            printf("EIP: %08x Op: 66 %x not implemented.\n", emu->eip, op);
             exit(1);
             break;
         }
@@ -107,7 +129,8 @@ static void rep(Emulator *emu)
     for (i = 0; i < ecx_value; i++)
     {
         emu->eip = op_eip;
-        printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
+        if (!quiet)
+            printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
         instructions[op](emu);
         if ((op == 0xA6 || op == 0xA7 || op == 0xAE || op == 0xAF) && !is_zero(emu))
         {
@@ -132,7 +155,8 @@ static void repne(Emulator *emu)
     for (i = 0; i < ecx_value; i++)
     {
         emu->eip = op_eip;
-        printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
+        if (!quiet)
+            printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
         instructions[op](emu);
         if ((op == 0xA6 || op == 0xA7 || op == 0xAE || op == 0xAF) && is_zero(emu))
         {
@@ -148,12 +172,17 @@ static void init_two_byte_instructions(void)
     two_byte_instructions[0x01] = code_0f_01;
     two_byte_instructions[0x20] = mov_r32_cr;
     two_byte_instructions[0x22] = mov_cr_r32;
-    two_byte_instructions[0xB6] = movzx_r32_rm8;
-    two_byte_instructions[0xB7] = movzx_r32_rm16;
     two_byte_instructions[0x82] = jc32;
     two_byte_instructions[0x83] = jnc32;
     two_byte_instructions[0x84] = jz32;
     two_byte_instructions[0x85] = jnz32;
+    two_byte_instructions[0x86] = jna32;
+    two_byte_instructions[0x87] = ja32;
+    two_byte_instructions[0x8F] = jg32;
+    two_byte_instructions[0x94] = sete;
+    two_byte_instructions[0xB6] = movzx_r32_rm8;
+    two_byte_instructions[0xB7] = movzx_r32_rm16;
+    two_byte_instructions[0xBE] = movsx_r32_rm8;
 }
 
 void init_instructions(void)
@@ -279,6 +308,7 @@ void init_instructions(void)
     instructions[0x79] = jns;
     instructions[0x7C] = jl;
     instructions[0x7E] = jle;
+    instructions[0x7F] = jg;
 
     instructions[0x80] = code_80;
     instructions[0x81] = code_81;
@@ -366,6 +396,7 @@ void init_instructions(void)
     instructions[0xEE] = out_dx_al;
     instructions[0xEF] = out_dx_eax;
 
+    instructions[0xF0] = lock_prefix;
     instructions[0xF2] = repne;
     instructions[0xF3] = rep;
     instructions[0xF5] = cmc;
