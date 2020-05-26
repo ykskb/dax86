@@ -56,7 +56,7 @@ uint32_t get_phys_addr(Emulator *emu, uint32_t linear_addr, uint8_t write, uint8
      */
     if ((cr4_pse != 0) && (pde_ps != 0))
     {
-        uint32_t phys_base = pde >> 12;
+        uint32_t phys_base = pde & 0xFFFFF000;
         uint32_t phys_offset = linear_addr & 0x3FFFFF;
         return phys_base + phys_offset;
     }
@@ -68,10 +68,10 @@ uint32_t get_phys_addr(Emulator *emu, uint32_t linear_addr, uint8_t write, uint8
      */
     else
     {
-        uint16_t pt_base = pde >> 12;
-        uint16_t pte_index = (linear_addr >> 12) & 0x3FF;
+        uint32_t pt_base = pde & 0xFFFFF000;
+        uint32_t pte_index = (linear_addr >> 12) & 0x3FF;
         uint32_t pte = _get_memory32(emu, pt_base + (pte_index * 4));
-        uint32_t phys_base = pte >> 12;
+        uint32_t phys_base = pte & 0xFFFFF000;
         uint32_t phys_offset = linear_addr & 0xFFF;
         return phys_base + phys_offset;
     }

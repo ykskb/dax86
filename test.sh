@@ -74,15 +74,16 @@ function run_test() {
 }
 
 # Files below do not run after 0x7c00 offset:
-#
-# tests/mov_jmp/mov_jmp.bin
+#   tests/mov_jmp/mov_jmp.bin
 #
 # Files below require input:
 #   tests/io/in.bin
 #   tests/io/in_display.bin
 #   tests/rep/rep.bin
+# 
 # Binary is more than 512 bytes (1 sector):
-#   tests/mp/mp.bin
+#   tests/mp/mp.bin (prints "c" "i" "m" "p"): requires 1024 bytes.
+#   tests/console/console.bin (prints "test123"): requires 2048 bytes.
 
 function test_all() {
   for i in \
@@ -120,7 +121,6 @@ function test_all() {
   "gdt"\
   "mul"\
   "div"\
-  "paging"\
   "disk"\
   "movzx"\
   "lapic"\

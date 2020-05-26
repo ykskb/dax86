@@ -194,11 +194,13 @@ int main(void)
             //     ncpu++;
             // }
             p += sizeof(struct mpproc);
+            outb(SERIALDATA, 'c');
             continue;
         case MPIOAPIC:
             ioapic = (struct mpioapic *)p;
             // ioapicid = ioapic->apicno;
             p += sizeof(struct mpioapic);
+            outb(SERIALDATA, 'i');
             continue;
         case MPBUS:
         case MPIOINTR:
