@@ -125,9 +125,9 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
 }
 
 /*
- * _Mod:00________________________________________________________________________________
+ *  _Mod:00________________________________________________________________________________
  * | Scale | Index REG | Base REG |                                                        |
- * | 00: 1 |           | 000: eax | 001 | 010 | 011 | 100 |    101     |   110   |   111   | 
+ * | 00: 1 |           | 000: eax | 001 | 010 | 011 | 100 |  101 (ebp) |   110   |   111   | 
  * | 01: 2 | 000: eax  |                                  |            |                   |
  * | 10: 4 | 001: ecx  |    [Base + (Index * Scale)]      | [(I * S)   | [Base + (I * S)]  |
  * | 11: 8 | 010: edx  |                                  |  + disp32] |                   |
@@ -164,22 +164,35 @@ void parse_modrm(Emulator *emu, ModRM *modrm)
  */
 uint32_t calc_cib_address(Emulator *emu, ModRM *modrm)
 {
-    if (modrm->sib.index == 4 && modrm->sib.base == 5)
-    {
-        return modrm->disp32;
-    }
     uint32_t base_val = get_register32(emu, modrm->sib.base);
-    if (modrm->sib.index == 4)
-    {
-        return base_val;
-    }
     uint32_t scale = pow(2, modrm->sib.scale);
     uint32_t index_val = get_register32(emu, modrm->sib.index);
-    if (modrm->sib.base == 5)
+    // printf("modrm sib mod %d index: %d base %d\n", modrm->mod, modrm->sib.index, modrm->sib.base);
+    if (modrm->mod == 0)
     {
-        return (index_val * scale) + modrm->disp32;
+        if (modrm->sib.index == 4 && modrm->sib.base == 5)
+            return modrm->disp32;
+        if (modrm->sib.index == 4)
+            return base_val;
+        if (modrm->sib.base == 5)
+            return (index_val * scale) + modrm->disp32;
+        return index_val * scale + base_val;
     }
-    return index_val * scale + base_val;
+    if (modrm->mod == 1)
+    {
+        if (modrm->sib.index == 4)
+            return base_val + modrm->disp8;
+        return base_val + (index_val * scale) + modrm->disp8;
+    }
+    if (modrm->mod == 2)
+    {
+        if (modrm->sib.index == 4)
+            return base_val + modrm->disp32;
+        return base_val + (index_val * scale) + modrm->disp32;
+    }
+
+    printf("Invalid Mod value for SIB");
+    exit(1);
 }
 
 uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
@@ -217,7 +230,7 @@ uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
         /* SIB (Mod: 01 R/M: 100) */
         if (modrm->rm == 4)
         {
-            return calc_cib_address(emu, modrm) + modrm->disp8;
+            return calc_cib_address(emu, modrm);
         }
         /* Mod: 1 R/M: 000 - 011, 101 - 111 uses [reg] + disp8 */
         else
@@ -231,7 +244,7 @@ uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
         /* SIB (MOD: 10 R/M: 100) */
         if (modrm->rm == 4)
         {
-            return calc_cib_address(emu, modrm) + modrm->disp32;
+            return calc_cib_address(emu, modrm);
         }
         /* Mod: 10 R/M: 000 - 011, 101 - 111 uses [reg] + disp32 */
         else
