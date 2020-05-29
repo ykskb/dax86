@@ -120,7 +120,7 @@ static void check_entry_access(uint8_t access_byte, uint8_t cpl, uint8_t write, 
         }
     }
     uint8_t dpl = (access_byte >> 5) & 3;
-    if (dpl > cpl)
+    if (dpl < cpl)
     {
         gdt_access_error("entry privilege not met");
     }

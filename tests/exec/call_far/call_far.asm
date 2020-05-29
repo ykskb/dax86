@@ -12,7 +12,7 @@ load_gdt:
 BITS 32
 pe_enter:
     ; Set data and stack segements.
-    mov eax, 0x11 ; 10001b
+    mov eax, 0x10 ; 10000b
     mov ds, eax
     mov ss, eax
 

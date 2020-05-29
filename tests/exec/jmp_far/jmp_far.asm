@@ -17,7 +17,7 @@ load_gdt:
 
 BITS 32
 pe_enter:
-    mov eax, 0x11 ; 10001b
+    mov eax, 0x10 ; 10000b
     mov ds, eax
     mov ss, eax
     jmp [NEAR_ADDR1]
