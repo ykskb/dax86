@@ -11,6 +11,7 @@
 #include "twos_complement.h"
 #include "gdt.h"
 #include "lapic.h"
+#include "util.h"
 
 /*
  * cmc: 1 byte
@@ -176,7 +177,7 @@ void code_f6(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: F6 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -336,7 +337,7 @@ void code_f7(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: F7 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -454,7 +455,7 @@ void code_fe(Emulator *emu)
 
     default:
         printf("Not implemented: Op: FE with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -589,6 +590,6 @@ void code_ff(Emulator *emu)
 
     default:
         printf("Not implemented: Op: FF with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
