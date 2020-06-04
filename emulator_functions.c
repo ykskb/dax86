@@ -86,7 +86,7 @@ uint32_t get_ctrl_register32(Emulator *emu, int reg_index)
 
 /* Physical Memory Operations */
 
-static uint32_t get_physical_address(Emulator *emu, int seg_index, uint32_t offset, uint8_t write)
+uint32_t get_physical_address(Emulator *emu, int seg_index, uint32_t offset, uint8_t write)
 {
     uint8_t exec = 0;
     if (seg_index == CS)
@@ -312,14 +312,30 @@ uint32_t pop32(Emulator *emu)
 
 void push_segment_register(Emulator *emu, int reg_index)
 {
-    uint16_t value = get_seg_register16(emu, reg_index);
-    push16(emu, value);
+    if (emu->is_pe)
+    {
+        uint16_t value = get_seg_register16(emu, reg_index);
+        push32(emu, (uint32_t)value);
+    }
+    else
+    {
+        uint16_t value = get_seg_register16(emu, reg_index);
+        push16(emu, value);
+    }
 }
 
 void pop_segment_register(Emulator *emu, int reg_index)
 {
-    uint16_t value = pop16(emu);
-    set_seg_register16(emu, reg_index, value);
+    if (emu->is_pe)
+    {
+        uint16_t value = (uint16_t)pop32(emu);
+        set_seg_register16(emu, reg_index, value);
+    }
+    else
+    {
+        uint16_t value = pop16(emu);
+        set_seg_register16(emu, reg_index, value);
+    }
 }
 
 /* Eflag Operations */
@@ -478,23 +494,6 @@ void update_eflags_sub(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t
     set_overflow_flag(emu, sign1 != sign2 && sign1 != signr);
 }
 
-/*
- * imul & mul both updates OF and CF when a significant bit gets into upper half.
- */
-void update_eflags_mul(Emulator *emu, uint64_t upper_half_result)
-{
-    if (upper_half_result == 0)
-    {
-        set_overflow_flag(emu, 0);
-        set_carry_flag(emu, 0);
-    }
-    else
-    {
-        set_overflow_flag(emu, 1);
-        set_carry_flag(emu, 1);
-    }
-}
-
 void update_eflags_sub_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint16_t result)
 {
     int sign1 = value1 >> 7;
@@ -502,6 +501,18 @@ void update_eflags_sub_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint1
     int signr = (result >> 7) & 1;
 
     set_carry_flag(emu, result >> 8); // higher 32 bits
+    set_zero_flag(emu, result == 0);
+    set_sign_flag(emu, signr);
+    set_overflow_flag(emu, sign1 != sign2 && sign1 != signr);
+}
+
+void update_eflags_sub_16bit(Emulator *emu, uint16_t value1, uint16_t value2, uint32_t result)
+{
+    int sign1 = value1 >> 15;
+    int sign2 = value2 >> 15;
+    int signr = (result >> 15) & 1;
+
+    set_carry_flag(emu, result >> 16); // higher 32 bits
     set_zero_flag(emu, result == 0);
     set_sign_flag(emu, signr);
     set_overflow_flag(emu, sign1 != sign2 && sign1 != signr);
@@ -534,8 +545,36 @@ void update_eflags_logical_ops_16bit(Emulator *emu, uint8_t result)
     set_overflow_flag(emu, 0);
 }
 
+/*
+ * imul & mul both updates OF and CF when a significant bit gets into upper half.
+ */
+void update_eflags_mul(Emulator *emu, uint64_t upper_half_result)
+{
+    if (upper_half_result == 0)
+    {
+        set_overflow_flag(emu, 0);
+        set_carry_flag(emu, 0);
+    }
+    else
+    {
+        set_overflow_flag(emu, 1);
+        set_carry_flag(emu, 1);
+    }
+}
+
+void set_tr(Emulator *emu, uint16_t val)
+{
+    emu->tr = val;
+}
+
 void set_gdtr(Emulator *emu, uint16_t limit, uint32_t base)
 {
     emu->gdtr.limit = limit;
     emu->gdtr.base = base;
+}
+
+void set_idtr(Emulator *emu, uint16_t limit, uint32_t base)
+{
+    emu->idtr.limit = limit;
+    emu->idtr.base = base;
 }
