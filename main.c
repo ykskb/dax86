@@ -13,6 +13,8 @@
 #include "kbd.h"
 #include "mp.h"
 #include "kbd.h"
+#include "interrupt.h"
+#include "util.h"
 
 int remove_arg_at(int argc, char *argv[], int index)
 {
@@ -35,49 +37,15 @@ int remove_arg_at(int argc, char *argv[], int index)
 IOAPIC *ioapic;
 Emulator *emu;
 
-#define DEBUG_SIZE 256
-
-int debug_i = 0;
-int debug_eips[DEBUG_SIZE];
-int debug_ops[DEBUG_SIZE];
-int debug_esp[DEBUG_SIZE];
-
-void debug_append(uint32_t eip, uint8_t op, uint32_t esp_val)
-{
-    debug_eips[debug_i] = eip;
-    debug_ops[debug_i] = op;
-    debug_esp[debug_i] = esp_val;
-    debug_i = (debug_i + 1) % DEBUG_SIZE;
-}
-
-void debug_print()
-{
-    printf("Last %d instructions:\n", DEBUG_SIZE);
-    int i;
-    for (i = debug_i; i < 256; i++)
-    {
-        printf("EIP: %x Op: %02x ESP: %x\n", debug_eips[i], debug_ops[i], debug_esp[i]);
-    }
-    for (i = 0; i < debug_i; i++)
-    {
-        printf("EIP: %x Op: %02x ESP: %x\n", debug_eips[i], debug_ops[i], debug_esp[i]);
-    }
-}
-
 void termination_handler(int signum)
 {
     if (signum == SIGSEGV)
     {
-        debug_print();
         printf("Segmentation fault at EIP: %08X.\n", emu->eip);
-        dump_registers(emu);
-        exit(1);
+        panic_exit(emu);
     }
-    debug_print();
-    dump_registers(emu);
-    dump_memory(emu, 0x7b00, 1024);
     // enable_canon_echo();
-    exit(0);
+    sig_exit(emu);
 }
 
 void set_signals()
@@ -179,33 +147,34 @@ int main(int argc, char *argv[])
 
         if (instructions[op] == NULL)
         {
-            debug_print();
             printf("EIP: %08X Op: %x not implemented.\n", emu->eip, op);
-            dump_registers(emu);
-            break;
+            panic_exit(emu);
         }
 
-        debug_append(emu->eip, op, emu->registers[ESP]);
+        debug_append(emu->segment_registers[CS], emu->eip, op, emu->segment_registers[SS], emu->registers[ESP]);
 
         instructions[op](emu);
+
+        if (emu->int_enabled == 1 && emu->int_r > 0)
+        {
+            handle_interrupt(emu, emu->int_r, 0);
+            emu->int_r = 0;
+        }
 
         // dump_registers(emu);
 
         if (emu->eip == 0x00)
         {
+            // panic_exit(emu);
             if (!quiet)
                 printf("End of program :)\n");
-            break;
+            // break;
         }
     }
 
     if (!quiet)
     {
-        dump_registers(emu);
-        dump_eflags(emu);
-        dump_memory(emu, 0x7b00, 1024);
-        dump_lapic(emu->lapic);
-        dump_ioapic();
+        print_emu(emu);
     }
     destroy_emu(emu);
     return 0;

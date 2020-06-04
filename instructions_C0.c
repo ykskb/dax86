@@ -9,6 +9,7 @@
 #include "modrm.h"
 #include "io.h"
 #include "shift.h"
+#include "interrupt.h"
 
 static uint8_t adjust_imm8_for_rm8(uint8_t val)
 {
@@ -359,5 +360,41 @@ void leave(Emulator *emu)
 void ret_far(Emulator *emu)
 {
     emu->eip = pop32(emu);
-    set_seg_register16(emu, CS, pop16(emu));
+    pop_segment_register(emu, CS);
+}
+
+/*
+ * int imm8: 2 bytes
+ * Software interrupt.
+ * 1 byte: op (CD)
+ * 1 byte: imm8
+ */
+void int_imm8(Emulator *emu)
+{
+    uint8_t int_num = get_code8(emu, 1);
+    handle_interrupt(emu, int_num, 1);
+    emu->eip += 2;
+}
+
+/*
+ * iret: 1 byte
+ * Returns from interrupt.
+ * 1 byte: op (CF)
+ */
+void iret(Emulator *emu)
+{
+    printf("iret\n");
+    uint8_t cpl = get_seg_register16(emu, CS) & 3;
+
+    emu->eip = pop32(emu);
+    pop_segment_register(emu, CS);
+    /* By right each flag such as IOPL should be checked if CPL is 0 or not. */
+    emu->eflags = pop32(emu);
+
+    if ((get_seg_register16(emu, CS) & 3) > cpl)
+    {
+        uint32_t esp_val = pop32(emu);
+        pop_segment_register(emu, SS);
+        set_register32(emu, ESP, esp_val);
+    }
 }
