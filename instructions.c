@@ -9,6 +9,7 @@
 #include "emulator_functions.h"
 #include "modrm.h"
 #include "io.h"
+#include "util.h"
 
 instruction_func_t *two_byte_instructions[256];
 instruction_func_t *instructions[256];
@@ -24,11 +25,14 @@ static void two_byte_inst(Emulator *emu)
     if (two_byte_instructions[op] == NULL)
     {
         printf("EIP: %08x Op: 0f %x not implemented.\n", emu->eip, op);
-        exit(1);
+        panic_exit(emu);
     }
     two_byte_instructions[op](emu);
 }
 
+/*
+ * Lock Prefix (F0)
+ */
 static void lock_prefix(Emulator *emu)
 {
     emu->eip += 1;
@@ -44,8 +48,16 @@ static void operand_override(Emulator *emu)
     uint8_t op = get_code8(emu, 0);
     if (emu->is_pe)
     {
+        if (op >= 0x90 && op <= 0x97)
+        {
+            xchg_r16_r16(emu);
+            return;
+        }
         switch (op)
         {
+        case 0x83:
+            code_83_rm16(emu);
+            break;
         case 0x85:
             test_rm16_r16(emu);
             break;
@@ -63,8 +75,7 @@ static void operand_override(Emulator *emu)
             break;
         default:
             printf("EIP: %08x Op: 66 %x not implemented.\n", emu->eip, op);
-            exit(1);
-            break;
+            panic_exit(emu);
         }
     }
     else
@@ -90,8 +101,7 @@ static void operand_override(Emulator *emu)
             break;
         default:
             printf("EIP: %08x Op: 66 %x not implemented.\n", emu->eip, op);
-            exit(1);
-            break;
+            panic_exit(emu);
         }
     }
 }
@@ -123,7 +133,7 @@ static void rep(Emulator *emu)
     if (instructions[op] == NULL)
     {
         printf("Op: f3 %x not implemented.\n", op);
-        exit(1);
+        panic_exit(emu);
     }
     int i;
     for (i = 0; i < ecx_value; i++)
@@ -149,7 +159,7 @@ static void repne(Emulator *emu)
     if (instructions[op] == NULL)
     {
         printf("Op: f2 %x not implemented.\n", op);
-        exit(1);
+        panic_exit(emu);
     }
     int i;
     for (i = 0; i < ecx_value; i++)
@@ -169,7 +179,12 @@ static void repne(Emulator *emu)
 static void init_two_byte_instructions(void)
 {
     memset(two_byte_instructions, 0, sizeof(two_byte_instructions));
+    two_byte_instructions[0x00] = code_0f_00;
     two_byte_instructions[0x01] = code_0f_01;
+    two_byte_instructions[0xA0] = push_fs;
+    two_byte_instructions[0xA1] = pop_fs;
+    two_byte_instructions[0xA8] = push_gs;
+    two_byte_instructions[0xA9] = pop_gs;
     two_byte_instructions[0x20] = mov_r32_cr;
     two_byte_instructions[0x22] = mov_cr_r32;
     two_byte_instructions[0x82] = jc32;
@@ -178,6 +193,9 @@ static void init_two_byte_instructions(void)
     two_byte_instructions[0x85] = jnz32;
     two_byte_instructions[0x86] = jna32;
     two_byte_instructions[0x87] = ja32;
+    two_byte_instructions[0x88] = js32;
+    two_byte_instructions[0x89] = jns32;
+    two_byte_instructions[0x8E] = jng32;
     two_byte_instructions[0x8F] = jg32;
     two_byte_instructions[0x94] = sete;
     two_byte_instructions[0xB6] = movzx_r32_rm8;
@@ -378,6 +396,8 @@ void init_instructions(void)
     instructions[0xC7] = mov_rm32_imm32;
     instructions[0xC9] = leave;
     instructions[0xCB] = ret_far;
+    instructions[0xCD] = int_imm8;
+    instructions[0xCF] = iret;
 
     instructions[0xE0] = loopnz;
     instructions[0xE1] = loopz;
