@@ -16,6 +16,7 @@ OBJS = \
 	kbd.o\
 	disk.o\
 	mp.o\
+	util.o\
 	instructions_00.o\
 	instructions_10.o\
 	instructions_20.o\
@@ -53,6 +54,9 @@ all :
 
 $(TARGET) : $(OBJS) Makefile
 	$(CC) -o $@ $(OBJS) -lm -lpthread
+
+clean:
+	rm -f *.o
 
 create-docker:
 	docker build -t dax86 .
