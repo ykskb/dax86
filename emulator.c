@@ -26,9 +26,14 @@ Emulator *create_emu(uint8_t *memory, uint32_t eip, uint32_t esp)
     memset(emu->registers, 0, sizeof(emu->registers));
     memset(emu->segment_registers, 0, sizeof(emu->segment_registers));
     memset(emu->control_registers, 0, sizeof(emu->control_registers));
+    emu->gdtr.base = 0;
+    emu->gdtr.limit = 0;
+    emu->idtr.base = 0;
+    emu->idtr.limit = 0;
     emu->eip = eip;
     emu->registers[ESP] = esp;
     emu->int_r = 0;
+    emu->eflags = 0;
 
     /* Devices */
     emu->lapic = create_lapic(emu);
@@ -38,7 +43,7 @@ Emulator *create_emu(uint8_t *memory, uint32_t eip, uint32_t esp)
     /* Utility */
     emu->is_pe = 0;
     emu->is_pg = 0;
-    emu->int_enabled = 1;
+    emu->int_enabled = 0;
     emu->exception = NO_ERR;
 
     return emu;
@@ -89,6 +94,8 @@ void dump_registers(Emulator *emu)
         printf("%s: %08x\n", ctr_register_names[i], emu->control_registers[i]);
     }
     printf("GDTR: %04x %08x\n", emu->gdtr.limit, emu->gdtr.base);
+    printf("IDTR: %04x %08x\n", emu->idtr.limit, emu->idtr.base);
+    printf("TR: %04x\n", emu->tr);
 }
 
 // void dump_input(Emulator *emu)

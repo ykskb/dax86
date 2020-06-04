@@ -78,6 +78,12 @@ typedef struct
     uint32_t base;
 } Gdtr;
 
+typedef struct
+{
+    uint16_t limit;
+    uint32_t base;
+} Idtr;
+
 enum Exception
 {
     NO_ERR,
@@ -135,6 +141,8 @@ struct Emulator
     uint32_t control_registers[CONTROL_REGISTER_COUNT];
     uint32_t eip;
     Gdtr gdtr;
+    Idtr idtr;
+    uint16_t tr;
     uint8_t int_r;
     /* Devices */
     struct LAPIC *lapic;
