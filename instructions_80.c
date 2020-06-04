@@ -559,6 +559,63 @@ void code_83(Emulator *emu)
 }
 
 /*
+ * cmp rm16 imm8: 3 bytes
+ * Compares rm16 value and imm8 value by subtracting in order.
+ * Op code 83 and ModR/M op code: 111 execute this.
+ * 1 byte: shared op (83)
+ * 1 byte: ModR/M
+ * 1 byte: imm8 to subtract
+ */
+static void cmp_rm16_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint16_t rm16 = get_rm16(emu, modrm);
+    uint16_t imm8 = (int16_t)get_sign_code8(emu, 0);
+    emu->eip += 1;
+
+    uint32_t result = (uint32_t)rm16 - (uint32_t)imm8;
+    update_eflags_sub_16bit(emu, rm16, imm8, result);
+}
+
+void code_83_rm16(Emulator *emu)
+{
+    /* Proceed 1 byte for op code 83. */
+    emu->eip += 1;
+    ModRM modrm = create_modrm();
+    parse_modrm(emu, &modrm);
+
+    switch (modrm.opcode)
+    {
+    // case 0:
+    //     add_rm16_imm8(emu, &modrm);
+    //     break;
+    // case 1:
+    //     or_rm16_imm8(emu, &modrm);
+    //     break;
+    // case 2:
+    //     adc_rm16_imm8(emu, &modrm);
+    //     break;
+    // case 3:
+    //     sbb_rm16_imm8(emu, &modrm);
+    //     break;
+    // case 4:
+    //     and_rm16_imm8(emu, &modrm);
+    //     break;
+    // case 5:
+    //     sub_rm16_imm8(emu, &modrm);
+    //     break;
+    // case 6:
+    //     xor_rm16_imm8(emu, &modrm);
+    //     break;
+    case 7:
+        cmp_rm16_imm8(emu, &modrm);
+        break;
+    default:
+        printf("Not implemented: Op: 83 with ModR/M Op: %d\n", modrm.opcode);
+        exit(1);
+    }
+}
+
+/*
  * test rm8 r8: 2|3 bytes
  * Performs logical AND of operands and updates flags. No result store.
  * 1 byte: op (84)

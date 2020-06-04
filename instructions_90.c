@@ -24,6 +24,20 @@ void xchg_r32_r32(Emulator *emu)
 }
 
 /*
+ * xchg r16 r16: 1 byte
+ * Exchanges values of AX and r16.
+ * 1 byte: op (90 ~ 97)
+ */
+void xchg_r16_r16(Emulator *emu)
+{
+    uint8_t reg = get_code8(emu, 0) - 0x90;
+    uint16_t original_val = get_register16(emu, reg);
+    set_register16(emu, reg, get_register16(emu, EAX));
+    set_register16(emu, EAX, original_val);
+    emu->eip += 1;
+}
+
+/*
  * cwde: 1 byte
  * Sign-extend word(AX) to double word(EAX).
  * 1 byte: op (98)
@@ -85,6 +99,12 @@ void ptr_call(Emulator *emu)
  */
 void pushfd(Emulator *emu)
 {
+    /*
+    if (emu->is_pe)
+        push32(emu, emu->eflags);
+    else
+        push16(emu, (uint16_t)emu->eflags);
+    */
     push32(emu, emu->eflags);
     emu->eip += 1;
 };
@@ -96,8 +116,15 @@ void pushfd(Emulator *emu)
  */
 void popfd(Emulator *emu)
 {
-    uint32_t value = pop32(emu);
+    /*
+    uint32_t value;
+    if (emu->is_pe)
+        value = pop32(emu);
+    else
+        value = (uint32_t)pop16(emu);
     emu->eflags = value;
+    */
+    emu->eflags = pop32(emu);
     emu->eip += 1;
 };
 
