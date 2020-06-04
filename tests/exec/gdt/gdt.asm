@@ -54,3 +54,11 @@ GDT:
 GDT_DESC:
     dw (GDT_DESC - GDT - 1)
     dd GDT
+
+GDT_TEST:
+    dw 0xFFFF       ; limit low
+    dw 0x5678       ; base low
+    db 0x34         ; base middle
+    db 10010010b    ; access
+    db 11001111b    ; limit + flags
+    db 0x12         ; base high

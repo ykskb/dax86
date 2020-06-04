@@ -80,13 +80,18 @@ int main(int argc, char *argv[])
 {
     FILE *binary; // FILE: pointer to stream
     int i;
-    quiet = 0;
+    init_config(0, 0);
 
     while (i < argc)
     {
-        if (strcmp(argv[i], "-q") == 0)
+        if (strcmp(argv[i], "-v") == 0)
         {
-            quiet = 1;
+            config.verbose = 1;
+            argc = remove_arg_at(argc, argv, i);
+        }
+        else if (strcmp(argv[i], "test") == 0)
+        {
+            config.test = 1;
             argc = remove_arg_at(argc, argv, i);
         }
         else
@@ -142,7 +147,7 @@ int main(int argc, char *argv[])
     while ((emu->eip < MEMORY_SIZE) || (emu->is_pg))
     {
         uint8_t op = get_code8(emu, 0);
-        if (!quiet)
+        if (config.verbose)
             printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
 
         if (instructions[op] == NULL)
@@ -163,16 +168,15 @@ int main(int argc, char *argv[])
 
         // dump_registers(emu);
 
-        if (emu->eip == 0x00)
+        if (config.test && emu->eip == 0x00)
         {
-            // panic_exit(emu);
-            if (!quiet)
+            if (config.verbose)
                 printf("End of program :)\n");
-            // break;
+            break;
         }
     }
 
-    if (!quiet)
+    if (config.verbose)
     {
         print_emu(emu);
     }

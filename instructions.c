@@ -13,7 +13,6 @@
 
 instruction_func_t *two_byte_instructions[256];
 instruction_func_t *instructions[256];
-uint8_t quiet;
 
 /*
  * Executes 2-byte instruction: 1 byte
@@ -37,7 +36,7 @@ static void lock_prefix(Emulator *emu)
 {
     emu->eip += 1;
     uint8_t op = get_code8(emu, 0);
-    if (!quiet)
+    if (config.verbose)
         printf("Ignoring lock prefix.\n");
     instructions[op](emu);
 }
@@ -139,7 +138,7 @@ static void rep(Emulator *emu)
     for (i = 0; i < ecx_value; i++)
     {
         emu->eip = op_eip;
-        if (!quiet)
+        if (config.verbose)
             printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
         instructions[op](emu);
         if ((op == 0xA6 || op == 0xA7 || op == 0xAE || op == 0xAF) && !is_zero(emu))
@@ -165,7 +164,7 @@ static void repne(Emulator *emu)
     for (i = 0; i < ecx_value; i++)
     {
         emu->eip = op_eip;
-        if (!quiet)
+        if (config.verbose)
             printf("CS: %04X EIP: %08X Op: %02X\n", get_seg_register16(emu, CS), emu->eip, op);
         instructions[op](emu);
         if ((op == 0xA6 || op == 0xA7 || op == 0xAE || op == 0xAF) && is_zero(emu))

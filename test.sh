@@ -33,7 +33,7 @@ function run_test() {
     echo
   fi
   echo "Running test with $1..."
-  output=$(./dax86 $test_path)
+  output=$(./dax86 $test_path test -v)
   if [[ $output == *"End of program :)"* ]]; then
     echo "[Run: SUCCESS]"
     if [ "$verbose" = true ]; then

@@ -4,6 +4,7 @@
 #include "emulator.h"
 #include "kbd.h"
 #include "instructions.h"
+#include "util.h"
 
 /* 
  * PS/2 (keyboard) Controller
@@ -54,7 +55,7 @@ uint8_t io_in8(Emulator *emu, uint16_t address)
     case SERIALLINESTA:
         return 0x20;
     default:
-        if (!quiet)
+        if (config.verbose)
             printf("IN8 on port %x not implemented.\n", address);
         return 0;
     }
@@ -70,7 +71,7 @@ uint32_t io_in32(Emulator *emu, uint16_t address)
         return 0;
         // return getchar();
     default:
-        if (!quiet)
+        if (config.verbose)
             printf("IN32 on port %x not implemented.\n", address);
         return 0;
     }
@@ -108,7 +109,7 @@ void io_out8(Emulator *emu, uint16_t address, uint8_t value)
         putchar(value);
         break;
     default:
-        if (!quiet)
+        if (config.verbose)
             printf("OUT8 on port %x not implemented.\n", address);
         break;
     }
@@ -122,7 +123,7 @@ void io_out32(Emulator *emu, uint16_t address, uint32_t value)
         putchar(value);
         break;
     default:
-        if (!quiet)
+        if (config.verbose)
             printf("OUT32 on port %x not implemented.\n", address);
         break;
     }

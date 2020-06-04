@@ -2,7 +2,9 @@
 
 x86 (i386) Emulator in C
 
-Primary purpose is to run xv6 so that one can trace how an OS runs at CPU level.
+Primary purpose is to run xv6 so that one can trace how an OS runs on CPU.
+
+June 2020: It reached scheduler loop handling ISR.
 
 In scope:
 
@@ -10,7 +12,9 @@ In scope:
 - Real mode
 - Protected mode
 - Paging
-- Device emulation (Keyboard, APIC, Display etc)
+- MP configuration
+- Software/Hardware interrupts
+- Device emulation (disk, keyboard, APIC timer, local APIC, IO APIC, UART etc)
 
 Out of scope:
 
@@ -43,20 +47,34 @@ make
 
 ```
 ./dax86 [binary_file]
+
+# verbose run (prints each op)
+./dax86 [binary_file] -v
 ```
 
 ##### Test
 
 ```
+# test all
 ./test.sh
+
+# test specific one in tests/exec directory
+./test.sh [test_name]
+
+# directory test binary (stops at EIP: 0x0)
+./test.sh test [binary_file]
 ```
 
-##### Commands to Analyze Test Cases and Others
+##### Commands to Analyze Test Cases
 
 - Disassemble Binary
 
 ```
+# 32 bit all the way 
 ndisasm -b 32 [binary_file]
+
+# 32 bit after 0xFF bytes of real mode
+ndisasm -b 32 [binary_file] -k 0,0xFF
 ```
 
 - View Binary

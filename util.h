@@ -5,6 +5,15 @@
 
 #include "emulator.h"
 
+typedef struct
+{
+    int verbose;
+    int test;
+} Config;
+
+extern Config config;
+
+void init_config(int verbose, int test);
 void debug_append(uint16_t cs, uint32_t eip, uint8_t op, uint16_t ss, uint32_t esp_val);
 void debug_print();
 void panic_exit(Emulator *emu);

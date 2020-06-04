@@ -7,12 +7,19 @@
 
 #define DEBUG_SIZE 256
 
+Config config;
 int debug_i = 0;
 int debug_cs[DEBUG_SIZE];
 int debug_eips[DEBUG_SIZE];
 int debug_ops[DEBUG_SIZE];
 int debug_ss[DEBUG_SIZE];
 int debug_esp[DEBUG_SIZE];
+
+void init_config(int verbose, int test)
+{
+    config.verbose = verbose;
+    config.test = test;
+}
 
 void debug_append(uint16_t cs, uint32_t eip, uint8_t op, uint16_t ss, uint32_t esp_val)
 {
