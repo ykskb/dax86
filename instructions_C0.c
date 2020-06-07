@@ -372,8 +372,8 @@ void ret_far(Emulator *emu)
 void int_imm8(Emulator *emu)
 {
     uint8_t int_num = get_code8(emu, 1);
-    handle_interrupt(emu, int_num, 1);
     emu->eip += 2;
+    handle_interrupt(emu, int_num, 1);
 }
 
 /*
@@ -383,11 +383,19 @@ void int_imm8(Emulator *emu)
  */
 void iret(Emulator *emu)
 {
-    printf("iret\n");
+    printf("iret--------\n");
     uint8_t cpl = get_seg_register16(emu, CS) & 3;
+
+    // set_register32(emu, ESP, get_register32(emu, ESP) - 4);
+
+    printf("ss: %x espv: %x\n", get_seg_register16(emu, SS), get_register32(emu, ESP));
+    printf("esp: %x\n", get_physical_address(emu, SS, get_register32(emu, ESP), 0));
+    dump_memory(emu, get_physical_address(emu, SS, get_register32(emu, ESP), 0) - 100, 200);
 
     emu->eip = pop32(emu);
     pop_segment_register(emu, CS);
+    printf("popped cs: %x eip %x\n", get_seg_register16(emu, CS), emu->eip);
+    // printf("cs: %x\n", get_seg_register16(emu, CS));
     /* By right each flag such as IOPL should be checked if CPL is 0 or not. */
     emu->eflags = pop32(emu);
 
@@ -396,5 +404,6 @@ void iret(Emulator *emu)
         uint32_t esp_val = pop32(emu);
         pop_segment_register(emu, SS);
         set_register32(emu, ESP, esp_val);
+        printf("popping ss %x and esp %x from tss\n", get_seg_register16(emu, SS), get_register32(emu, ESP));
     }
 }

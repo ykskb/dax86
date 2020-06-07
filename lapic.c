@@ -30,6 +30,7 @@ void lapic_send_intr(LAPIC *lapic)
     {
         if (lapic->irr[i] > 0)
         {
+            printf("lapic irr to intr: %d\n", lapic->irr[i]);
             lapic->isr[i] = lapic->irr[i];
             lapic->isr_index = i;
             lapic->emu->int_r = lapic->irr[i];

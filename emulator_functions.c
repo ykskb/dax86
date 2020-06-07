@@ -6,6 +6,7 @@
 #include "io.h"
 #include "lapic.h"
 #include "ioapic.h"
+#include "util.h"
 
 /* Register Operations */
 
@@ -127,6 +128,8 @@ void _set_memory16(Emulator *emu, uint32_t p_address, uint16_t value)
 
 void _set_memory32(Emulator *emu, uint32_t p_address, uint32_t value)
 {
+    if (p_address == 0xdffffec)
+        printf("!! eip: %x wrote val %x to 11\n", emu->eip, value);
     int i;
     for (i = 0; i < 4; i++)
     {
@@ -282,9 +285,14 @@ void push16(Emulator *emu, uint16_t value)
 
 void push32(Emulator *emu, uint32_t value)
 {
+
     /* New offset would be ESP value - 4 bytes.  */
     uint32_t offset = get_register32(emu, ESP) - 4;
+    if (emu->eip == 0x801058c7 || emu->eip == 0x801058c9)
+        printf("eip %x offset %x value %x\n", emu->eip, offset, value);
     /* Updates ESP with the new address. */
+    if (offset == 0x8dfffff0 - 4)
+        printf("eip: %x\n", emu->eip);
     set_register32(emu, ESP, offset);
     uint32_t p_address = get_physical_address(emu, SS, offset, 1);
     _set_memory32(emu, p_address, value);
