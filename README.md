@@ -4,8 +4,9 @@ x86 (i386) Emulator in C
 
 Primary purpose is to run xv6 so that one can trace how an OS runs on CPU.
 
-June 2020: Instructions reached scheduler loop handling ISR.
-June 2020: Shell has started.
+June 2020: Instructions reached scheduler loop.
+
+June 2020: Shell has started after fixing ISR to exec syscall.
 
 In scope:
 
@@ -48,15 +49,12 @@ make
 
 ```
 # basic use
-
 ./dax86 [binary_file]
 
 # run xv6
-
 ./dax86 xv6memfs.img
 
 # verbose run (prints each op)
-
 ./dax86 [binary_file] -v
 ```
 
@@ -64,16 +62,13 @@ make
 
 ```
 # test all
-
 ./test.sh
 
 # test specific one in tests/exec directory
-
 ./test.sh [test_name]
 
 # directory test binary (stops at EIP: 0x0)
-
-./test.sh test [binary_file]
+./dax86 test [binary_file]
 ```
 
 ##### Commands to Analyze Test Cases
@@ -82,11 +77,9 @@ make
 
 ```
 # 32 bit all the way 
-
 ndisasm -b 32 [binary_file]
 
 # 32 bit after 0xFF bytes of real mode instructions
-
 ndisasm -b 32 [binary_file] -k 0,0xFF
 ```
 
@@ -94,11 +87,9 @@ ndisasm -b 32 [binary_file] -k 0,0xFF
 
 ```
 # hex
-
 xxd [bin_file]
 
 # bin
-
 xxd -b [binary_file]
 ```
 
