@@ -23,3 +23,24 @@ void sete(Emulator *emu)
         set_rm8(emu, &modrm, 0);
     }
 }
+
+/*
+ * setne
+ * Sets rm8 to 1 if zero flag is not set, otherwise 0.
+ * 2 byte: op code (0F 95)
+ * 1|2 bytes: ModR/M
+ */
+void setne(Emulator *emu)
+{
+    emu->eip += 2;
+    ModRM modrm = create_modrm();
+    parse_modrm(emu, &modrm);
+    if (is_zero(emu))
+    {
+        set_rm8(emu, &modrm, 0);
+    }
+    else
+    {
+        set_rm8(emu, &modrm, 1);
+    }
+}

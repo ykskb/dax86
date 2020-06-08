@@ -383,7 +383,7 @@ void int_imm8(Emulator *emu)
  */
 void iret(Emulator *emu)
 {
-    printf("iret\n");
+    // printf("iret\n");
     uint8_t cpl = get_seg_register16(emu, CS) & 3;
 
     emu->eip = pop32(emu);

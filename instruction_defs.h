@@ -230,15 +230,18 @@ void jna32(Emulator *emu);
 void ja32(Emulator *emu);
 void js32(Emulator *emu);
 void jns32(Emulator *emu);
+void jge32(Emulator *emu);
 void jng32(Emulator *emu);
 void jg32(Emulator *emu);
 
 /* 0x0F90 */
 void sete(Emulator *emu);
+void setne(Emulator *emu);
 
 /* 0x0FB0 */
 void movzx_r32_rm8(Emulator *emu);
 void movzx_r32_rm16(Emulator *emu);
 void movsx_r32_rm8(Emulator *emu);
+void movsx_r32_rm16(Emulator *emu);
 
 #endif

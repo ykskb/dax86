@@ -59,7 +59,7 @@ void handle_interrupt(Emulator *emu, uint8_t vector, int sw)
     /* Inter-privilege */
     if (gate_dpl < cpl)
     {
-        printf("inter-privilege interrupt: %d\n", vector);
+        // printf("inter-privilege interrupt: %d\n", vector);
         // debug_print();
         uint16_t cur_ss = get_seg_register16(emu, SS);
         uint32_t cur_esp = get_register32(emu, ESP);
@@ -92,7 +92,7 @@ void handle_interrupt(Emulator *emu, uint8_t vector, int sw)
     /* Kernel mode */
     else
     {
-        printf("intra-level interrupt: %d\n", vector);
+        // printf("intra-level interrupt: %d\n", vector);
         uint16_t cur_cs = get_seg_register16(emu, CS);
         uint32_t cur_eip = emu->eip;
         push32(emu, emu->eflags);

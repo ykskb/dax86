@@ -62,6 +62,17 @@ void ja32(Emulator *emu)
 DEFINE_NEAR_JX(s, is_sign)
 
 /*
+ * jge 
+ * Jumps if greater or equal (SF=OF)
+ * 2 byte: op code (0F 8D)
+ * 4 bytes: offset to jump
+ */
+void jge32(Emulator *emu)
+{
+    int diff = (is_sign(emu) == is_overflow(emu)) ? get_sign_code32(emu, 2) : 0;
+    emu->eip += (diff + 6);
+}
+/*
  * jng 
  * Jumps if not greater (ZF=1 or SF!=OF)
  * 2 byte: op code (0F 8E)

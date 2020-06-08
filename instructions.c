@@ -194,12 +194,15 @@ static void init_two_byte_instructions(void)
     two_byte_instructions[0x87] = ja32;
     two_byte_instructions[0x88] = js32;
     two_byte_instructions[0x89] = jns32;
+    two_byte_instructions[0x8D] = jge32;
     two_byte_instructions[0x8E] = jng32;
     two_byte_instructions[0x8F] = jg32;
     two_byte_instructions[0x94] = sete;
+    two_byte_instructions[0x95] = setne;
     two_byte_instructions[0xB6] = movzx_r32_rm8;
     two_byte_instructions[0xB7] = movzx_r32_rm16;
     two_byte_instructions[0xBE] = movsx_r32_rm8;
+    two_byte_instructions[0xBF] = movsx_r32_rm16;
 }
 
 void init_instructions(void)
