@@ -45,6 +45,8 @@ uint8_t io_in8(Emulator *emu, uint16_t address)
 {
     switch (address)
     {
+    case PS2DATA:
+        return get_kbd_data();
     case PS2STACMD:
         return get_kbd_status();
     case DISKSTACMD:

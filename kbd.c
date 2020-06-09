@@ -11,11 +11,32 @@
 #include "emulator_functions.h"
 #include "interrupt.h"
 
+#define KBD_DIB 0x01
+
 KBD *kbd;
 
 uint8_t get_kbd_status()
 {
+    if (kbd->buf_index != kbd->buf_out_index)
+        kbd->status |= KBD_DIB;
+    else
+        kbd->status &= 0xFE;
     return kbd->status;
+}
+
+uint8_t get_kbd_data()
+{
+    uint8_t data = kbd->buf[kbd->buf_out_index];
+    if (kbd->buf_out_index > 254)
+    {
+        kbd->buf_out_index = 0;
+    }
+    else
+    {
+        kbd->buf_out_index += 1;
+    }
+    printf("kbd data %x\n", data);
+    return data;
 }
 
 void write_ps2_output_port(uint8_t value)
@@ -42,21 +63,32 @@ void write_ps2_config_byte(uint8_t value)
     }
 }
 
+static int append_to_buf(uint8_t c)
+{
+    if (c < 1 || c > 127)
+        return 0;
+    uint8_t sc = scmap[c];
+    if (!sc)
+        return 0;
+    kbd->buf[kbd->buf_index] = sc;
+    if (kbd->buf_index > 254)
+    {
+        kbd->buf_index = 0;
+    }
+    else
+    {
+        kbd->buf_index += 1;
+    }
+    return 1;
+}
+
 static void *kbd_loop()
 {
     while (1)
     {
-        uint8_t value = getchar();
-        kbd->buf[kbd->buf_index] = value;
-        if (kbd->buf_index > 254)
-        {
-            kbd->buf_index = 0;
-        }
-        else
-        {
-            kbd->buf_index += 1;
-        }
-        ioapic_int_to_lapic(T_IRQ0 + IRQ_KBD);
+        uint8_t c = getchar();
+        if (append_to_buf(c))
+            ioapic_int_to_lapic(T_IRQ0 + IRQ_KBD);
     }
     return NULL;
 }
