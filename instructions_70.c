@@ -83,6 +83,18 @@ void jle(Emulator *emu)
 }
 
 /*
+ * jge (7D)
+ * Jumps if greater or equal (SF=OF)
+ * 1 byte: op code
+ * 1 byte: offset to jump
+ */
+void jge(Emulator *emu)
+{
+    int diff = ((is_sign(emu) == is_overflow(emu))) ? get_sign_code8(emu, 1) : 0;
+    emu->eip += (diff + 2);
+}
+
+/*
  * jg (7f)
  * Jumps if greater (ZF=0 and SF=OF)
  * 1 byte: op code

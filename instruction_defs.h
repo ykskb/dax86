@@ -99,6 +99,7 @@ void ja(Emulator *emu);
 void js(Emulator *emu);
 void jns(Emulator *emu);
 void jl(Emulator *emu);
+void jge(Emulator *emu);
 void jle(Emulator *emu);
 void jg(Emulator *emu);
 

@@ -327,6 +327,7 @@ void init_instructions(void)
     instructions[0x78] = js;
     instructions[0x79] = jns;
     instructions[0x7C] = jl;
+    instructions[0x7D] = jge;
     instructions[0x7E] = jle;
     instructions[0x7F] = jg;
 
