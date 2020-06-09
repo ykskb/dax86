@@ -2,11 +2,15 @@
 
 x86 (i386) Emulator in C
 
-Primary purpose is to run xv6 so that one can trace how an OS runs on CPU.
+Why:
 
-June 2020: Instructions reached scheduler loop.
+I wanted to trace how an OS runs on CPU.
 
-June 2020: Shell has started after fixing ISR to exec syscall.
+What:
+
+- Runs non-modified xv6 (memfs) image from boot.
+- Each instruction is hand-implemented. (You'll know what I mean once you look into instruction functions.)
+- Logic representation > performance
 
 In scope:
 
