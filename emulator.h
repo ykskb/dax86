@@ -163,8 +163,8 @@ struct LAPIC
     /* convenience properties */
     uint8_t unit_enabled;
     uint8_t int_enabled;
-    uint8_t irr[256];
-    uint8_t isr[256];
+    uint8_t irr[32];
+    uint8_t isr[32];
     uint8_t isr_index;
     pthread_mutex_t lock;
     pthread_t *timer_thread;

@@ -8,6 +8,8 @@
 #include "lapic.h"
 #include "interrupt.h"
 
+#define IRR_L 32
+
 LAPIC *create_lapic(Emulator *emu)
 {
     LAPIC *lapic = malloc(sizeof(LAPIC));
@@ -26,11 +28,10 @@ void lapic_send_intr(LAPIC *lapic)
     }
     pthread_mutex_lock(&lapic->lock);
     uint8_t i;
-    for (i = 0; i < 255; i++)
+    for (i = 0; i < IRR_L; i++)
     {
         if (lapic->irr[i] > 0)
         {
-            printf("lapic irr to intr: %d\n", lapic->irr[i]);
             lapic->isr[i] = lapic->irr[i];
             lapic->isr_index = i;
             lapic->emu->int_r = lapic->irr[i];
@@ -46,6 +47,7 @@ static void lapic_eoi(LAPIC *lapic)
 {
     pthread_mutex_lock(&lapic->lock);
     lapic->isr[lapic->isr_index] = 0;
+    lapic->registers[EOI] = 0;
     pthread_mutex_unlock(&lapic->lock);
     lapic_send_intr(lapic);
 }
@@ -58,7 +60,7 @@ void lapic_write_to_irr(LAPIC *lapic, uint8_t irq)
     }
     pthread_mutex_lock(&lapic->lock);
     uint8_t i;
-    for (i = 0; i < 255; i++)
+    for (i = 0; i < IRR_L; i++)
     {
         if (lapic->irr[i] == 0)
         {
