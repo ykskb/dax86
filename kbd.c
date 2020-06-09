@@ -35,7 +35,6 @@ uint8_t get_kbd_data()
     {
         kbd->buf_out_index += 1;
     }
-    printf("kbd data %x\n", data);
     return data;
 }
 
