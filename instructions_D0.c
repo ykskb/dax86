@@ -9,6 +9,7 @@
 #include "modrm.h"
 #include "io.h"
 #include "shift.h"
+#include "util.h"
 
 static void rol_rm8_once(Emulator *emu, ModRM *modrm, uint8_t use_cl)
 {
@@ -97,7 +98,7 @@ void code_d0(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: D0 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -188,7 +189,7 @@ void code_d1(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: D1 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -227,7 +228,7 @@ void code_d2(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: D2 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -266,7 +267,7 @@ void code_d3(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: D3 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 

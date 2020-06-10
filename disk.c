@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "disk.h"
+#include "util.h"
 
 #define SECTOR_SIZE 512
 
@@ -28,7 +29,7 @@ void load_data_to_disk(Disk *disk, FILE *f)
     if (binary_size > DISK_SIZE)
     {
         printf("Binary file bigger than disk size.");
-        exit(1);
+        panic();
     }
     fread(disk->storage, 1, binary_size, f);
 }

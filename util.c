@@ -1,9 +1,12 @@
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "util.h"
 #include "emulator.h"
 #include "lapic.h"
 #include "ioapic.h"
+
+#include <termios.h>
 
 #define DEBUG_SIZE 256
 
@@ -54,8 +57,33 @@ void print_emu(Emulator *emu)
     dump_ioapic();
 }
 
+void add_canon_echo()
+{
+    static struct termios oldt, newt;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag |= (ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+}
+
+void remove_canon_echo()
+{
+    static struct termios oldt, newt;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+}
+
+void panic()
+{
+    add_canon_echo();
+    exit(1);
+}
+
 void panic_exit(Emulator *emu)
 {
+    add_canon_echo();
     debug_print();
     print_emu(emu);
     exit(1);
@@ -63,6 +91,7 @@ void panic_exit(Emulator *emu)
 
 void sig_exit(Emulator *emu)
 {
+    add_canon_echo();
     debug_print();
     print_emu(emu);
     exit(0);

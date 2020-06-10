@@ -10,6 +10,7 @@
 #include "io.h"
 #include "gdt.h"
 #include "interrupt.h"
+#include "util.h"
 
 void code_0f_00(Emulator *emu)
 {
@@ -25,7 +26,7 @@ void code_0f_00(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: 0F00 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -45,7 +46,7 @@ void code_0f_01(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: 0F01 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 

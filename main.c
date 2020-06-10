@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <unistd.h>
 #include <signal.h>
 
 #include "emulator.h"
@@ -12,7 +11,6 @@
 #include "disk.h"
 #include "kbd.h"
 #include "mp.h"
-#include "kbd.h"
 #include "interrupt.h"
 #include "util.h"
 
@@ -44,7 +42,6 @@ void termination_handler(int signum)
         printf("Segmentation fault at EIP: %08X.\n", emu->eip);
         panic_exit(emu);
     }
-    // enable_canon_echo();
     sig_exit(emu);
 }
 
@@ -106,8 +103,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    set_signals();
-
     /* Main memory */
     uint8_t *memory = malloc(MEMORY_SIZE);
 
@@ -143,6 +138,9 @@ int main(int argc, char *argv[])
     /* dump_input(emu); */
 
     init_instructions();
+
+    set_signals();
+    remove_canon_echo();
 
     while ((emu->eip < MEMORY_SIZE) || (emu->is_pg))
     {

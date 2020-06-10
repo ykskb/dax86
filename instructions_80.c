@@ -8,6 +8,7 @@
 #include "emulator_functions.h"
 #include "modrm.h"
 #include "io.h"
+#include "util.h"
 
 /*
  * add rm8 imm8: 3|4 bytes
@@ -188,7 +189,7 @@ void code_80(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: 80 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -371,7 +372,7 @@ void code_81(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: 81 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -554,7 +555,7 @@ void code_83(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: 83 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -611,7 +612,7 @@ void code_83_rm16(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: 83 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 

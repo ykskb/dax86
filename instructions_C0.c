@@ -10,6 +10,7 @@
 #include "io.h"
 #include "shift.h"
 #include "interrupt.h"
+#include "util.h"
 
 static uint8_t adjust_imm8_for_rm8(uint8_t val)
 {
@@ -121,7 +122,7 @@ void code_c0(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: C0 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 
@@ -235,7 +236,7 @@ void code_c01(Emulator *emu)
         break;
     default:
         printf("Not implemented: Op: C1 with ModR/M Op: %d\n", modrm.opcode);
-        exit(1);
+        panic_exit(emu);
     }
 }
 

@@ -6,6 +6,7 @@
 
 #include "emulator_functions.h"
 #include "modrm.h"
+#include "util.h"
 
 /*
  * Mod R/M: 1 byte
@@ -192,7 +193,7 @@ uint32_t calc_cib_address(Emulator *emu, ModRM *modrm)
     }
 
     printf("Invalid Mod value for SIB");
-    exit(1);
+    panic_exit(emu);
 }
 
 uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
@@ -255,7 +256,7 @@ uint32_t calc_memory_address(Emulator *emu, ModRM *modrm)
     else
     {
         printf("ModRM with mod: 00 - 10 are only implemented.");
-        exit(0);
+        panic_exit(emu);
     }
 }
 
