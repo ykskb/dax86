@@ -4,15 +4,15 @@ x86 (i386) Emulator in C
 
 Why:
 
-I wanted to trace how an OS runs on CPU.
+- I wanted to trace how an OS runs on CPU at archtecture / instruction level.
 
 What:
 
-- Runs non-modified xv6 (memfs) image from boot.
-- Each instruction is hand-implemented. (You'll know what I mean once you look into instruction functions.)
-- Logic representation > performance
+- Runs vanilla xv6 (memfs) image from boot.
+- Each instruction is hand-implemented.
+- Representation of logic > performance
 
-In scope:
+Done:
 
 - Instructions required for running xv6
 - Real mode
@@ -22,10 +22,17 @@ In scope:
 - Software/Hardware interrupts
 - Device emulation (disk, keyboard, APIC timer, local APIC, IO APIC, UART etc)
 
-Out of scope:
+To do:
 
 - FPU-related instructions
+- Exception
 - Virtual 8086 mode
+- TLB
+
+System requirements:
+
+- Memory: 512MB
+- CPU: scheduler loop will occupy CPU resource. `nice` command, cgroups or docker resource setting might help here.
 
 ##### Setup Environment using Docker
 
