@@ -4,13 +4,13 @@ x86 (i386) Emulator in C
 
 Why:
 
-- I wanted to trace how an OS runs on CPU at archtecture / instruction level.
+- I wanted to trace how an OS runs on CPUs at archtecture / instruction level.
 
 What:
 
 - Runs vanilla xv6 (memfs) image from boot.
-- Each instruction is hand-implemented.
 - Representation of logic > performance
+- Each instruction is manually implemented and executed sequentially without binary translation or OoOE.
 
 Done:
 
