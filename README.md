@@ -36,7 +36,7 @@ System requirements:
 
 ##### Setup Environment using Docker
 
-The base image of Mini Debian Jessie is used.
+dax86 can be built for different targets and run, but there's also a docker image if Debian's `build-essential` package is preferred to the build environment of your host. Mini Debian Jessie is used for the base image. 
 
 The command below will build image, run a container with the image and execute shell in interactive mode.
 
@@ -106,8 +106,9 @@ xxd -b [binary_file]
 
 Referenced these publications with many thanks:
 
+- https://wiki.osdev.org/
+- https://book.mynavi.jp/support/bookmook/x86/
 - https://software.intel.com/en-us/articles/intel-sdm
 - http://ref.x86asm.net/
 - https://x86.puri.sm/
 - https://c9x.me/x86/
-- https://book.mynavi.jp/support/bookmook/x86/
