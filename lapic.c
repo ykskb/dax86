@@ -22,7 +22,7 @@ LAPIC *create_lapic(Emulator *emu)
 
 void lapic_send_intr(LAPIC *lapic)
 {
-    if (!lapic->int_enabled || !lapic->unit_enabled || !lapic->emu->int_enabled || lapic->registers[EOI] != 0)
+    if (!lapic->int_enabled || !lapic->unit_enabled || !lapic->emu->int_enabled || lapic->registers[EOI >> 4] != 0)
     {
         return;
     }
@@ -35,7 +35,7 @@ void lapic_send_intr(LAPIC *lapic)
             lapic->isr[i] = lapic->irr[i];
             lapic->isr_index = i;
             lapic->emu->int_r = lapic->irr[i];
-            lapic->registers[EOI] = 1;
+            lapic->registers[EOI >> 4] = 1;
             lapic->irr[i] = 0;
             break;
         }
@@ -47,7 +47,7 @@ static void lapic_eoi(LAPIC *lapic)
 {
     pthread_mutex_lock(&lapic->lock);
     lapic->isr[lapic->isr_index] = 0;
-    lapic->registers[EOI] = 0;
+    lapic->registers[EOI >> 4] = 0;
     pthread_mutex_unlock(&lapic->lock);
     lapic_send_intr(lapic);
 }

@@ -53,7 +53,7 @@
 ModRM create_modrm()
 {
     ModRM modrm;
-    SIB sib;
+    SIB sib = {};
     modrm.sib = sib;
     return modrm;
 }

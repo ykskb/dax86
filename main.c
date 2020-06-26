@@ -76,7 +76,7 @@ void set_signals()
 int main(int argc, char *argv[])
 {
     FILE *binary; // FILE: pointer to stream
-    int i;
+    int i = 0;
     init_config(0, 0);
 
     while (i < argc)
