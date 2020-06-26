@@ -179,5 +179,5 @@ int main(int argc, char *argv[])
         print_emu(emu);
     }
     destroy_emu(emu);
-    return 0;
+    normal_exit();
 }

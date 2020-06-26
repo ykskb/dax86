@@ -24,5 +24,6 @@ void remove_canon_echo();
 void panic() __attribute__((noreturn));
 void panic_exit(Emulator *emu) __attribute__((noreturn));
 void sig_exit(Emulator *emu) __attribute__((noreturn));
+void normal_exit();
 
 #endif

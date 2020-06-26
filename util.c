@@ -96,3 +96,9 @@ void sig_exit(Emulator *emu)
     print_emu(emu);
     exit(0);
 }
+
+void normal_exit()
+{
+    add_canon_echo();
+    exit(0);
+}
