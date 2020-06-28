@@ -560,6 +560,24 @@ void code_83(Emulator *emu)
 }
 
 /*
+ * add rm16 imm8: 3|4 bytes
+ * Adds imm8 to RM16. Op code 83 and ModR/M op code: 0 execute this.
+ * 1 byte: shared op (83)
+ * 1|2 byte: ModR/M
+ * 1 byte: imm8 to add
+ */
+static void add_rm16_imm8(Emulator *emu, ModRM *modrm)
+{
+    uint16_t rm16 = get_rm16(emu, modrm);
+    uint16_t imm8 = (uint16_t)get_sign_code8(emu, 0);
+    emu->eip += 1;
+
+    uint32_t result = (uint32_t)rm16 + (uint32_t)imm8;
+    set_rm16(emu, modrm, result);
+    update_eflags_add_16bit(emu, rm16, imm8, result);
+}
+
+/*
  * cmp rm16 imm8: 3 bytes
  * Compares rm16 value and imm8 value by subtracting in order.
  * Op code 83 and ModR/M op code: 111 execute this.
@@ -586,9 +604,9 @@ void code_83_rm16(Emulator *emu)
 
     switch (modrm.opcode)
     {
-    // case 0:
-    //     add_rm16_imm8(emu, &modrm);
-    //     break;
+    case 0:
+        add_rm16_imm8(emu, &modrm);
+        break;
     // case 1:
     //     or_rm16_imm8(emu, &modrm);
     //     break;

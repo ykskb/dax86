@@ -402,6 +402,12 @@ void init_instructions(void)
     instructions[0xCD] = int_imm8;
     instructions[0xCF] = iret;
 
+    instructions[0xD0] = code_d0;
+    instructions[0xD1] = code_d1;
+    instructions[0xD2] = code_d2;
+    instructions[0xD3] = code_d3;
+    instructions[0xD6] = set_al_on_carry;
+
     instructions[0xE0] = loopnz;
     instructions[0xE1] = loopz;
     instructions[0xE2] = loop;

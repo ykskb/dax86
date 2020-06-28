@@ -177,7 +177,7 @@ void code_d0(Emulator *emu);
 void code_d1(Emulator *emu);
 void code_d2(Emulator *emu);
 void code_d3(Emulator *emu);
-void set_al_on_c(Emulator *emu);
+void set_al_on_carry(Emulator *emu);
 
 /* 0xE0 */
 void loopnz(Emulator *emu);

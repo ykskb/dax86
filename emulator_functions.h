@@ -96,6 +96,7 @@ int32_t is_overflow(Emulator *emu);
 
 void update_eflags_add(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t result);
 void update_eflags_add_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint16_t result);
+void update_eflags_add_16bit(Emulator *emu, uint8_t value1, uint8_t value2, uint16_t result);
 
 void update_eflags_sub(Emulator *emu, uint32_t value1, uint32_t value2, uint64_t result);
 void update_eflags_sub_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint16_t result);

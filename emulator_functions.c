@@ -475,6 +475,16 @@ void update_eflags_add_8bit(Emulator *emu, uint8_t value1, uint8_t value2, uint1
     set_sign_flag(emu, signr);
 }
 
+void update_eflags_add_16bit(Emulator *emu, uint8_t value1, uint8_t value2, uint16_t result)
+{
+    int sign1 = value1 >> 15;
+    int sign2 = value2 >> 15;
+    int signr = (result >> 15) & 1;
+    set_carry_flag(emu, result >> 16);
+    set_overflow_flag(emu, sign1 == sign2 && sign1 != signr);
+    set_sign_flag(emu, signr);
+}
+
 /* 
  * 1000 (-8) - 0001 (1) = 10111 (-9) -> carry
  * 1000 (-8) - 0010 (2) = 10110 (-10) -> carry

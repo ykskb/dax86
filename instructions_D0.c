@@ -271,7 +271,12 @@ void code_d3(Emulator *emu)
     }
 }
 
-void set_al_on_c(Emulator *emu)
+/*
+ * salc
+ * Sets AL if carry.
+ * 1 byte: op (D6)
+ */
+void set_al_on_carry(Emulator *emu)
 {
     if (is_carry(emu))
     {
@@ -281,4 +286,5 @@ void set_al_on_c(Emulator *emu)
     {
         set_register8(emu, AL, 0x0);
     }
+    emu->eip += 1;
 }
