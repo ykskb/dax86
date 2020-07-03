@@ -9,7 +9,7 @@ Why:
 What:
 
 - Runs vanilla xv6 (memfs) image from boot.
-- Representation of logic > performance
+- Representation of logic is prioritized over the performance. Codes have bunch of comments covering the instructions and the hardware mechanism as well.
 - Each instruction is manually implemented and executed sequentially without binary translation or OoOE.
 
 Done:
@@ -34,22 +34,6 @@ System requirements:
 - Memory: 512MB
 - CPU: scheduler loop will occupy CPU resource. `nice` command, cgroups or docker resource setting might help here.
 
-##### Setup Environment using Docker
-
-dax86 can be built for different targets and run, but there's also a docker image if Debian's `build-essential` package is preferred to the build environment of your host. Mini Debian Jessie is used for the base image. 
-
-The command below will build image, run a container with the image and execute shell in interactive mode.
-
-```
-make create-docker
-```
-
-To clean created container and image, run the command below.
-
-```
-make clean-docker
-```
-
 ##### Build dax86
 
 ```
@@ -62,11 +46,27 @@ make
 # basic use
 ./dax86 [binary_file]
 
-# run xv6
+# run xv6 (ctrl + c to stop)
 ./dax86 xv6memfs.img
 
 # verbose run (prints each op)
 ./dax86 [binary_file] -v
+```
+
+##### Setup Environment using Docker
+
+Though dax86 can be built for different targets and run, there's a docker image in case Debian's `build-essential` package is preferred to the build environment of your host. Mini Debian Jessie is used for the base image. 
+
+The command below will build image, run a container with the image and execute shell in interactive mode.
+
+```
+make create-docker
+```
+
+To clean created container and image, run the command below.
+
+```
+make clean-docker
 ```
 
 ##### Test
