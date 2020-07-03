@@ -9,8 +9,8 @@ Why:
 What:
 
 - Runs vanilla xv6 (memfs) image from boot.
-- Representation of logic is prioritized over the performance. Codes have bunch of comments covering the instructions and the hardware mechanism as well.
 - Each instruction is manually implemented and executed sequentially without binary translation or OoOE.
+- Representation of logic is prioritized over the performance. Codes have bunch of comments covering the instructions and the hardware mechanism as well.
 
 Done:
 
