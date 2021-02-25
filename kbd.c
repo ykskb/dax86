@@ -13,148 +13,148 @@
 
 #define KBD_DIB 0x01
 
-uint8_t scmap[128] = {
+uint8_t scmap[128][3] = {
     /* 0x00 */
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    0x0e, // backspace
-    0x0f, // tab
-    0x1c, // enter (LF)
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {0x0e, NO, NO}, // backspace
+    {0x0f, NO, NO}, // tab
+    {0x1c, NO, NO}, // enter (LF)
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
     /* 0x10 */
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    NO,
-    0x01, // esc
-    NO,
-    NO,
-    NO,
-    NO,
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {0x01, NO, NO}, // esc
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
+    {NO, NO, NO},
     /* 0x20 */
-    0x39, // space
-    NO,   // !
-    NO,   // "
-    NO,   // #
-    NO,   // $
-    NO,   // %
-    NO,   // &
-    0x28, // '
-    NO,   // (
-    NO,   // )
-    NO,   // *
-    NO,   // +
-    0x33, // ,
-    0x0c, // -
-    0x34, // .
-    0x35, // /
+    {0x39, NO, NO},     // space
+    {0x2a, 0x02, 0xaa}, // !
+    {0x2a, 0x28, 0xaa}, // "
+    {0x2a, 0x04, 0xaa}, // #
+    {0x2a, 0x05, 0xaa}, // $
+    {0x2a, 0x06, 0xaa}, // %
+    {0x2a, 0x08, 0xaa}, // &
+    {0x28, NO, NO},     // '
+    {0x2a, 0x0a, 0xaa}, // (
+    {0x2a, 0x0b, 0xaa}, // )
+    {0x2a, 0x09, 0xaa}, // *
+    {0x2a, 0x0d, 0xaa}, // +
+    {0x33, NO, NO},     // ,
+    {0x0c, NO, NO},     // -
+    {0x34, NO, NO},     // .
+    {0x35, NO, NO},     // /
 
     /* 0x30 */
-    0x0b, // 0
-    0x02, // 1
-    0x03, // 2
-    0x04, // 3
-    0x05, // 4
-    0x06, // 5
-    0x07, // 6
-    0x08, // 7
-    0x09, // 8
-    0x0a, // 9
-    NO,   // :
-    0x27, // ;
-    NO,   // <
-    0x0d, // =
-    NO,   // >
-    NO,   // ?
+    {0x0b, NO, NO},     // 0
+    {0x02, NO, NO},     // 1
+    {0x03, NO, NO},     // 2
+    {0x04, NO, NO},     // 3
+    {0x05, NO, NO},     // 4
+    {0x06, NO, NO},     // 5
+    {0x07, NO, NO},     // 6
+    {0x08, NO, NO},     // 7
+    {0x09, NO, NO},     // 8
+    {0x0a, NO, NO},     // 9
+    {0x2a, 0x27, 0xaa}, // :
+    {0x27, NO, NO},     // ;
+    {0x2a, 0x33, 0xaa}, // <
+    {0x0d, NO, NO},     // =
+    {0x2a, 0x34, 0xaa}, // >
+    {0x2a, 0x35, 0xaa}, // ?
 
     /* 0x40 */
-    NO, // @
-    NO, // A
-    NO, // B
-    NO, // C
-    NO, // D
-    NO, // E
-    NO, // F
-    NO, // G
-    NO, // H
-    NO, // I
-    NO, // J
-    NO, // K
-    NO, // L
-    NO, // M
-    NO, // N
-    NO, // O
+    {0x2a, 0x03, 0xaa}, // @
+    {0x2a, 0x1e, 0xaa}, // A
+    {0x2a, 0x30, 0xaa}, // B
+    {0x2a, 0x2e, 0xaa}, // C
+    {0x2a, 0x20, 0xaa}, // D
+    {0x2a, 0x12, 0xaa}, // E
+    {0x2a, 0x21, 0xaa}, // F
+    {0x2a, 0x22, 0xaa}, // G
+    {0x2a, 0x23, 0xaa}, // H
+    {0x2a, 0x17, 0xaa}, // I
+    {0x2a, 0x24, 0xaa}, // J
+    {0x2a, 0x25, 0xaa}, // K
+    {0x2a, 0x26, 0xaa}, // L
+    {0x2a, 0x32, 0xaa}, // M
+    {0x2a, 0x31, 0xaa}, // N
+    {0x2a, 0x18, 0xaa}, // O
 
     /* 0x50 */
-    NO,   // P
-    NO,   // Q
-    NO,   // R
-    NO,   // S
-    NO,   // T
-    NO,   // U
-    NO,   // V
-    NO,   // W
-    NO,   // X
-    NO,   // Y
-    NO,   // Z
-    0x1a, // [
-    0x2b, // backslash
-    0x1b, // ]
-    NO,   // ^
-    NO,   // _
+    {0x2a, 0x19, 0xaa}, // P
+    {0x2a, 0x10, 0xaa}, // Q
+    {0x2a, 0x13, 0xaa}, // R
+    {0x2a, 0x1f, 0xaa}, // S
+    {0x2a, 0x14, 0xaa}, // T
+    {0x2a, 0x16, 0xaa}, // U
+    {0x2a, 0x2f, 0xaa}, // V
+    {0x2a, 0x11, 0xaa}, // W
+    {0x2a, 0x2d, 0xaa}, // X
+    {0x2a, 0x15, 0xaa}, // Y
+    {0x2a, 0x2c, 0xaa}, // Z
+    {0x1a, NO, NO},     // [
+    {0x2b, NO, NO},     // backslash
+    {0x1b, NO, NO},     // ]
+    {0x2a, 0x07, 0xaa}, // ^
+    {0x2a, 0x0c, 0xaa}, // _
 
     /* 0x60 */
-    0x29, // `
-    0x1e, // a
-    0x30, // b
-    0x2e, // c
-    0x20, // d
-    0x12, // e
-    0x21, // f
-    0x22, // g
-    0x23, // h
-    0x17, // i
-    0x24, // j
-    0x25, // k
-    0x26, // l
-    0x32, // m
-    0x31, // n
-    0x18, // o
+    {0x29, NO, NO}, // `
+    {0x1e, NO, NO}, // a
+    {0x30, NO, NO}, // b
+    {0x2e, NO, NO}, // c
+    {0x20, NO, NO}, // d
+    {0x12, NO, NO}, // e
+    {0x21, NO, NO}, // f
+    {0x22, NO, NO}, // g
+    {0x23, NO, NO}, // h
+    {0x17, NO, NO}, // i
+    {0x24, NO, NO}, // j
+    {0x25, NO, NO}, // k
+    {0x26, NO, NO}, // l
+    {0x32, NO, NO}, // m
+    {0x31, NO, NO}, // n
+    {0x18, NO, NO}, // o
 
     /* 0x70 */
-    0x19, // p
-    0x10, // q
-    0x13, // r
-    0x1f, // s
-    0x14, // t
-    0x16, // u
-    0x2f, // v
-    0x11, // w
-    0x2d, // x
-    0x15, // y
-    0x2c, // z
-    NO,   // {
-    NO,   // |
-    NO,   // }
-    NO,   // ~
-    0x0e  // delete character
+    {0x19, NO, NO},     // p
+    {0x10, NO, NO},     // q
+    {0x13, NO, NO},     // r
+    {0x1f, NO, NO},     // s
+    {0x14, NO, NO},     // t
+    {0x16, NO, NO},     // u
+    {0x2f, NO, NO},     // v
+    {0x11, NO, NO},     // w
+    {0x2d, NO, NO},     // x
+    {0x15, NO, NO},     // y
+    {0x2c, NO, NO},     // z
+    {0x2a, 0x1a, 0xaa}, // {
+    {0x2a, 0x2b, 0xaa}, // |
+    {0x2a, 0x1b, 0xaa}, // }
+    {0x2a, 0x29, 0xaa}, // ~
+    {0x0e, NO, NO}      // delete character
 };
 
 KBD *kbd;
@@ -210,19 +210,25 @@ static int append_to_buf(uint8_t c)
 {
     if (c < 1 || c > 127)
         return 0;
-    uint8_t sc = scmap[c];
-    if (!sc)
-        return 0;
-    kbd->buf[kbd->buf_index] = sc;
-    if (kbd->buf_index > 254)
+    int i;
+    int pushed = 0;
+    for (i = 0; i < 3; i++)
     {
-        kbd->buf_index = 0;
+        if (scmap[c][i])
+        {
+            pushed = 1;
+            kbd->buf[kbd->buf_index] = scmap[c][i];
+            if (kbd->buf_index > 254)
+            {
+                kbd->buf_index = 0;
+            }
+            else
+            {
+                kbd->buf_index += 1;
+            }
+        }
     }
-    else
-    {
-        kbd->buf_index += 1;
-    }
-    return 1;
+    return pushed;
 }
 
 static void *kbd_loop()
